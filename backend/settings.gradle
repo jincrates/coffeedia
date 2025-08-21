@@ -1,7 +1,16 @@
 rootProject.name = 'coffeedia'
 
-file('modules').eachDir { dir ->
-    def moduleName = dir.name
-    include moduleName
-    project(":$moduleName").projectDir = dir
+def modulePaths = [
+        "modules/domain",
+        "modules/application/usecase",
+        "modules/application/port",
+        "modules/infrastructure",
+        "modules/bootstrap",
+        "modules/common",
+]
+
+modulePaths.each { path ->
+    def module = path.replace('modules/', '').replace('/', ':')
+    include module
+    project(":$module").projectDir = file(path)
 }
