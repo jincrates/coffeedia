@@ -1,0 +1,96 @@
+plugins {
+    id "java"
+    id "org.springframework.boot" version "${springBootVersion}"
+    id "io.spring.dependency-management" version "${springDependencyManagementVersion}"
+    id("dev.iurysouza.modulegraph") version "${moduleGraphVersion}"
+    id 'jacoco'
+}
+
+// 프로젝트 공통 설정
+allprojects {
+    group = "${projectGroup}"
+    version = "${applicationVersion}"
+
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of("${javaVersion}")
+        }
+    }
+
+    repositories {
+        mavenCentral()
+    }
+
+    // plain jar는 생성되지 않도록
+    jar.enabled = false
+}
+
+// 각 서브 프로젝트 공통 설정
+subprojects {
+    apply plugin: "java-library"
+    apply plugin: "org.springframework.boot"
+    apply plugin: "io.spring.dependency-management"
+    apply plugin: 'jacoco'
+
+    configurations {
+        compileOnly {
+            extendsFrom annotationProcessor
+        }
+    }
+
+    dependencyManagement {
+        imports {
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+        }
+    }
+
+    dependencies {
+        // lombok
+        compileOnly "org.projectlombok:lombok:${lombokVersion}"
+        annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+
+        // macOS에서 네이티브 DNS 해결을 위한 Netty 의존성
+        implementation "io.netty:netty-resolver-dns-native-macos:${nettyVersion}:osx-aarch_64"
+
+        // test
+        testImplementation platform("org.junit:junit-bom:${junitBomVersion}")
+        testImplementation 'org.junit.jupiter:junit-jupiter'
+    }
+
+    test {
+        useJUnitPlatform()
+        finalizedBy jacocoTestReport
+    }
+
+    // jacoco
+    jacoco {
+        toolVersion = "${jacocoVersion}"
+    }
+
+    jacocoTestReport {
+        dependsOn test
+        reports {
+            xml.required = true
+            csv.required = false
+            html.required = false
+        }
+
+        // report 제외대상 지정
+        afterEvaluate {
+            classDirectories.setFrom(
+                    files(classDirectories.files.collect {
+                        fileTree(dir: it, exclude: [
+                                '**/generated/**',
+                                "**/*Application.class"
+                        ])
+                    })
+            )
+        }
+    }
+}
+
+moduleGraphConfig {
+    readmePath.set("${rootDir}/README.md")
+    heading.set("### Module Graph")
+    showFullPath.set(false)
+}
