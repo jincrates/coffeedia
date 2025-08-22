@@ -4,16 +4,10 @@ spring:
   sql:
     init:
       mode: always
-      schema-locations: classpath:testdb/schema.sql
-      data-locations: classpath:testdb/data.sql
+      schema-locations: classpath:db/schema.sql
+      data-locations: classpath:db/data.sql
 
   datasource:
     driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
 
-#logging:
-#  level:
-#    org.springframework.test: DEBUG
-#    org.testcontainers: INFO
-#    org.hibernate: DEBUG
-#    org.hibernate.SQL: DEBUG
-#    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+

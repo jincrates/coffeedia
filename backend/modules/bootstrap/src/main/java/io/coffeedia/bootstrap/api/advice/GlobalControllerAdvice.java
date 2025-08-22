@@ -1,6 +1,6 @@
-package io.coffeedia.boostrap.api.advice;
+package io.coffeedia.bootstrap.api.advice;
 
-import io.coffeedia.boostrap.api.dto.BaseResponse;
+import io.coffeedia.bootstrap.api.dto.BaseResponse;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;

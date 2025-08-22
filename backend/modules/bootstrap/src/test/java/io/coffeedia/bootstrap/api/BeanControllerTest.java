@@ -1,6 +1,6 @@
-package io.coffeedia.boostrap.api;
+package io.coffeedia.bootstrap.api;
 
-import io.coffeedia.boostrap.IntegrationSupportTest;
+import io.coffeedia.bootstrap.IntegrationSupportTest;
 import java.time.LocalDate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;

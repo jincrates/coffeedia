@@ -1,4 +1,4 @@
-package io.coffeedia.boostrap;
+package io.coffeedia.bootstrap;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

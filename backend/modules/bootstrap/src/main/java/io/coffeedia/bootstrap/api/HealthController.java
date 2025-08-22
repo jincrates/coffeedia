@@ -1,4 +1,4 @@
-package io.coffeedia.boostrap.api;
+package io.coffeedia.bootstrap.api;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.env.Environment;

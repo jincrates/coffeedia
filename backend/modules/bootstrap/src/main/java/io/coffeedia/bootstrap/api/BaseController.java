@@ -1,6 +1,6 @@
-package io.coffeedia.boostrap.api;
+package io.coffeedia.bootstrap.api;
 
-import io.coffeedia.boostrap.api.dto.BaseResponse;
+import io.coffeedia.bootstrap.api.dto.BaseResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;

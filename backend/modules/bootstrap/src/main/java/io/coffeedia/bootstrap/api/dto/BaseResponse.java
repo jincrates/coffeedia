@@ -1,4 +1,4 @@
-package io.coffeedia.boostrap.api.dto;
+package io.coffeedia.bootstrap.api.dto;
 
 public record BaseResponse<T>(
     boolean success,

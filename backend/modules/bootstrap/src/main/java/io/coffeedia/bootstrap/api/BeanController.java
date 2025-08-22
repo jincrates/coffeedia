@@ -1,9 +1,9 @@
-package io.coffeedia.boostrap.api;
+package io.coffeedia.bootstrap.api;
 
 import io.coffeedia.application.usecase.CreateBeanUseCase;
 import io.coffeedia.application.usecase.dto.CreateBeanCommand;
 import io.coffeedia.application.usecase.dto.CreateBeanResponse;
-import io.coffeedia.boostrap.api.dto.BaseResponse;
+import io.coffeedia.bootstrap.api.dto.BaseResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
