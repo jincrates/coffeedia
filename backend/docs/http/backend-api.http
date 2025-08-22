@@ -1,0 +1,29 @@
+### 원두 등록
+< {%
+  // 과거 1년 내의 랜덤한 날짜 생성
+  const today = new Date();
+  const oneYearAgo = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
+  const randomTime = oneYearAgo.getTime() + Math.random() * (today.getTime() - oneYearAgo.getTime());
+  const randomDate = new Date(randomTime);
+  const formattedDate = randomDate.toISOString().split('T')[0]; // YYYY-MM-DD 형식
+
+  request.variables.set("randomRoastDate", formattedDate);
+%}
+POST{{backend-api}}/api/beans
+Content-Type: application/json
+
+{
+  "name": "{{$random.commerce.productName}}",
+  "origin": {
+    "country": "{{$random.address.country}}",
+    "region": "{{$random.address.cityName}}"
+  },
+  "roaster": "{{$random.ancient.god}}",
+  "roastDate": "{{randomRoastDate}}",
+  "grams": {{$random.integer(100, 500)}},
+  "flavorIds": [
+    {{$random.integer(1, 10)}},
+    {{$random.integer(1, 10)}},
+    {{$random.integer(1, 10)}}
+  ]
+}
