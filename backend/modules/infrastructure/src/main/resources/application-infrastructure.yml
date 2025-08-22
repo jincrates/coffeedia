@@ -1,0 +1,60 @@
+spring.profiles.active: local
+
+spring:
+  sql:
+    init:
+      mode: never
+
+  datasource:
+    main:
+      hikari:
+        maximum-pool-size: 20
+        minimum-idle: 5
+        connection-timeout: 20000
+        idle-timeout: 300000
+        pool-name: MainHikariPool
+
+    replica:
+      hikari:
+        maximum-pool-size: 10
+        minimum-idle: 3
+        connection-timeout: 20000
+        idle-timeout: 300000
+        pool-name: ReplicaHikariPool
+
+---
+spring.config.activate.on-profile: local
+
+spring:
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:db/schema.sql
+      data-locations: classpath:db/data.sql
+
+  datasource:
+    main:
+      hikari:
+        driver-class-name: org.postgresql.Driver
+        jdbc-url: jdbc:postgresql://localhost:5432/coffeedia_db
+        username: user
+        password: password
+    replica:
+      hikari:
+        driver-class-name: org.postgresql.Driver
+        jdbc-url: jdbc:postgresql://localhost:5433/coffeedia_db
+        username: user
+        password: password
+
+#logging:
+#  level:
+#    org.springframework.jdbc.core.JdbcTemplate: DEBUG
+#    org.springframework.jdbc.core.StatementCreatorUtils: TRACE
+#    org.springframework.jdbc.datasource.DataSourceTransactionManager: DEBUG
+#    org.springframework.data.jdbc: DEBUG
+
+---
+spring.config.activate.on-profile: dev
+
+---
+spring.config.activate.on-profile: prod
