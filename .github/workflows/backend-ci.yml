@@ -1,0 +1,93 @@
+name: CI - Backend Test & Coverage
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+    paths: [ "backend/**" ]
+
+permissions:
+  contents: read
+  pull-requests: write
+  security-events: write
+
+env:
+  ROOT_DIR: backend
+
+jobs:
+  test:
+    name: Run Test # 작업의 이름
+    runs-on: ubuntu-22.04 # 작업이 실행도리 머신의 유형
+    timeout-minutes: 15 # 최대 실행 시간 설정
+    steps:
+      # 저장소 체크아웃
+      - name: Checkout Repository
+        uses: actions/checkout@v4 # 깃 저장소의 코드를 체크아웃하는 액션을 사용
+
+      # JDK 21 설치
+      - name: Set Up JDK 21
+        uses: actions/setup-java@v4 # 자바 런타임을 설치하고 설정
+        with: # 사용할 버전, 배포, 캐시 유형을 정의
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+
+      # Gradle 캐시 적용
+      - name: Cache Gradle Packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      # Docker 서비스 확인 및 대기
+      - name: Verify Docker Service
+        run: |
+          docker --version
+          docker info
+          echo "Docker is ready"
+
+      # 테스트 실행
+      - name: Run Tests
+        env:
+          SPRING_PROFILES_ACTIVE: test
+        #          TESTCONTAINERS_RYUK_DISABLED: true
+        #          TESTCONTAINERS_CHECKS_DISABLE: true
+        #          DOCKER_HOST: unix:///var/run/docker.sock
+        run: |
+          cd ${{env.ROOT_DIR}}
+          chmod +x ./gradlew
+          ./gradlew --no-daemon :clean :test
+
+      # 컨테이너 정리
+      - name: Clean up containers
+        if: always()
+        run: |
+          docker container prune -f || true
+          docker volume prune -f || true
+
+      - name: Collect Jacoco Report Paths
+        id: collect-paths
+        run: |
+          JACOCO_PATHS=$(find . -type f -name 'jacocoTestReport.xml' | paste -sd "," -)
+          echo "paths=$JACOCO_PATHS" >> $GITHUB_OUTPUT
+
+      # 테스트 커버리지 결과 생성
+      - name: Generate Coverage Report
+        id: jacoco
+        uses: madrapps/jacoco-report@v1.5
+        with:
+          title: 📊 Test Coverage Report
+          paths: ${{ steps.collect-paths.outputs.paths }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          min-coverage-overall: 80 # 프로젝트 전체 테스트 커버리지에 대한 최소 코드 커버리지 기준(기본값 80)
+          min-coverage-changed-files: 80 # 변경된 파일에 대한 최소 코드 커버리지 기준(기본값 80)
+          update-comment: true # 새로 코멘트를 추가하지 않고 기존 코멘트를 업데이트(기본값: false)
+
+      # 테스트 커버리지 결과 요약
+      - name: Coverage Summary
+        run: |
+          echo "✅ Overall Coverage: ${{ steps.jacoco.outputs.coverage-overall }}%"
+          echo "✅ Changed Files Coverage: ${{ steps.jacoco.outputs.coverage-changed-files }}%"
