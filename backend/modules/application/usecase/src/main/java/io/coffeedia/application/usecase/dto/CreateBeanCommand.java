@@ -6,6 +6,7 @@ import io.coffeedia.domain.vo.BlendType;
 import io.coffeedia.domain.vo.Origin;
 import io.coffeedia.domain.vo.ProcessType;
 import io.coffeedia.domain.vo.RoastLevel;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -16,6 +17,7 @@ public record CreateBeanCommand(
     @NotBlank(message = "원두 이름은 필수입니다.")
     String name,
     @NotNull(message = "원두 원산지는 필수입니다.")
+    @Valid
     Origin origin,
     @NotBlank(message = "원두 로스터는 필수입니다.")
     String roaster,

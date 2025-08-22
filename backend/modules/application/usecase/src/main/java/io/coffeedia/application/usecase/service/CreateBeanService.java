@@ -9,6 +9,7 @@ import io.coffeedia.application.usecase.mapper.BeanMapper;
 import io.coffeedia.domain.event.BeanEvent.BeanCreated;
 import io.coffeedia.domain.model.Bean;
 import io.coffeedia.domain.model.Flavor;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -37,6 +38,7 @@ class CreateBeanService implements CreateBeanUseCase {
         eventPublisher.publishEvent(
             BeanCreated.builder()
                 .beanId(created.id())
+                .issuedAt(LocalDateTime.now())
                 .build()
         );
 
