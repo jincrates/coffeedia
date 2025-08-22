@@ -59,7 +59,7 @@ jobs:
         run: |
           cd ${{env.ROOT_DIR}}
           chmod +x ./gradlew
-          ./gradlew --no-daemon :clean :test
+          ./gradlew --no-daemon clean test
 
       # 컨테이너 정리
       - name: Clean up containers

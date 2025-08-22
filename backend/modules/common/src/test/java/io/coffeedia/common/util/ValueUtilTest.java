@@ -6,6 +6,9 @@ import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class ValueUtilTest {
 
@@ -30,6 +33,20 @@ class ValueUtilTest {
         );
 
         assertThat(result).isEqualTo("new");
+    }
+
+    @ParameterizedTest
+    @DisplayName("새 문자열이 null이거나 공백이면 기존 문자열을 반환한다")
+    @NullSource
+    @ValueSource(strings = {"", " ", "   "})
+    void whenNewStringIsNullOrBlank_thenExistingStringIsReturned(String newString) {
+        String existingValue = "existing";
+        String result = ValueUtil.defaultIfBlank(
+            newString,
+            existingValue
+        );
+
+        assertThat(result).isEqualTo(existingValue);
     }
 
     @Test
@@ -60,22 +77,29 @@ class ValueUtilTest {
     }
 
     @Test
-    @DisplayName("새 컬렉션이 null이거나 비어 있으면 기존 컬렉션을 반환한다")
-    void whenNewCollectionIsNullOrEmpty_thenExistingCollectionIsReturned() {
+    @DisplayName("새 컬렉션이 null이면 기존 컬렉션을 반환한다")
+    void whenNewCollectionIsNull_thenExistingCollectionIsReturned() {
         List<String> existingList = List.of("existing");
-        List<String> result1 = ValueUtil.defaultIfNullOrEmpty(
+        List<String> result = ValueUtil.defaultIfNullOrEmpty(
             null,
             existingList
         );
-        List<String> result2 = ValueUtil.defaultIfNullOrEmpty(
+
+        assertThat(result).isEqualTo(existingList);
+    }
+
+    @Test
+    @DisplayName("새 컬렉션이 비어 있으면 기존 컬렉션을 반환한다")
+    void whenNewCollectionIsEmpty_thenExistingCollectionIsReturned() {
+        List<String> existingList = List.of("existing");
+        List<String> result = ValueUtil.defaultIfNullOrEmpty(
             Collections.emptyList(),
             existingList
         );
 
-        assertThat(result1).isEqualTo(existingList);
-        assertThat(result2).isEqualTo(existingList);
+        assertThat(result).isEqualTo(existingList);
     }
-
+    
     @Test
     @DisplayName("새 컬렉션이 비어 있지 않으면 새 컬렉션을 반환한다")
     void whenNewCollectionIsNotEmpty_thenNewCollectionIsReturned() {
