@@ -3,8 +3,8 @@ package io.coffeedia.application.usecase.service;
 import io.coffeedia.application.port.repository.BeanRepositoryPort;
 import io.coffeedia.application.port.repository.FlavorRepositoryPort;
 import io.coffeedia.application.usecase.CreateBeanUseCase;
+import io.coffeedia.application.usecase.dto.BeanResponse;
 import io.coffeedia.application.usecase.dto.CreateBeanCommand;
-import io.coffeedia.application.usecase.dto.CreateBeanResponse;
 import io.coffeedia.application.usecase.mapper.BeanMapper;
 import io.coffeedia.domain.event.BeanEvent.BeanCreated;
 import io.coffeedia.domain.model.Bean;
@@ -29,7 +29,7 @@ class CreateBeanService implements CreateBeanUseCase {
 
     @Override
     @Transactional
-    public CreateBeanResponse invoke(final CreateBeanCommand command) {
+    public BeanResponse invoke(final CreateBeanCommand command) {
         List<Flavor> flavors = validateFlavors(command.flavorIds());
 
         Bean bean = BeanMapper.toDomain(command, flavors);

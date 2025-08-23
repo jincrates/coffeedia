@@ -84,7 +84,9 @@ subprojects {
                     files(classDirectories.files.collect {
                         fileTree(dir: it, exclude: [
                                 '**/generated/**',
-                                "**/*Application.class"
+                                "**/config/**",
+                                "**/Application.class",
+                                "**/GlobalControllerAdvice.class"
                         ])
                     })
             )

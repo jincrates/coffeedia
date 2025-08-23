@@ -5,12 +5,13 @@ import io.coffeedia.domain.model.Flavor;
 import io.coffeedia.domain.vo.Origin;
 import io.coffeedia.infrastructure.persistence.jdbc.entity.BeanFlavorJdbcEntity;
 import io.coffeedia.infrastructure.persistence.jdbc.entity.BeanJdbcEntity;
+import io.coffeedia.infrastructure.persistence.jdbc.entity.FlavorJdbcEntity;
 import java.util.List;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class BeanJdbcMapper {
-
-    private BeanJdbcMapper() {
-    }
 
     public static BeanJdbcEntity toEntity(final Bean bean) {
         return BeanJdbcEntity.builder()
@@ -66,13 +67,26 @@ public class BeanJdbcMapper {
             .toList();
     }
 
-    private static BeanFlavorJdbcEntity toEntity(
+    public static BeanFlavorJdbcEntity toEntity(
         final BeanJdbcEntity bean,
         final Flavor flavor
     ) {
         return BeanFlavorJdbcEntity.builder()
             .beanId(bean.id())
             .flavorId(flavor.id())
+            .build();
+    }
+
+    public static List<Flavor> toDomain(final List<FlavorJdbcEntity> flavors) {
+        return flavors.stream()
+            .map(BeanJdbcMapper::toDomain)
+            .toList();
+    }
+
+    public static Flavor toDomain(final FlavorJdbcEntity flavor) {
+        return Flavor.builder()
+            .id(flavor.id())
+            .name(flavor.name())
             .build();
     }
 }

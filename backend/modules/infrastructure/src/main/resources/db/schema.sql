@@ -36,7 +36,5 @@ CREATE TABLE IF NOT EXISTS bean_flavors
     id        BIGSERIAL PRIMARY KEY,
     bean_id   BIGINT NOT NULL,
     flavor_id BIGINT NOT NULL,
-    CONSTRAINT fk_bean_flavors_bean FOREIGN KEY (bean_id) REFERENCES beans (id) ON DELETE CASCADE,
-    CONSTRAINT fk_bean_flavors_flavor FOREIGN KEY (flavor_id) REFERENCES flavors (id) ON DELETE CASCADE,
     UNIQUE (bean_id, flavor_id)
 );

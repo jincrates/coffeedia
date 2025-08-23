@@ -31,7 +31,7 @@ graph LR
   :domain -->|api| :common
   :infrastructure -->|api| :application:port
   :bootstrap -->|implementation| :application:usecase
-  :bootstrap -->|runtimeOnly| :infrastructure
+  :bootstrap -->|implementation| :infrastructure
   :application:usecase -->|api| :domain
   :application:usecase -->|api| :application:port
   :application:port -->|api| :domain

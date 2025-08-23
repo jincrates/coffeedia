@@ -72,6 +72,7 @@ jobs:
         id: collect-paths
         run: |
           JACOCO_PATHS=$(find . -type f -name 'jacocoTestReport.xml' | paste -sd "," -)
+          echo "JaCoCo Paths: $JACOCO_PATHS"
           echo "paths=$JACOCO_PATHS" >> $GITHUB_OUTPUT
 
       # 테스트 커버리지 결과 생성
@@ -79,7 +80,7 @@ jobs:
         id: jacoco
         uses: madrapps/jacoco-report@v1.5
         with:
-          title: 📊 Test Coverage Report
+          title: 📊 JaCoCo Coverage Report
           paths: ${{ steps.collect-paths.outputs.paths }}
           token: ${{ secrets.GITHUB_TOKEN }}
           min-coverage-overall: 80 # 프로젝트 전체 테스트 커버리지에 대한 최소 코드 커버리지 기준(기본값 80)
@@ -89,5 +90,5 @@ jobs:
       # 테스트 커버리지 결과 요약
       - name: Coverage Summary
         run: |
-          echo "✅ Overall Coverage: ${{ steps.jacoco.outputs.coverage-overall }}%"
+          echo "✅ Total Project Coverage: ${{ steps.jacoco.outputs.coverage-overall }}%"
           echo "✅ Changed Files Coverage: ${{ steps.jacoco.outputs.coverage-changed-files }}%"
