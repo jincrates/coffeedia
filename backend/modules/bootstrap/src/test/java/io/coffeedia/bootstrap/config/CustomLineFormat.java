@@ -86,6 +86,9 @@ public class CustomLineFormat implements MessageFormattingStrategy {
                 if (lowerWord.equals("from")) {
                     result.append("  ");
                 }
+                if (lowerWord.equals("set")) {
+                    result.append("   ");
+                }
                 if (lowerWord.equals("where")) {
                     result.append(" ");
                 }
@@ -93,6 +96,12 @@ public class CustomLineFormat implements MessageFormattingStrategy {
 
             // SELECT 절에서 콤마 후 줄바꿈
             if (word.endsWith(",") && isInSelectClause(lowerWords, i)) {
+                result.append(word).append("\n       ");
+                continue;
+            }
+
+            // UPDATE 절에서 콤마 후 줄바꿈
+            if (word.endsWith(",") && isInUpdateClause(lowerWords, i)) {
                 result.append(word).append("\n       ");
                 continue;
             }
@@ -130,7 +139,8 @@ public class CustomLineFormat implements MessageFormattingStrategy {
             lowerWord.equals("insert") ||
             lowerWord.equals("update") ||
             lowerWord.equals("delete") ||
-            lowerWord.equals("values");
+            lowerWord.equals("values") ||
+            lowerWord.equals("set");
     }
 
     private boolean isInSelectClause(String[] lowerWords, int currentIndex) {
@@ -140,6 +150,19 @@ public class CustomLineFormat implements MessageFormattingStrategy {
             if (lowerWords[i].equals("select")) {
                 afterSelect = true;
             } else if (lowerWords[i].equals("from")) {
+                afterSelect = false;
+            }
+        }
+        return afterSelect;
+    }
+
+    private boolean isInUpdateClause(String[] lowerWords, int currentIndex) {
+        // UPDATE 이후이고 WHERE 이전인지 확인
+        boolean afterSelect = false;
+        for (int i = 0; i < currentIndex; i++) {
+            if (lowerWords[i].equals("update")) {
+                afterSelect = true;
+            } else if (lowerWords[i].equals("where")) {
                 afterSelect = false;
             }
         }
