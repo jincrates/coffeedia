@@ -9,7 +9,7 @@
 
   request.variables.set("randomRoastDate", formattedDate);
 %}
-POST{{backend-api}}/api/beans
+POST {{backend-api}}/api/beans
 Content-Type: application/json
 
 {
@@ -26,4 +26,20 @@ Content-Type: application/json
     {{$random.integer(1, 10)}},
     {{$random.integer(1, 10)}}
   ]
+}
+
+> {%
+  client.log('beanId', response.body.data.beanId);
+  client.global.set("beanId", response.body.data.beanId);
+%}
+
+### 원두 조회
+GET {{backend-api}}/api/beans/{{beanId}}
+
+### 원두 수정
+PUT {{backend-api}}/api/beans/{{beanId}}
+Content-Type: application/json
+
+{
+ "name": "{{$random.commerce.productName}}"
 }

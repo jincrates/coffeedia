@@ -3,7 +3,7 @@ jar.enabled = false
 
 dependencies {
     implementation project(":application:usecase")
-    runtimeOnly project(":infrastructure")
+    implementation project(":infrastructure")
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")

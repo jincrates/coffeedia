@@ -12,4 +12,12 @@ public interface BeanEvent extends DomainEvent {
     ) implements BeanEvent {
 
     }
+
+    @Builder
+    record BeanUpdated(
+        Long beanId,
+        LocalDateTime issuedAt
+    ) implements BeanEvent {
+
+    }
 }

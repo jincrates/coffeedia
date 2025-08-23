@@ -5,5 +5,5 @@ import io.coffeedia.application.usecase.dto.CreateBeanCommand;
 
 public interface CreateBeanUseCase {
 
-    BeanResponse invoke(CreateBeanCommand command);
+    BeanResponse invoke(final CreateBeanCommand command);
 }

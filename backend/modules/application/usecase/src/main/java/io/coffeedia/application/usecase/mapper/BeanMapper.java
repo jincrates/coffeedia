@@ -1,8 +1,11 @@
 package io.coffeedia.application.usecase.mapper;
 
+import static io.coffeedia.common.util.ValueUtil.defaultIfNull;
+
 import io.coffeedia.application.usecase.dto.BeanResponse;
 import io.coffeedia.application.usecase.dto.CreateBeanCommand;
 import io.coffeedia.application.usecase.dto.FlavorResponse;
+import io.coffeedia.application.usecase.dto.UpdateBeanCommand;
 import io.coffeedia.domain.model.Bean;
 import io.coffeedia.domain.model.Flavor;
 import java.util.List;
@@ -61,6 +64,27 @@ public class BeanMapper {
         return FlavorResponse.builder()
             .id(flavor.id())
             .name(flavor.name())
+            .build();
+    }
+
+    public static Bean toDomain(final UpdateBeanCommand command, final Bean existing) {
+        return Bean.builder()
+            .id(existing.id())
+            .name(defaultIfNull(command.name(), existing.name()))
+            .origin(defaultIfNull(command.origin(), existing.origin()))
+            .roaster(defaultIfNull(command.roaster(), existing.roaster()))
+            .roastDate(defaultIfNull(command.roastDate(), existing.roastDate()))
+            .grams(defaultIfNull(command.grams(), existing.grams()))
+            .roastLevel(defaultIfNull(command.roastLevel(), existing.roastLevel()))
+            .processType(defaultIfNull(command.processType(), existing.processType()))
+            .blendType(defaultIfNull(command.blendType(), existing.blendType()))
+            .isDecaf(defaultIfNull(command.isDecaf(), existing.isDecaf()))
+            .flavors(existing.flavors())
+            .memo(defaultIfNull(command.memo(), existing.memo()))
+            .status(defaultIfNull(command.status(), existing.status()))
+            .accessType(defaultIfNull(command.accessType(), existing.accessType()))
+            .createdAt(existing.createdAt())
+            .updatedAt(existing.updatedAt())  // 기존값을 넣어줘도 Auditing으로 최신화됨
             .build();
     }
 }

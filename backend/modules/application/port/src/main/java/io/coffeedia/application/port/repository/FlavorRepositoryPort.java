@@ -6,5 +6,5 @@ import java.util.Set;
 
 public interface FlavorRepositoryPort {
 
-    List<Flavor> findAllByIds(Set<Long> ids);
+    List<Flavor> findAllByIds(final Set<Long> ids);
 }
