@@ -1,5 +1,18 @@
 # coffeedia-backend
+
 coffee + encyclopedia
+
+
+<br/>
+
+## 기술스택
+
+![Generic badge](https://img.shields.io/badge/21-OpenJDK-537E99.svg)
+![Generic badge](https://img.shields.io/badge/3.5.4-SpringBoot-6DB33F.svg)
+![Generic badge](https://img.shields.io/badge/14-PosgreSQL-01578B.svg)
+![Generic badge](https://img.shields.io/badge/5.0-JUnit-DD524A.svg)
+
+<br/>
 
 ### Module Graph
 
@@ -15,18 +28,11 @@ graph LR
     :application:port["port"]
     :application:usecase["usecase"]
   end
-  :application:port --> :common
-  :application:port --> :domain
-  :infrastructure --> :common
-  :infrastructure --> :domain
-  :infrastructure --> :application:port
-  :domain --> :common
-  :bootstrap --> :common
-  :bootstrap --> :domain
-  :bootstrap --> :application:usecase
-  :bootstrap --> :application:port
-  :bootstrap --> :infrastructure
-  :application:usecase --> :common
-  :application:usecase --> :domain
-  :application:usecase --> :application:port
+  :domain -->|api| :common
+  :infrastructure -->|api| :application:port
+  :bootstrap -->|implementation| :application:usecase
+  :bootstrap -->|runtimeOnly| :infrastructure
+  :application:usecase -->|api| :domain
+  :application:usecase -->|api| :application:port
+  :application:port -->|api| :domain
 ```

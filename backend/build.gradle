@@ -21,8 +21,7 @@ allprojects {
         mavenCentral()
     }
 
-    // plain jar는 생성되지 않도록
-    jar.enabled = false
+    bootJar.enabled = false
 }
 
 // 각 서브 프로젝트 공통 설정
@@ -56,9 +55,9 @@ subprojects {
         implementation "io.netty:netty-resolver-dns-native-macos:${nettyVersion}:osx-aarch_64"
 
         // test
-        testImplementation("org.springframework.boot:spring-boot-starter-test")
         testImplementation platform("org.junit:junit-bom:${junitBomVersion}")
         testImplementation 'org.junit.jupiter:junit-jupiter'
+        testImplementation 'org.assertj:assertj-core'
     }
 
     test {

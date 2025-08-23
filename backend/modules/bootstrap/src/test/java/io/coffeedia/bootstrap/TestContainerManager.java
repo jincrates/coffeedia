@@ -9,7 +9,7 @@ public final class TestContainerManager {
     }
 
     // image
-    private static final String POSTGRES_IMAGE = "postgres:15";
+    private static final String POSTGRES_IMAGE = "postgres:14";
 
     public static final PostgreSQLContainer<?> POSTGRES_CONTAINER =
         new PostgreSQLContainer<>(POSTGRES_IMAGE)
