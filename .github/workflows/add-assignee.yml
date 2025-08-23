@@ -1,0 +1,23 @@
+name: Auto Assign PR
+
+on:
+  pull_request:
+    types: [ opened, synchronize ]
+    branches: [ main, develop ]
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  assign:
+    name: Auto Assign PR
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Auto Assign PR to Author
+        run: |
+          gh pr edit ${{ github.event.pull_request.number }} \
+            --add-assignee ${{ github.actor }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

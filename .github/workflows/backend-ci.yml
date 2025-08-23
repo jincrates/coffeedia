@@ -92,12 +92,3 @@ jobs:
         run: |
           echo "✅ Total Project Coverage: ${{ steps.jacoco.outputs.coverage-overall }}%"
           echo "✅ Changed Files Coverage: ${{ steps.jacoco.outputs.coverage-changed-files }}%"
-
-      # PR에 Assignee 자동 할당
-      - name: Auto Assign PR to Author
-        if: github.event_name == 'pull_request'
-        run: |
-          gh pr edit ${{ github.event.pull_request.number }} \
-            --add-assignee ${{ github.actor }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
