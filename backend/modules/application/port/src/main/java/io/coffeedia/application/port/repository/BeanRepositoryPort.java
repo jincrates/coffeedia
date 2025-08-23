@@ -10,4 +10,6 @@ public interface BeanRepositoryPort {
     Bean update(final Bean bean);
 
     Optional<Bean> findById(final Long beanId);
+
+    void deleteAll();
 }

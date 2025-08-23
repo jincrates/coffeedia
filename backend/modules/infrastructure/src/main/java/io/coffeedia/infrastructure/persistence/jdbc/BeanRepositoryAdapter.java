@@ -48,6 +48,12 @@ class BeanRepositoryAdapter implements BeanRepositoryPort {
             .map(it -> BeanJdbcMapper.toDomain(it, flavors));
     }
 
+    @Override
+    public void deleteAll() {
+        beanFlavorRepository.deleteAll();
+        beanRepository.deleteAll();
+    }
+
     private List<Flavor> findFlavors(final Long beanId) {
         List<Long> flavorIds = findFlavorIds(beanId);
         return flavorRepository.findAllById(flavorIds).stream()

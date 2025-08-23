@@ -2,10 +2,8 @@ package io.coffeedia.bootstrap;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.ComponentScan;
 
-@ComponentScan(basePackages = "io.coffeedia")
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "io.coffeedia")
 public class Application {
 
     public static void main(String[] args) {
