@@ -71,7 +71,9 @@ jobs:
       - name: Collect Jacoco Report Paths
         id: collect-paths
         run: |
+          cd ${{env.ROOT_DIR}}
           JACOCO_PATHS=$(find . -type f -name 'jacocoTestReport.xml' | paste -sd "," -)
+          echo "Found JaCoCo reports: $JACOCO_PATHS"
           echo "paths=$JACOCO_PATHS" >> $GITHUB_OUTPUT
 
       # 테스트 커버리지 결과 생성

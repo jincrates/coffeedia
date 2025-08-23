@@ -17,11 +17,6 @@ class BeanControllerTest extends IntegrationSupportTest {
     @DisplayName("원두 등록")
     class CreateBeanTest {
 
-        @BeforeEach
-        void setUp() {
-            System.out.println("====================== CreateBeanTest =========================");
-        }
-
         @Test
         @DisplayName("필수 정보만으로도 원두가 정상적으로 등록된다")
         void createBeanWithRequiredFieldsOnly() {
