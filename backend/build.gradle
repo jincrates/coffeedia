@@ -85,7 +85,8 @@ subprojects {
                         fileTree(dir: it, exclude: [
                                 '**/generated/**',
                                 "**/config/**",
-                                "**/*Application.class"
+                                "**/Application.class",
+                                "**/GlobalControllerAdvice.class"
                         ])
                     })
             )

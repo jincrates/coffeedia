@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 abstract class BaseController {
 
     protected <T> ResponseEntity<BaseResponse<T>> ok(T data) {
-        return buildResponse(
+        return response(
             HttpStatus.OK,
             null,
             data
@@ -16,50 +16,14 @@ abstract class BaseController {
     }
 
     protected <T> ResponseEntity<BaseResponse<T>> created(T data) {
-        return buildResponse(
+        return response(
             HttpStatus.CREATED,
             null,
             data
         );
     }
 
-    protected <T> ResponseEntity<BaseResponse<T>> noContent() {
-        return buildResponse(
-            HttpStatus.NO_CONTENT,
-            null,
-            null
-        );
-    }
-
-    protected <T> ResponseEntity<BaseResponse<T>> badRequest(String message) {
-        return buildResponse(
-            HttpStatus.BAD_REQUEST,
-            message,
-            null
-        );
-    }
-
-    protected <T> ResponseEntity<BaseResponse<T>> error(String message) {
-        return buildResponse(
-            HttpStatus.INTERNAL_SERVER_ERROR,
-            message,
-            null
-        );
-    }
-
     protected <T> ResponseEntity<BaseResponse<T>> response(
-        HttpStatus status,
-        String message,
-        T data
-    ) {
-        return buildResponse(
-            status,
-            message,
-            data
-        );
-    }
-
-    private <T> ResponseEntity<BaseResponse<T>> buildResponse(
         HttpStatusCode httpStatus,
         String message,
         T data

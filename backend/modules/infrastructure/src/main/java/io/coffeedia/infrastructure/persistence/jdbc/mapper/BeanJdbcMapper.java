@@ -7,11 +7,11 @@ import io.coffeedia.infrastructure.persistence.jdbc.entity.BeanFlavorJdbcEntity;
 import io.coffeedia.infrastructure.persistence.jdbc.entity.BeanJdbcEntity;
 import io.coffeedia.infrastructure.persistence.jdbc.entity.FlavorJdbcEntity;
 import java.util.List;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class BeanJdbcMapper {
-
-    private BeanJdbcMapper() {
-    }
 
     public static BeanJdbcEntity toEntity(final Bean bean) {
         return BeanJdbcEntity.builder()
@@ -83,10 +83,10 @@ public class BeanJdbcMapper {
             .toList();
     }
 
-    public static Flavor toDomain(final FlavorJdbcEntity it) {
+    public static Flavor toDomain(final FlavorJdbcEntity flavor) {
         return Flavor.builder()
-            .id(it.id())
-            .name(it.name())
+            .id(flavor.id())
+            .name(flavor.name())
             .build();
     }
 }

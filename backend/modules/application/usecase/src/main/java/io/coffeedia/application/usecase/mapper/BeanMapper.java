@@ -9,11 +9,11 @@ import io.coffeedia.application.usecase.dto.UpdateBeanCommand;
 import io.coffeedia.domain.model.Bean;
 import io.coffeedia.domain.model.Flavor;
 import java.util.List;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class BeanMapper {
-
-    private BeanMapper() {
-    }
 
     public static Bean toDomain(final CreateBeanCommand command, final List<Flavor> flavors) {
         return Bean.builder()
