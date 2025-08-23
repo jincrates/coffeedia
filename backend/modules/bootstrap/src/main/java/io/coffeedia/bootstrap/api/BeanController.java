@@ -1,8 +1,8 @@
 package io.coffeedia.bootstrap.api;
 
 import io.coffeedia.application.usecase.CreateBeanUseCase;
+import io.coffeedia.application.usecase.dto.BeanResponse;
 import io.coffeedia.application.usecase.dto.CreateBeanCommand;
-import io.coffeedia.application.usecase.dto.CreateBeanResponse;
 import io.coffeedia.bootstrap.api.dto.BaseResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ public class BeanController extends BaseController {
     private final CreateBeanUseCase createUseCase;
 
     @PostMapping
-    public ResponseEntity<BaseResponse<CreateBeanResponse>> createBean(
+    public ResponseEntity<BaseResponse<BeanResponse>> createBean(
         @Valid @RequestBody CreateBeanCommand command
     ) {
         return created(createUseCase.invoke(command));

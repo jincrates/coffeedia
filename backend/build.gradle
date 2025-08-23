@@ -75,7 +75,7 @@ subprojects {
         reports {
             xml.required = true
             csv.required = false
-            html.required = false
+            html.required = true
         }
 
         // report 제외대상 지정
@@ -84,6 +84,7 @@ subprojects {
                     files(classDirectories.files.collect {
                         fileTree(dir: it, exclude: [
                                 '**/generated/**',
+                                "**/config/**",
                                 "**/*Application.class"
                         ])
                     })
