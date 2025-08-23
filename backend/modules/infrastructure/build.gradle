@@ -1,8 +1,6 @@
 dependencies {
-    implementation project(":common")
-    implementation project(":domain")
-    implementation project(":application:port")
+    api project(":application:port")
 
     runtimeOnly("org.postgresql:postgresql")
-    implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+    implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
 }

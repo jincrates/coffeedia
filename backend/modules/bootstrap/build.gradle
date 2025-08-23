@@ -1,12 +1,13 @@
+bootJar.enabled = true
+jar.enabled = false
+
 dependencies {
-    implementation project(":common")
-    implementation project(":domain")
     implementation project(":application:usecase")
-    implementation project(":application:port")
-    implementation project(":infrastructure")
+    runtimeOnly project(":infrastructure")
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.10")
 
     testImplementation("org.springframework.boot:spring-boot-starter-webflux")
     testImplementation("com.tngtech.archunit:archunit-junit5:${archUnitVersion}")

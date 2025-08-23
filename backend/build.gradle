@@ -21,8 +21,7 @@ allprojects {
         mavenCentral()
     }
 
-    // plain jar는 생성되지 않도록
-    jar.enabled = false
+    bootJar.enabled = false
 }
 
 // 각 서브 프로젝트 공통 설정
