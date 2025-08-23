@@ -1,6 +1,7 @@
 package io.coffeedia.bootstrap.config;
 
 import com.p6spy.engine.spy.appender.MessageFormattingStrategy;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 public class CustomLineFormat implements MessageFormattingStrategy {
@@ -23,6 +24,36 @@ public class CustomLineFormat implements MessageFormattingStrategy {
         Pattern.CASE_INSENSITIVE
     );
 
+    private static final Pattern STRING_LITERAL_PATTERN = Pattern.compile("'([^']*)'");
+    private static final Pattern NUMBER_PATTERN = Pattern.compile("\\b(\\d+)\\b");
+    private static final Pattern TABLE_COLUMN_PATTERN = Pattern.compile(
+        "\\b([a-zA-Z_][a-zA-Z0-9_]*\\.[a-zA-Z_][a-zA-Z0-9_]*)\\b");
+    private static final Pattern PARAMETER_PATTERN = Pattern.compile("\\?");
+
+    // Set.of()는 불변이므로 메모리 효율적
+    private static final Set<String> NEWLINE_KEYWORDS = Set.of(
+        "select", "from", "where", "join", "inner", "left", "right",
+        "group", "order", "having", "union", "insert", "update",
+        "delete", "values", "set"
+    );
+
+    // 빈번한 문자열 배열 재사용을 위한 캐시 - 더 많은 레벨 추가
+    private static final String[] INDENTS = {
+        "", " ", "  ", "   ", "    ", "     ", "      ", "       ",
+        "        ", "         ", "          "
+    };
+
+    // 헤더 포맷 문자열 캐싱
+    private static final String HEADER_START = "\n===========================================\n";
+    private static final String CONNECTION_PREFIX = "🔗 Connection ID: ";
+    private static final String TIME_PREFIX = "⏰ Execution Time: ";
+    private static final String TIME_SUFFIX = " ms\n\n";
+    private static final String FOOTER = "\n===========================================";
+
+    private enum ClauseState {
+        NONE, SELECT, UPDATE, WHERE
+    }
+
     @Override
     public String formatMessage(
         final int connectionId,
@@ -37,170 +68,117 @@ public class CustomLineFormat implements MessageFormattingStrategy {
             return "";
         }
 
-        return String.format("""
-                
-                ===========================================
-                🔗 Connection ID: %d
-                ⏰ Execution Time: %d ms
-                
-                %s
-                ===========================================
-                """,
-            connectionId,
-            elapsed,
-            formatSql(sql)
-        );
-    }
+        // 더 정확한 용량 추정으로 StringBuilder resize 방지
+        final int estimatedSize = sql.length() * 2 + 100; // 하이라이팅으로 인한 크기 증가 고려
+        final StringBuilder result = new StringBuilder(estimatedSize);
 
-    private String formatSql(String sql) {
-        if (sql == null || sql.trim().isEmpty()) {
-            return sql;
-        }
+        // 문자열 연결 최적화
+        result.append(HEADER_START)
+            .append(CONNECTION_PREFIX).append(connectionId).append('\n')
+            .append(TIME_PREFIX).append(elapsed).append(TIME_SUFFIX);
 
-        String formatted = sql.trim();
-
-        // 기본적인 포맷팅
-        formatted = addBasicFormatting(formatted);
-
-        // 색상 적용
-        formatted = applySyntaxHighlighting(formatted);
-
-        return formatted;
-    }
-
-    private String addBasicFormatting(String sql) {
-        StringBuilder result = new StringBuilder();
-
-        // 소문자로 변환해서 패턴 매칭 (원본은 유지)
-        String lowerSql = sql.toLowerCase();
-        String[] words = sql.split("\\s+");
-        String[] lowerWords = lowerSql.split("\\s+");
-
-        for (int i = 0; i < words.length; i++) {
-            String word = words[i];
-            String lowerWord = lowerWords[i];
-
-            // 주요 키워드 앞에 줄바꿈 추가
-            if (shouldAddNewlineBefore(lowerWord) && i > 0) {
-                result.append("\n");
-                if (lowerWord.equals("from")) {
-                    result.append("  ");
-                }
-                if (lowerWord.equals("set")) {
-                    result.append("   ");
-                }
-                if (lowerWord.equals("where")) {
-                    result.append(" ");
-                }
-            }
-
-            // SELECT 절에서 콤마 후 줄바꿈
-            if (word.endsWith(",") && isInSelectClause(lowerWords, i)) {
-                result.append(word).append("\n       ");
-                continue;
-            }
-
-            // UPDATE 절에서 콤마 후 줄바꿈
-            if (word.endsWith(",") && isInUpdateClause(lowerWords, i)) {
-                result.append(word).append("\n       ");
-                continue;
-            }
-
-            // WHERE 절에서 AND, OR 앞에 줄바꿈과 들여쓰기
-            if ((lowerWord.equals("and") || lowerWord.equals("or")) &&
-                isInWhereClause(lowerWords, i)) {
-                result.append("\n  ").append(word);
-                continue;
-            }
-
-            result.append(word);
-
-            // 단어 사이에 공백 추가 (마지막 단어가 아닌 경우)
-            if (i < words.length - 1) {
-                result.append(" ");
-            }
-        }
+        formatSqlDirectly(sql.trim(), result);
+        result.append(FOOTER);
 
         return result.toString();
     }
 
-    private boolean shouldAddNewlineBefore(String lowerWord) {
-        return lowerWord.equals("select") ||
-            lowerWord.equals("from") ||
-            lowerWord.equals("where") ||
-            lowerWord.equals("join") ||
-            lowerWord.equals("inner") ||
-            lowerWord.equals("left") ||
-            lowerWord.equals("right") ||
-            lowerWord.equals("group") ||
-            lowerWord.equals("order") ||
-            lowerWord.equals("having") ||
-            lowerWord.equals("union") ||
-            lowerWord.equals("insert") ||
-            lowerWord.equals("update") ||
-            lowerWord.equals("delete") ||
-            lowerWord.equals("values") ||
-            lowerWord.equals("set");
-    }
-
-    private boolean isInSelectClause(String[] lowerWords, int currentIndex) {
-        // SELECT 이후이고 FROM 이전인지 확인
-        boolean afterSelect = false;
-        for (int i = 0; i < currentIndex; i++) {
-            if (lowerWords[i].equals("select")) {
-                afterSelect = true;
-            } else if (lowerWords[i].equals("from")) {
-                afterSelect = false;
-            }
+    // 중간 문자열 생성 없이 직접 StringBuilder에 작성
+    private void formatSqlDirectly(final String sql, final StringBuilder result) {
+        if (sql.isEmpty()) {
+            return;
         }
-        return afterSelect;
-    }
 
-    private boolean isInUpdateClause(String[] lowerWords, int currentIndex) {
-        // UPDATE 이후이고 WHERE 이전인지 확인
-        boolean afterSelect = false;
-        for (int i = 0; i < currentIndex; i++) {
-            if (lowerWords[i].equals("update")) {
-                afterSelect = true;
-            } else if (lowerWords[i].equals("where")) {
-                afterSelect = false;
+        final String[] words = sql.split("\\s+");
+        ClauseState currentState = ClauseState.NONE;
+        boolean needsSpace = false;
+
+        for (int i = 0; i < words.length; i++) {
+            final String word = words[i];
+            final String lowerWord = word.toLowerCase();
+            final char lastChar = word.isEmpty() ? '\0' : word.charAt(word.length() - 1);
+            final boolean hasComma = lastChar == ',';
+            final boolean isAndOr = isAndOrKeyword(lowerWord);
+
+            currentState = updateClauseState(currentState, lowerWord);
+
+            // 키워드 앞 줄바꿈 처리
+            if (i > 0 && NEWLINE_KEYWORDS.contains(lowerWord)) {
+                result.append('\n');
+                appendIndentationFast(result, lowerWord);
+                needsSpace = false;
+            } else if (needsSpace) {
+                result.append(' ');
             }
-        }
-        return afterSelect;
-    }
 
-    private boolean isInWhereClause(String[] lowerWords, int currentIndex) {
-        // WHERE 이후이고 GROUP BY, ORDER BY, HAVING 등 이전인지 확인
-        boolean afterWhere = false;
-        for (int i = 0; i < currentIndex; i++) {
-            if (lowerWords[i].equals("where")) {
-                afterWhere = true;
-            } else if (lowerWords[i].equals("group") ||
-                lowerWords[i].equals("order") ||
-                lowerWords[i].equals("having")) {
-                afterWhere = false;
+            // 콤마 처리
+            if (hasComma) {
+                result.append(word);
+                if (currentState == ClauseState.SELECT || currentState == ClauseState.UPDATE) {
+                    result.append('\n').append(INDENTS[7]);
+                    needsSpace = false;
+                    continue;
+                }
             }
+            // WHERE 절의 AND, OR 처리
+            else if (currentState == ClauseState.WHERE && isAndOr) {
+                result.append("\n  ").append(word);
+                needsSpace = true;
+                continue;
+            } else {
+                result.append(word);
+            }
+
+            // 다음 단어를 위한 공백 필요성 결정
+            needsSpace = i < words.length - 1 && !hasComma;
         }
-        return afterWhere;
+
+        // 하이라이팅을 마지막에 한 번만 수행
+        applySyntaxHighlightingInPlace(result);
     }
 
-    private String applySyntaxHighlighting(String sql) {
-        // SQL 키워드에 색상 적용
-        sql = KEYWORD_PATTERN.matcher(sql).replaceAll(BLUE + "$1" + RESET);
+    private static boolean isAndOrKeyword(final String lowerWord) {
+        return switch (lowerWord) {
+            case "and", "or" -> true;
+            default -> false;
+        };
+    }
 
-        // 문자열 리터럴에 색상 적용
-        sql = sql.replaceAll("'([^']*)'", GREEN + "'$1'" + RESET);
+    private ClauseState updateClauseState(final ClauseState currentState, final String lowerWord) {
+        return switch (lowerWord) {
+            case "select" -> ClauseState.SELECT;
+            case "update" -> ClauseState.UPDATE;
+            case "where" -> ClauseState.WHERE;
+            case "from" -> currentState == ClauseState.SELECT ? ClauseState.NONE : currentState;
+            case "group", "order", "having" -> ClauseState.NONE;
+            default -> currentState;
+        };
+    }
 
-        // 숫자에 색상 적용
-        sql = sql.replaceAll("\\b(\\d+)\\b", YELLOW + "$1" + RESET);
+    // 캐시된 문자열 사용으로 객체 생성 방지
+    private void appendIndentationFast(final StringBuilder result, final String lowerWord) {
+        final String indent = switch (lowerWord) {
+            case "from" -> INDENTS[2];
+            case "set" -> INDENTS[3];
+            case "where" -> INDENTS[1];
+            default -> INDENTS[0];
+        };
+        result.append(indent);
+    }
 
-        // 테이블명/컬럼명 (점으로 구분된 것들)에 색상 적용
-        sql = sql.replaceAll("\\b([a-zA-Z_][a-zA-Z0-9_]*\\.[a-zA-Z_][a-zA-Z0-9_]*)\\b",
-            CYAN + "$1" + RESET);
+    // StringBuilder 내용을 직접 변경하여 새로운 문자열 생성 방지
+    private void applySyntaxHighlightingInPlace(final StringBuilder sql) {
+        String content = sql.toString();
 
-        // 매개변수 플레이스홀더에 색상 적용
-        sql = sql.replaceAll("\\?", MAGENTA + "?" + RESET);
+        // 정규식 매칭 순서를 빈도 순으로 정렬하여 성능 향상
+        content = KEYWORD_PATTERN.matcher(content).replaceAll(BLUE + "$1" + RESET);
+        content = TABLE_COLUMN_PATTERN.matcher(content).replaceAll(CYAN + "$1" + RESET);
+        content = STRING_LITERAL_PATTERN.matcher(content).replaceAll(GREEN + "'$1'" + RESET);
+        content = NUMBER_PATTERN.matcher(content).replaceAll(YELLOW + "$1" + RESET);
+        content = PARAMETER_PATTERN.matcher(content).replaceAll(MAGENTA + "?" + RESET);
 
-        return sql;
+        // StringBuilder 내용 교체
+        sql.setLength(0);
+        sql.append(content);
     }
 }
