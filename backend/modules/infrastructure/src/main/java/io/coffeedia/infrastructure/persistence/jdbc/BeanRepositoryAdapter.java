@@ -5,19 +5,14 @@ import io.coffeedia.domain.model.Bean;
 import io.coffeedia.domain.model.Flavor;
 import io.coffeedia.domain.vo.BeanSortType;
 import io.coffeedia.domain.vo.PageSize;
-import io.coffeedia.infrastructure.persistence.jdbc.entity.BeanFlavorJdbcEntity;
 import io.coffeedia.infrastructure.persistence.jdbc.entity.BeanJdbcEntity;
-import io.coffeedia.infrastructure.persistence.jdbc.entity.FlavorJdbcEntity;
 import io.coffeedia.infrastructure.persistence.jdbc.mapper.BeanJdbcMapper;
-import io.coffeedia.infrastructure.persistence.jdbc.repository.BeanFlavorJdbcRepository;
+import io.coffeedia.infrastructure.persistence.jdbc.mapper.FlavorJdbcMapper;
 import io.coffeedia.infrastructure.persistence.jdbc.repository.BeanJdbcRepository;
 import io.coffeedia.infrastructure.persistence.jdbc.repository.FlavorJdbcRepository;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -30,23 +25,27 @@ class BeanRepositoryAdapter implements BeanRepositoryPort {
 
     private final BeanJdbcRepository beanRepository;
     private final FlavorJdbcRepository flavorRepository;
-    private final BeanFlavorJdbcRepository beanFlavorRepository;
 
     @Override
     public Bean create(final Bean bean) {
         BeanJdbcEntity entity = BeanJdbcMapper.toEntity(bean);
         BeanJdbcEntity saved = beanRepository.save(entity);
-        beanFlavorRepository.saveAll(BeanJdbcMapper.toEntity(saved, bean.flavors()));
 
-        return BeanJdbcMapper.toDomain(saved, bean.flavors());
+        List<Flavor> flavors = findFlavorsByIds(
+            bean.flavors().stream()
+                .map(Flavor::id)
+                .toList()
+        );
+
+        return BeanJdbcMapper.toDomain(saved, flavors);
     }
 
     @Override
     public List<Bean> createAll(final List<Bean> beans) {
         List<BeanJdbcEntity> entity = BeanJdbcMapper.toEntity(beans);
         List<BeanJdbcEntity> saved = beanRepository.saveAll(entity);
-        beanFlavorRepository.saveAll(BeanJdbcMapper.toEntity(saved, beans));
-        return List.of();
+//        return BeanJdbcMapper.toDomain(saved, flavorMap);
+        return null;
     }
 
     @Override
@@ -54,22 +53,21 @@ class BeanRepositoryAdapter implements BeanRepositoryPort {
         if (bean.id() == null) {
             throw new IllegalArgumentException("원두 ID는 필수입니다.");
         }
-        BeanJdbcEntity entity = BeanJdbcMapper.toEntity(bean);
-        BeanJdbcEntity saved = beanRepository.save(entity);
-        return BeanJdbcMapper.toDomain(saved, bean.flavors());
-    }
-
-    @Override
-    public Optional<Bean> findById(final Long beanId) {
-        List<Flavor> flavors = findFlavors(beanId);
-        return beanRepository.findById(beanId)
-            .map(it -> BeanJdbcMapper.toDomain(it, flavors));
+        return create(bean);
     }
 
     @Override
     public void deleteAll() {
-        beanFlavorRepository.deleteAll();
         beanRepository.deleteAll();
+    }
+
+    @Override
+    public Optional<Bean> findById(final Long beanId) {
+        return beanRepository.findById(beanId)
+            .map(it -> {
+                List<Flavor> flavors = findFlavorsByIds(it.flavorIds());
+                return BeanJdbcMapper.toDomain(it, flavors);
+            });
     }
 
     @Override
@@ -85,67 +83,22 @@ class BeanRepositoryAdapter implements BeanRepositoryPort {
             return Collections.emptyList();
         }
 
-        List<Long> beanIds = beans.stream().map(BeanJdbcEntity::id).toList();
-        Map<Long, List<Flavor>> flavorsByBeanId = findFlavorsByBeanIds(beanIds);
-
-        return beans.stream()
-            .map(entity -> {
-                List<Flavor> flavors = flavorsByBeanId.getOrDefault(entity.id(), List.of());
-                return BeanJdbcMapper.toDomain(entity, flavors);
-            })
-            .toList();
+//        List<Long> beanIds = beans.stream().map(BeanJdbcEntity::id).toList();
+//        Map<Long, List<Flavor>> flavorsByBeanId = findFlavorsByBeanIds(beanIds);
+//
+//        return beans.stream()
+//            .map(entity -> {
+//                List<Flavor> flavors = flavorsByBeanId.getOrDefault(entity.id(), List.of());
+//                return BeanJdbcMapper.toDomain(entity, flavors);
+//            })
+//            .toList();
+        return null;
     }
 
-    private List<Flavor> findFlavors(final Long beanId) {
-        List<Long> flavorIds = findFlavorIds(beanId);
+    private List<Flavor> findFlavorsByIds(final List<Long> flavorIds) {
         return flavorRepository.findAllById(flavorIds).stream()
-            .map(BeanJdbcMapper::toDomain)
+            .map(FlavorJdbcMapper::toDomain)
             .toList();
-    }
-
-    private List<Long> findFlavorIds(final Long beanId) {
-        List<BeanFlavorJdbcEntity> beanFlavors = beanFlavorRepository.findAllByBeanId(beanId);
-        return beanFlavors.stream()
-            .map(BeanFlavorJdbcEntity::flavorId)
-            .toList();
-    }
-
-    private Map<Long, List<Flavor>> findFlavorsByBeanIds(final List<Long> beanIds) {
-        if (beanIds.isEmpty()) {
-            return Map.of();
-        }
-
-        // 1. Bean-Flavor 관계 조회
-        List<BeanFlavorJdbcEntity> beanFlavors = beanFlavorRepository.findAllByBeanIdIn(beanIds);
-
-        // 2. 고유한 Flavor ID들 추출
-        List<Long> flavorIds = beanFlavors.stream()
-            .map(BeanFlavorJdbcEntity::flavorId)
-            .distinct()
-            .toList();
-
-        // 3. Flavor 엔티티들 배치 조회
-        Map<Long, Flavor> flavorMap = flavorRepository.findAllById(flavorIds)
-            .stream()
-            .collect(Collectors.toMap(
-                FlavorJdbcEntity::id,
-                BeanJdbcMapper::toDomain
-            ));
-
-        // 4. Bean ID별로 Flavor 리스트 그룹핑
-        Map<Long, List<Flavor>> result = beanFlavors.stream()
-            .collect(Collectors.groupingBy(
-                BeanFlavorJdbcEntity::beanId,
-                Collectors.mapping(
-                    beanFlavor -> flavorMap.get(beanFlavor.flavorId()),
-                    Collectors.filtering(Objects::nonNull, Collectors.toList())
-                )
-            ));
-
-        // 5. Flavor가 없는 Bean들도 빈 리스트로 포함
-        beanIds.forEach(beanId -> result.putIfAbsent(beanId, List.of()));
-
-        return result;
     }
 
     private Sort toSort(final List<BeanSortType> sorts) {

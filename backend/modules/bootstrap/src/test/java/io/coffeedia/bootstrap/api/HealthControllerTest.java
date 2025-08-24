@@ -1,6 +1,6 @@
 package io.coffeedia.bootstrap.api;
 
-import io.coffeedia.bootstrap.IntegrationSupportTest;
+import io.coffeedia.IntegrationSupportTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Tag;

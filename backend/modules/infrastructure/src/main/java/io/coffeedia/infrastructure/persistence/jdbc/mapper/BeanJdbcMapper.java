@@ -2,24 +2,36 @@ package io.coffeedia.infrastructure.persistence.jdbc.mapper;
 
 import io.coffeedia.domain.model.Bean;
 import io.coffeedia.domain.model.Flavor;
-import io.coffeedia.domain.vo.Origin;
 import io.coffeedia.infrastructure.persistence.jdbc.entity.BeanFlavorJdbcEntity;
 import io.coffeedia.infrastructure.persistence.jdbc.entity.BeanJdbcEntity;
-import io.coffeedia.infrastructure.persistence.jdbc.entity.FlavorJdbcEntity;
-import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class BeanJdbcMapper {
 
+    public static List<BeanJdbcEntity> toEntity(final List<Bean> beans) {
+        return beans.stream()
+            .map(BeanJdbcMapper::toEntity)
+            .toList();
+    }
+
     public static BeanJdbcEntity toEntity(final Bean bean) {
+        Set<BeanFlavorJdbcEntity> beanFlavors = bean.flavors().stream()
+            .map(flavor -> BeanFlavorJdbcEntity.builder()
+                .beanId(null)   // beanId는 null로 두면 Spring Data JDBC가 자동 설정
+                .flavorId(flavor.id())
+                .build())
+            .collect(Collectors.toCollection(LinkedHashSet::new));
+
         return BeanJdbcEntity.builder()
             .id(bean.id())
             .name(bean.name())
-            .originCountry(bean.origin().country())
-            .originRegion(bean.origin().region())
+            .origin(bean.origin())
             .roaster(bean.roaster())
             .roastDate(bean.roastDate())
             .grams(bean.grams())
@@ -32,6 +44,7 @@ public class BeanJdbcMapper {
             .accessType(bean.accessType())
             .createdAt(bean.createdAt())
             .updatedAt(bean.updatedAt())
+            .beanFlavors(beanFlavors)
             .build();
     }
 
@@ -42,7 +55,7 @@ public class BeanJdbcMapper {
         return Bean.builder()
             .id(bean.id())
             .name(bean.name())
-            .origin(new Origin(bean.originCountry(), bean.originRegion()))
+            .origin(bean.origin())
             .roaster(bean.roaster())
             .roastDate(bean.roastDate())
             .grams(bean.grams())
@@ -57,56 +70,5 @@ public class BeanJdbcMapper {
             .createdAt(bean.createdAt())
             .updatedAt(bean.updatedAt())
             .build();
-    }
-
-    public static List<BeanFlavorJdbcEntity> toEntity(
-        final BeanJdbcEntity bean,
-        final List<Flavor> flavors
-    ) {
-        return flavors.stream()
-            .map(it -> toEntity(bean, it))
-            .toList();
-    }
-
-    public static BeanFlavorJdbcEntity toEntity(
-        final BeanJdbcEntity bean,
-        final Flavor flavor
-    ) {
-        return BeanFlavorJdbcEntity.builder()
-            .beanId(bean.id())
-            .flavorId(flavor.id())
-            .build();
-    }
-
-    public static List<Flavor> toDomain(final List<FlavorJdbcEntity> flavors) {
-        return flavors.stream()
-            .map(BeanJdbcMapper::toDomain)
-            .toList();
-    }
-
-    public static Flavor toDomain(final FlavorJdbcEntity flavor) {
-        return Flavor.builder()
-            .id(flavor.id())
-            .name(flavor.name())
-            .build();
-    }
-
-    public static List<BeanJdbcEntity> toEntity(final List<Bean> beans) {
-        return beans.stream()
-            .map(BeanJdbcMapper::toEntity)
-            .toList();
-    }
-
-    public static List<BeanFlavorJdbcEntity> toEntity(
-        final List<BeanJdbcEntity> entities,
-        final List<Bean> beans
-    ) {
-        List<BeanFlavorJdbcEntity> result = new ArrayList<>();
-        for (int i = 0; i < entities.size(); i++) {
-            BeanJdbcEntity entity = entities.get(i);
-            Bean bean = beans.get(i);
-            result.addAll(toEntity(entity, bean.flavors()));
-        }
-        return result;
     }
 }
