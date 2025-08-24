@@ -118,11 +118,6 @@ class BeanRepositoryAdapter implements BeanRepositoryPort {
         // 1. Bean-Flavor 관계 조회
         List<BeanFlavorJdbcEntity> beanFlavors = beanFlavorRepository.findAllByBeanIdIn(beanIds);
 
-        if (beanFlavors.isEmpty()) {
-            return beanIds.stream()
-                .collect(Collectors.toMap(beanId -> beanId, beanId -> List.of()));
-        }
-
         // 2. 고유한 Flavor ID들 추출
         List<Long> flavorIds = beanFlavors.stream()
             .map(BeanFlavorJdbcEntity::flavorId)
@@ -153,18 +148,12 @@ class BeanRepositoryAdapter implements BeanRepositoryPort {
         return result;
     }
 
-
     private Sort toSort(final List<BeanSortType> sorts) {
-        return sorts.stream()
-            .map(it -> toSort(it.getField(), it.getDirection()))
-            .reduce(Sort.unsorted(), Sort::and);
-    }
-
-    private Sort toSort(final String field, final String direction) {
-        Sort.Direction sortDirection = "asc".equals(direction)
-            ? Sort.Direction.ASC
-            : Sort.Direction.DESC;
-
-        return Sort.by(sortDirection, field);
+        List<Sort.Order> orders = sorts.stream()
+            .map(sort -> new Sort.Order(
+                Sort.Direction.fromString(sort.getDirection()), sort.getField())
+            )
+            .toList();
+        return Sort.by(orders);
     }
 }

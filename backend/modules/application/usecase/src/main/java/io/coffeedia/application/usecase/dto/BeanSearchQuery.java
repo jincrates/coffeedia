@@ -44,7 +44,7 @@ public record BeanSearchQuery(
             return BeanSortType.CREATED_AT_DESC;
         }
         String[] parts = singleSort.split(":");
-        if (parts.length != 2) {
+        if (parts.length != 2 || parts[0].isBlank() || parts[1].isBlank()) {
             throw new IllegalArgumentException(
                 String.format("잘못된 정렬 형식입니다. ('%s')", singleSort)
             );
