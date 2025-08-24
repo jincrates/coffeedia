@@ -42,6 +42,14 @@ class BeanRepositoryAdapter implements BeanRepositoryPort {
     }
 
     @Override
+    public List<Bean> createAll(final List<Bean> beans) {
+        List<BeanJdbcEntity> entity = BeanJdbcMapper.toEntity(beans);
+        List<BeanJdbcEntity> saved = beanRepository.saveAll(entity);
+        beanFlavorRepository.saveAll(BeanJdbcMapper.toEntity(saved, beans));
+        return List.of();
+    }
+
+    @Override
     public Bean update(final Bean bean) {
         if (bean.id() == null) {
             throw new IllegalArgumentException("원두 ID는 필수입니다.");

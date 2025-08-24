@@ -10,11 +10,13 @@ public interface BeanRepositoryPort {
 
     Bean create(final Bean bean);
 
+    List<Bean> createAll(List<Bean> beans);
+
     Bean update(final Bean bean);
 
-    Optional<Bean> findById(final Long beanId);
-
     void deleteAll();
+
+    Optional<Bean> findById(final Long beanId);
 
     List<Bean> findAll(PageSize pageSize, List<BeanSortType> sorts);
 }

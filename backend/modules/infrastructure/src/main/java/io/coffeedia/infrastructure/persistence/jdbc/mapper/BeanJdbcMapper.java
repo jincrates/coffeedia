@@ -6,6 +6,7 @@ import io.coffeedia.domain.vo.Origin;
 import io.coffeedia.infrastructure.persistence.jdbc.entity.BeanFlavorJdbcEntity;
 import io.coffeedia.infrastructure.persistence.jdbc.entity.BeanJdbcEntity;
 import io.coffeedia.infrastructure.persistence.jdbc.entity.FlavorJdbcEntity;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -88,5 +89,24 @@ public class BeanJdbcMapper {
             .id(flavor.id())
             .name(flavor.name())
             .build();
+    }
+
+    public static List<BeanJdbcEntity> toEntity(final List<Bean> beans) {
+        return beans.stream()
+            .map(BeanJdbcMapper::toEntity)
+            .toList();
+    }
+
+    public static List<BeanFlavorJdbcEntity> toEntity(
+        final List<BeanJdbcEntity> entities,
+        final List<Bean> beans
+    ) {
+        List<BeanFlavorJdbcEntity> result = new ArrayList<>();
+        for (int i = 0; i < entities.size(); i++) {
+            BeanJdbcEntity entity = entities.get(i);
+            Bean bean = beans.get(i);
+            result.addAll(toEntity(entity, bean.flavors()));
+        }
+        return result;
     }
 }

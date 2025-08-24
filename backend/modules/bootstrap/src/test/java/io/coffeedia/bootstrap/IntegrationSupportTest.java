@@ -11,6 +11,7 @@ import io.coffeedia.domain.vo.Origin;
 import io.coffeedia.domain.vo.ProcessType;
 import io.coffeedia.domain.vo.RoastLevel;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -72,5 +73,37 @@ public abstract class IntegrationSupportTest {
                 .accessType(AccessType.PUBLIC)
                 .build()
         );
+    }
+
+    protected List<Bean> createBeans(int count) {
+        List<Flavor> flavors = List.of(
+            Flavor.builder().id(1L).name("플레이버1").build(),
+            Flavor.builder().id(2L).name("플레이버2").build()
+        );
+
+        List<Bean> beans = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            Bean bean = Bean.builder()
+                .name("조회용 에티오피아 예가체프" + i)
+                .origin(Origin.builder()
+                    .country("에티오피아")
+                    .region("예가체프")
+                    .build())
+                .roaster("조회테스트 로스터")
+                .roastDate(LocalDate.now())
+                .grams(250)
+                .flavors(flavors)
+                .roastLevel(RoastLevel.MEDIUM)
+                .processType(ProcessType.WASHED)
+                .blendType(BlendType.SINGLE_ORIGIN)
+                .isDecaf(false)
+                .memo("조회 테스트용 메모")
+                .status(ActiveStatus.ACTIVE)
+                .accessType(AccessType.PUBLIC)
+                .build();
+            beans.add(bean);
+        }
+
+        return beanRepository.createAll(beans);
     }
 }
