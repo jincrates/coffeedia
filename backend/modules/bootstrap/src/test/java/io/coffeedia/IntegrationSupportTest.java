@@ -1,6 +1,7 @@
 package io.coffeedia;
 
 import io.coffeedia.application.port.repository.BeanRepositoryPort;
+import io.coffeedia.application.port.repository.FlavorRepositoryPort;
 import io.coffeedia.domain.model.Bean;
 import io.coffeedia.domain.model.Flavor;
 import io.coffeedia.domain.vo.AccessType;
@@ -32,6 +33,9 @@ public abstract class IntegrationSupportTest {
 
     @Autowired
     protected BeanRepositoryPort beanRepository;
+
+    @Autowired
+    protected FlavorRepositoryPort flavorRepository;
 
     static {
         TestContainerManager.POSTGRES_CONTAINER.start();

@@ -1,0 +1,119 @@
+package io.coffeedia.infrastructure.persistence.jpa.entity;
+
+import io.coffeedia.domain.vo.AccessType;
+import io.coffeedia.domain.vo.ActiveStatus;
+import io.coffeedia.domain.vo.BlendType;
+import io.coffeedia.domain.vo.Origin;
+import io.coffeedia.domain.vo.ProcessType;
+import io.coffeedia.domain.vo.RoastLevel;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Builder.Default;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Comment;
+
+@Getter
+@Builder
+@Entity
+@Table(name = "beans")
+@Comment("원두")
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class BeanJpaEntity extends BaseEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Comment("PK")
+    private Long id;
+
+    @Column(nullable = false, length = 80)
+    @Comment("이름")
+    private String name;
+
+    @Embedded
+    private Origin origin;
+
+    @Column(nullable = false, length = 80)
+    @Comment("로스터")
+    private String roaster;
+
+    @Column(nullable = false)
+    @Comment("로스팅일자")
+    private LocalDate roastDate;
+
+    @Column(nullable = false)
+    @Comment("그램")
+    private int grams;
+
+    @Column(nullable = false, length = 40)
+    @Comment("로스팅레벨")
+    @Enumerated(EnumType.STRING)
+    private RoastLevel roastLevel;
+
+    @Column(nullable = false, length = 40)
+    @Comment("가공타입")
+    @Enumerated(EnumType.STRING)
+    private ProcessType processType;
+
+    @Column(nullable = false, length = 40)
+    @Comment("블렌드타입")
+    @Enumerated(EnumType.STRING)
+    private BlendType blendType;
+
+    @Column(nullable = false)
+    @Comment("디카페인 여부")
+    private boolean isDecaf;
+
+    @Column(length = 200)
+    @Comment("메모")
+    private String memo;
+
+    @Column(nullable = false, length = 40)
+    @Comment("상태")
+    @Enumerated(EnumType.STRING)
+    private ActiveStatus status;
+
+    @Column(nullable = false, length = 40)
+    @Comment("접근권한")
+    @Enumerated(EnumType.STRING)
+    private AccessType accessType;
+
+    @Default
+    @OneToMany(mappedBy = "bean", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BeanFlavorJpaEntity> beanFlavors = new ArrayList<>();
+
+    public List<FlavorJpaEntity> getFlavors() {
+        return beanFlavors.stream()
+            .map(BeanFlavorJpaEntity::getFlavor)
+            .toList();
+    }
+
+    public void addFlavors(final List<FlavorJpaEntity> flavors) {
+        flavors.forEach(this::addFlavors);
+    }
+
+    private void addFlavors(final FlavorJpaEntity flavor) {
+        beanFlavors.add(
+            BeanFlavorJpaEntity.builder()
+                .bean(this)
+                .flavor(flavor)
+                .build()
+        );
+    }
+}
