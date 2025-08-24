@@ -347,6 +347,241 @@ class BeanControllerTest extends IntegrationSupportTest {
     }
 
     @Nested
+    @DisplayName("원두 목록 조회")
+    class GetAllBeanUseCase {
+
+        @BeforeEach
+        void setUp() {
+            cleanUpDatabase();
+            createBeans(15);
+        }
+
+        @Test
+        @DisplayName("기본 페이징으로 원두 목록을 조회할 수 있다")
+        void getAllBeansWithDefaultPaging() {
+            // when
+            webTestClient.get()
+                .uri("/api/beans")
+                .exchange()
+                // then
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.success").isEqualTo(true)
+                .jsonPath("$.message").isEqualTo(null)
+                .jsonPath("$.data").exists()
+                .jsonPath("$.data.page").isEqualTo(0)
+                .jsonPath("$.data.hasNext").isEqualTo(true)
+                .jsonPath("$.data.content").isArray()
+                .jsonPath("$.data.content.length()").isEqualTo(10);
+        }
+
+        @Test
+        @DisplayName("페이지와 사이즈를 지정하여 원두 목록을 조회할 수 있다")
+        void getAllBeansWithCustomPaging() {
+            // given
+            int page = 0;
+            int size = 5;
+
+            // when
+            webTestClient.get()
+                .uri("/api/beans?page={page}&size={size}", page, size)
+                .exchange()
+                // then
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.success").isEqualTo(true)
+                .jsonPath("$.data.page").isEqualTo(page)
+                .jsonPath("$.data.hasNext").isEqualTo(true)
+                .jsonPath("$.data.content").isArray()
+                .jsonPath("$.data.content.length()").isEqualTo(5);
+        }
+
+        @Test
+        @DisplayName("정렬을 적용하여 원두 목록을 조회할 수 있다")
+        void getAllBeansWithSorting() {
+            // given
+            String sort = "createdAt:asc";
+
+            // when
+            webTestClient.get()
+                .uri("/api/beans?sort={sort}", sort)
+                .exchange()
+                // then
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.success").isEqualTo(true)
+                .jsonPath("$.data.hasNext").isEqualTo(true)
+                .jsonPath("$.data.content").isArray()
+                .jsonPath("$.data.content[0]").exists();
+        }
+
+        @Test
+        @DisplayName("복합 정렬을 적용하여 원두 목록을 조회할 수 있다")
+        void getAllBeansWithMultipleSorting() {
+            // given
+            String sort = "roastDate:desc,createdAt:asc";
+
+            // when
+            webTestClient.get()
+                .uri("/api/beans?sort={sort}", sort)
+                .exchange()
+                // then
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.success").isEqualTo(true)
+                .jsonPath("$.data.hasNext").isEqualTo(true)
+                .jsonPath("$.data.content").isArray()
+                .jsonPath("$.data.content").isNotEmpty();
+        }
+
+        @Test
+        @DisplayName("페이징과 정렬을 동시에 적용하여 원두 목록을 조회할 수 있다")
+        void getAllBeansWithPagingAndSorting() {
+            // given
+            int page = 0;
+            int size = 3;
+            String sort = "createdAt:desc";
+
+            // when
+            webTestClient.get()
+                .uri("/api/beans?page={page}&size={size}&sort={sort}", page, size, sort)
+                .exchange()
+                // then
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.success").isEqualTo(true)
+                .jsonPath("$.data.page").isEqualTo(page)
+                .jsonPath("$.data.hasNext").isEqualTo(true)
+                .jsonPath("$.data.content").isArray()
+                .jsonPath("$.data.content.length()").isEqualTo(3);
+        }
+
+        @Test
+        @DisplayName("마지막 페이지를 조회할 수 있다")
+        void getAllBeansLastPage() {
+            // given
+            int page = 2; // 15개 원두, 페이지당 10개씩이면 마지막은 2페이지(0부터 시작)
+            int size = 10;
+
+            // when
+            webTestClient.get()
+                .uri("/api/beans?page={page}&size={size}", page, size)
+                .exchange()
+                // then
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.success").isEqualTo(true)
+                .jsonPath("$.data.page").isEqualTo(page)
+                .jsonPath("$.data.hasNext").isEqualTo(false)
+                .jsonPath("$.data.content").isArray();
+        }
+
+        @Test
+        @DisplayName("원두 목록 조회 시 각 원두의 기본 정보가 포함된다")
+        void getAllBeansContainsBasicBeanInfo() {
+            // when
+            webTestClient.get()
+                .uri("/api/beans?size=1")
+                .exchange()
+                // then
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.success").isEqualTo(true);
+        }
+
+        @Test
+        @DisplayName("원두가 없을 때 빈 목록이 반환된다")
+        void getAllBeansWhenEmpty() {
+            // given
+            cleanUpDatabase(); // 모든 원두 삭제
+
+            // when
+            webTestClient.get()
+                .uri("/api/beans")
+                .exchange()
+                // then
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.success").isEqualTo(true)
+                .jsonPath("$.data.content").isArray()
+                .jsonPath("$.data.content").isEmpty();
+        }
+
+        @Test
+        @DisplayName("잘못된 페이지 번호로 조회해도 정상 처리된다")
+        void getAllBeansWithInvalidPageNumber() {
+            // given
+            int invalidPage = 999;
+
+            // when
+            webTestClient.get()
+                .uri("/api/beans?page={page}", invalidPage)
+                .exchange()
+                // then
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.success").isEqualTo(true)
+                .jsonPath("$.data.page").isEqualTo(invalidPage)
+                .jsonPath("$.data.content").isArray()
+                .jsonPath("$.data.content").isEmpty();
+        }
+
+        @Test
+        @DisplayName("음수 페이지 번호는 0으로 처리된다")
+        void getAllBeansWithNegativePageNumber() {
+            // given
+            int negativePage = -1;
+
+            // when
+            webTestClient.get()
+                .uri("/api/beans?page={page}", negativePage)
+                .exchange()
+                // then
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.success").isEqualTo(true)
+                .jsonPath("$.data.content").isArray();
+        }
+
+        @Test
+        @DisplayName("잘못된 정렬 형식이면 조회 할 수 없다")
+        void getAllBeansWithInvalidSortFormat() {
+            // given
+            String invalidSort = "invalid_sort_format";
+
+            // when
+            webTestClient.get()
+                .uri("/api/beans?sort={sort}", invalidSort)
+                .exchange()
+                // then
+                .expectStatus().isBadRequest()
+                .expectBody()
+                .jsonPath("$.success").isEqualTo(false)
+                .jsonPath("$.message").isEqualTo("잘못된 정렬 형식입니다. ('invalid_sort_format')")
+                .jsonPath("$.data").isEmpty();
+        }
+
+        @Test
+        @DisplayName("사이즈가 0일 때도 정상 처리된다")
+        void getAllBeansWithZeroSize() {
+            // given
+            int size = 0;
+
+            // when
+            webTestClient.get()
+                .uri("/api/beans?size={size}", size)
+                .exchange()
+                // then
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.success").isEqualTo(true)
+                .jsonPath("$.data.hasNext").isEqualTo(true)
+                .jsonPath("$.data.content").isArray()
+                .jsonPath("$.data.content").isEmpty();
+        }
+    }
+
+    @Nested
     @DisplayName("원두 조회")
     class GetBeanTest {
 

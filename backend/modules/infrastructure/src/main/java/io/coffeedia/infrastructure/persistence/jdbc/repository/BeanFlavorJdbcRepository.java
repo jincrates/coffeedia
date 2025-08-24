@@ -7,4 +7,6 @@ import org.springframework.data.repository.ListCrudRepository;
 public interface BeanFlavorJdbcRepository extends ListCrudRepository<BeanFlavorJdbcEntity, Long> {
 
     List<BeanFlavorJdbcEntity> findAllByBeanId(Long beanId);
+
+    List<BeanFlavorJdbcEntity> findAllByBeanIdIn(List<Long> beanIds);
 }

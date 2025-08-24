@@ -33,6 +33,14 @@ Content-Type: application/json
   client.global.set("beanId", response.body.data.beanId);
 %}
 
+### 원두 목록 조회
+GET {{backend-api}}/api/beans
+
+
+### 원두 목록 조회(query)
+GET {{backend-api}}/api/beans?page=0&size=10&sort=roastDate:desc
+
+
 ### 원두 조회
 GET {{backend-api}}/api/beans/{{beanId}}
 
