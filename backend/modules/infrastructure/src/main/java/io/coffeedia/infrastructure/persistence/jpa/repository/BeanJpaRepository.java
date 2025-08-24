@@ -14,8 +14,9 @@ public interface BeanJpaRepository extends JpaRepository<BeanJpaEntity, Long> {
         SELECT b FROM BeanJpaEntity b
         LEFT JOIN FETCH b.beanFlavors bf
         LEFT JOIN FETCH bf.flavor f
+        WHERE b IN :beans
         """)
-    List<BeanJpaEntity> findAllWithFlavors(Pageable pageable);
+    List<BeanJpaEntity> findAllWithFlavors(@Param(value = "beans") final List<BeanJpaEntity> beans);
 
     @Query("""
         SELECT b FROM BeanJpaEntity b
@@ -23,5 +24,8 @@ public interface BeanJpaRepository extends JpaRepository<BeanJpaEntity, Long> {
         LEFT JOIN FETCH bf.flavor f
         WHERE b.id = :id
         """)
-    Optional<BeanJpaEntity> findByIdWithFlavors(@Param(value = "id") Long id);
+    Optional<BeanJpaEntity> findByIdWithFlavors(@Param(value = "id") final Long id);
+
+    @Query("SELECT b FROM BeanJpaEntity b")
+    List<BeanJpaEntity> findAllBeans(final Pageable pageable);
 }

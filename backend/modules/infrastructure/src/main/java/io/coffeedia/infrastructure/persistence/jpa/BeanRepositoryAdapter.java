@@ -40,7 +40,9 @@ class BeanRepositoryAdapter implements BeanRepositoryPort {
         if (bean.id() == null) {
             throw new IllegalArgumentException("원두 ID는 필수입니다.");
         }
-        return create(bean);
+        BeanJpaEntity entity = BeanJpaMapper.toEntity(bean);
+        BeanJpaEntity updated = beanRepository.save(entity);
+        return BeanJpaMapper.toDomain(updated);
     }
 
     @Override
@@ -61,7 +63,8 @@ class BeanRepositoryAdapter implements BeanRepositoryPort {
             pageSize.size() + 1,  // 다음 페이지가 있는지 확인하기 위해 +1
             toSort(sorts)
         );
-        return beanRepository.findAllWithFlavors(pageable).stream()
+        List<BeanJpaEntity> beans = beanRepository.findAllBeans(pageable);
+        return beanRepository.findAllWithFlavors(beans).stream()
             .map(BeanJpaMapper::toDomain)
             .toList();
     }
