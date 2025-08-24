@@ -1,6 +1,6 @@
 package io.coffeedia.bootstrap.api;
 
-import io.coffeedia.bootstrap.IntegrationSupportTest;
+import io.coffeedia.IntegrationSupportTest;
 import io.coffeedia.domain.model.Bean;
 import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;

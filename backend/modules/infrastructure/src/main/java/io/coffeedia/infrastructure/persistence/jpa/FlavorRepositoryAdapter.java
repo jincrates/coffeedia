@@ -1,9 +1,9 @@
-package io.coffeedia.infrastructure.persistence.jdbc;
+package io.coffeedia.infrastructure.persistence.jpa;
 
 import io.coffeedia.application.port.repository.FlavorRepositoryPort;
 import io.coffeedia.domain.model.Flavor;
-import io.coffeedia.infrastructure.persistence.jdbc.mapper.FlavorJdbcMapper;
-import io.coffeedia.infrastructure.persistence.jdbc.repository.FlavorJdbcRepository;
+import io.coffeedia.infrastructure.persistence.jpa.mapper.FlavorJpaMapper;
+import io.coffeedia.infrastructure.persistence.jpa.repository.FlavorJpaRepository;
 import java.util.List;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
@@ -13,12 +13,12 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 class FlavorRepositoryAdapter implements FlavorRepositoryPort {
 
-    private final FlavorJdbcRepository repository;
+    private final FlavorJpaRepository repository;
 
     @Override
     public List<Flavor> findAllByIds(final Set<Long> ids) {
         return repository.findAllById(ids).stream()
-            .map(FlavorJdbcMapper::toDomain)
+            .map(FlavorJpaMapper::toDomain)
             .toList();
     }
 }

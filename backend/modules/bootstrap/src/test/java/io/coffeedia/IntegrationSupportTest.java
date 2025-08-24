@@ -1,7 +1,7 @@
-package io.coffeedia.bootstrap;
+package io.coffeedia;
 
 import io.coffeedia.application.port.repository.BeanRepositoryPort;
-import io.coffeedia.bootstrap.config.P6SqySqlFormatConfig;
+import io.coffeedia.application.port.repository.FlavorRepositoryPort;
 import io.coffeedia.domain.model.Bean;
 import io.coffeedia.domain.model.Flavor;
 import io.coffeedia.domain.vo.AccessType;
@@ -15,24 +15,27 @@ import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
+import org.springframework.core.env.Environment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 @ActiveProfiles("test")
-@Import({
-    P6SqySqlFormatConfig.class,
-})
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public abstract class IntegrationSupportTest {
+
+    @Autowired
+    protected Environment env;
 
     @Autowired
     protected WebTestClient webTestClient;
 
     @Autowired
     protected BeanRepositoryPort beanRepository;
+
+    @Autowired
+    protected FlavorRepositoryPort flavorRepository;
 
     static {
         TestContainerManager.POSTGRES_CONTAINER.start();
