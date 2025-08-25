@@ -6,6 +6,8 @@ import io.coffeedia.domain.vo.BlendType;
 import io.coffeedia.domain.vo.Origin;
 import io.coffeedia.domain.vo.ProcessType;
 import io.coffeedia.domain.vo.RoastLevel;
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.AttributeOverrides;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -27,6 +29,7 @@ import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
+import org.hibernate.annotations.DynamicUpdate;
 
 @Getter
 @Builder
@@ -35,6 +38,7 @@ import org.hibernate.annotations.Comment;
 @Comment("원두")
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@DynamicUpdate
 public class BeanJpaEntity extends BaseEntity {
 
     @Id
@@ -47,6 +51,10 @@ public class BeanJpaEntity extends BaseEntity {
     private String name;
 
     @Embedded
+    @AttributeOverrides({
+        @AttributeOverride(name = "country", column = @Column(name = "origin_country")),
+        @AttributeOverride(name = "region", column = @Column(name = "origin_region"))
+    })
     private Origin origin;
 
     @Column(nullable = false, length = 80)
