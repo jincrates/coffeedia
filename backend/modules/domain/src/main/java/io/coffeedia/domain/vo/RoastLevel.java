@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 public enum RoastLevel {
     LIGHT("약배전"),
     MEDIUM("중배전"),
+    MEDIUM_DARK("중강배전"),
     DARK("강배전"),
     UNKNOWN("알 수 없음"),
     ;

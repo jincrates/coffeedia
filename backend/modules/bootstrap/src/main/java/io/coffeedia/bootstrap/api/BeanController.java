@@ -8,6 +8,7 @@ import io.coffeedia.application.usecase.dto.BeanResponse;
 import io.coffeedia.application.usecase.dto.BeanSearchQuery;
 import io.coffeedia.application.usecase.dto.CreateBeanCommand;
 import io.coffeedia.application.usecase.dto.UpdateBeanCommand;
+import io.coffeedia.bootstrap.api.docs.BeanControllerDocs;
 import io.coffeedia.bootstrap.api.dto.BaseResponse;
 import io.coffeedia.bootstrap.api.dto.PageResponse;
 import jakarta.validation.Valid;
@@ -26,13 +27,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/beans")
-public class BeanController extends BaseController {
+public class BeanController extends BaseController implements BeanControllerDocs {
 
     private final CreateBeanUseCase createUseCase;
     private final GetAllBeanUseCase getAllUseCase;
     private final GetBeanUseCase getUseCase;
     private final UpdateBeanUseCase updateUseCase;
 
+    @Override
     @PostMapping
     public ResponseEntity<BaseResponse<BeanResponse>> createBean(
         @Valid @RequestBody CreateBeanCommand command
@@ -40,6 +42,7 @@ public class BeanController extends BaseController {
         return created(createUseCase.invoke(command));
     }
 
+    @Override
     @GetMapping
     public ResponseEntity<BaseResponse<PageResponse<BeanResponse>>> getAllBeans(
         @RequestParam(defaultValue = "0") int page,
@@ -50,6 +53,7 @@ public class BeanController extends BaseController {
         return ok(PageResponse.of(page, size, response));
     }
 
+    @Override
     @GetMapping("/{beanId}")
     public ResponseEntity<BaseResponse<BeanResponse>> getBean(
         @PathVariable Long beanId
@@ -57,6 +61,7 @@ public class BeanController extends BaseController {
         return ok(getUseCase.invoke(beanId));
     }
 
+    @Override
     @PutMapping("/{beanId}")
     public ResponseEntity<BaseResponse<BeanResponse>> updateBean(
         @PathVariable Long beanId,
