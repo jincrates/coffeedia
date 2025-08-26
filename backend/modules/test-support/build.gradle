@@ -1,9 +1,11 @@
-bootJar.enabled = true
-jar.enabled = false
+bootJar.enabled = false
+jar.enabled = true
 
 dependencies {
-    testImplementation("org.springframework.boot:spring-boot-starter-webflux")
-    testImplementation("com.tngtech.archunit:archunit-junit5:${archUnitVersion}")
-    testImplementation("org.testcontainers:junit-jupiter")
-    testImplementation("org.testcontainers:postgresql")
+    implementation("org.springframework.boot:spring-boot-starter-test")
+//    implementation("org.springframework.boot:spring-boot-starter-web")
+//    implementation("org.springframework.boot:spring-boot-starter-webflux")
+    implementation("com.tngtech.archunit:archunit-junit5:${archUnitVersion}")
+    implementation("org.testcontainers:junit-jupiter")
+    implementation("org.testcontainers:postgresql")
 }

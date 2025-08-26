@@ -74,7 +74,7 @@ graph TD
     UC --> PORT
     PORT --> MODEL
     
-    %% 구현 방향 (Infrastructure → Domain)
+    %% 구현 방향 (Infrastructure → Application)
     JPA -.-> PORT
     KAFKA -.-> PORT
 
