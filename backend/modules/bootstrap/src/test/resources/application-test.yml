@@ -17,4 +17,4 @@ spring:
         highlight_sql: true
 
   datasource:
-    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    driver-class-name: org.postgresql.Driver

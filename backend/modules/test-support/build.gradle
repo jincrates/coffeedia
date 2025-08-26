@@ -1,0 +1,11 @@
+bootJar.enabled = false
+jar.enabled = true
+
+dependencies {
+    implementation("org.springframework.boot:spring-boot-starter-test")
+//    implementation("org.springframework.boot:spring-boot-starter-web")
+//    implementation("org.springframework.boot:spring-boot-starter-webflux")
+    implementation("com.tngtech.archunit:archunit-junit5:${archUnitVersion}")
+    implementation("org.testcontainers:junit-jupiter")
+    implementation("org.testcontainers:postgresql")
+}
