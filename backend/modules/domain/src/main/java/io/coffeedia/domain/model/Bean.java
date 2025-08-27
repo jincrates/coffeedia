@@ -19,11 +19,11 @@ public record Bean(
     Origin origin,
     String roaster,
     LocalDate roastDate,
-    int grams,
+    Integer grams,
     RoastLevel roastLevel,
     ProcessType processType,
     BlendType blendType,
-    boolean isDecaf,
+    Boolean isDecaf,
     List<Flavor> flavors,
     String memo,
     ActiveStatus status,
@@ -45,7 +45,7 @@ public record Bean(
         if (roastDate == null) {
             throw new IllegalArgumentException("원두 로스팅 일자는 필수입니다.");
         }
-        if (grams < 0) {
+        if (grams == null || grams < 0) {
             throw new IllegalArgumentException("원두 그램은 0g 이상이어야 합니다.");
         }
         if (roastLevel == null) {

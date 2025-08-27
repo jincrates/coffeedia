@@ -6,8 +6,7 @@ def modulePaths = [
         "modules/application/port",
         "modules/infrastructure",
         "modules/bootstrap",
-        "modules/common",
-        "modules/test-support",
+        "modules/common"
 ]
 
 modulePaths.each { path ->

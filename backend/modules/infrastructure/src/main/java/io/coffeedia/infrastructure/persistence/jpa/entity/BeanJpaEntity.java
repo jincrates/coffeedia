@@ -1,5 +1,6 @@
 package io.coffeedia.infrastructure.persistence.jpa.entity;
 
+import io.coffeedia.domain.model.Bean;
 import io.coffeedia.domain.vo.AccessType;
 import io.coffeedia.domain.vo.ActiveStatus;
 import io.coffeedia.domain.vo.BlendType;
@@ -123,5 +124,44 @@ public class BeanJpaEntity extends BaseEntity {
                 .flavor(flavor)
                 .build()
         );
+    }
+
+    public void update(final Bean bean) {
+        if (bean.name() != null) {
+            this.name = bean.name();
+        }
+        if (bean.origin() != null) {
+            this.origin = bean.origin();
+        }
+        if (bean.roaster() != null) {
+            this.roaster = bean.roaster();
+        }
+        if (bean.roastDate() != null) {
+            this.roastDate = bean.roastDate();
+        }
+        if (bean.grams() != null) {
+            this.grams = bean.grams();
+        }
+        if (bean.isDecaf() != null) {
+            this.isDecaf = bean.isDecaf();
+        }
+        if (bean.roastLevel() != null) {
+            this.roastLevel = bean.roastLevel();
+        }
+        if (bean.processType() != null) {
+            this.processType = bean.processType();
+        }
+        if (bean.blendType() != null) {
+            this.blendType = bean.blendType();
+        }
+        if (bean.memo() != null) {
+            this.memo = bean.memo();
+        }
+        if (bean.status() != null) {
+            this.status = bean.status();
+        }
+        if (bean.accessType() != null) {
+            this.accessType = bean.accessType();
+        }
     }
 }
