@@ -36,13 +36,19 @@ class BeanRepositoryAdapter implements BeanRepositoryPort {
     }
 
     @Override
-    public Bean update(final Bean bean) {
-        if (bean.id() == null) {
+    public Bean update(final Bean newBean) {
+        Long beanId = newBean.id();
+
+        if (beanId == null) {
             throw new IllegalArgumentException("원두 ID는 필수입니다.");
         }
-        BeanJpaEntity entity = BeanJpaMapper.toEntity(bean);
-        BeanJpaEntity updated = beanRepository.save(entity);
-        return BeanJpaMapper.toDomain(updated);
+
+        BeanJpaEntity bean = beanRepository.findById(beanId)
+            .orElseThrow(() -> new IllegalArgumentException(
+                "원두를 찾을 수 없습니다. (id: " + beanId + ")"
+            ));
+        bean.update(newBean);  // 더티체킹으로 변경
+        return BeanJpaMapper.toDomain(bean);
     }
 
     @Override
