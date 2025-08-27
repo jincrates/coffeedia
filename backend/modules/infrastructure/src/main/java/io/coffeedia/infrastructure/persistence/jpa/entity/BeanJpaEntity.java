@@ -139,8 +139,11 @@ public class BeanJpaEntity extends BaseEntity {
         if (bean.roastDate() != null) {
             this.roastDate = bean.roastDate();
         }
-        if (bean.grams() >= 0) {  // primitive int는 null 체크 불가하므로 >= 0으로 체크
+        if (bean.grams() != null) {
             this.grams = bean.grams();
+        }
+        if (bean.isDecaf() != null) {
+            this.isDecaf = bean.isDecaf();
         }
         if (bean.roastLevel() != null) {
             this.roastLevel = bean.roastLevel();
@@ -160,6 +163,5 @@ public class BeanJpaEntity extends BaseEntity {
         if (bean.accessType() != null) {
             this.accessType = bean.accessType();
         }
-        this.isDecaf = bean.isDecaf();  // boolean은 primitive 타입이므로 항상 업데이트
     }
 }
