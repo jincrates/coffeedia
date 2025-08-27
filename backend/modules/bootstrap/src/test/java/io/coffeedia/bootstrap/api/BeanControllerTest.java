@@ -1,7 +1,15 @@
 package io.coffeedia.bootstrap.api;
 
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
+
 import io.coffeedia.IntegrationSupportTest;
 import io.coffeedia.domain.model.Bean;
+import io.coffeedia.domain.vo.AccessType;
+import io.coffeedia.domain.vo.ActiveStatus;
+import io.coffeedia.domain.vo.BlendType;
+import io.coffeedia.domain.vo.ProcessType;
+import io.coffeedia.domain.vo.RoastLevel;
 import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -10,8 +18,13 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 
+// TODO: 요청/응답을 객체로 전환하는 것이 좋을 것 같다.
 @Tag("integration")
 class BeanControllerTest extends IntegrationSupportTest {
+    @BeforeEach
+    void setUp() {
+        cleanUpDatabase();
+    }
 
     @Nested
     @DisplayName("원두 등록")
@@ -46,7 +59,26 @@ class BeanControllerTest extends IntegrationSupportTest {
                 .expectBody()
                 .jsonPath("$.success").isEqualTo(true)
                 .jsonPath("$.message").isEqualTo(null)
-                .jsonPath("$.data.beanId").isNumber();
+                .jsonPath("$.data.beanId").isNumber()
+                .jsonPath("$.data.name").isEqualTo("에티오피아 예가체프")
+                .jsonPath("$.data.origin").exists()
+                .jsonPath("$.data.origin.country").isEqualTo("에티오피아")
+                .jsonPath("$.data.origin.region").isEqualTo("예가체프")
+                .jsonPath("$.data.roaster").isEqualTo("커피로스터")
+                .jsonPath("$.data.roastDate").isEqualTo(LocalDate.now().minusDays(3).toString())
+                .jsonPath("$.data.grams").isEqualTo(250)
+                .jsonPath("$.data.flavors").isArray()
+                .jsonPath("$.data.flavors").isNotEmpty()
+                // 기본값 검증
+                .jsonPath("$.data.roastLevel").isEqualTo(RoastLevel.UNKNOWN)
+                .jsonPath("$.data.processType").isEqualTo(ProcessType.UNKNOWN)
+                .jsonPath("$.data.blendType").isEqualTo(BlendType.UNKNOWN)
+                .jsonPath("$.data.isDecaf").isEqualTo(false)
+                .jsonPath("$.data.status").isEqualTo(ActiveStatus.ACTIVE)
+                .jsonPath("$.data.accessType").isEqualTo(AccessType.PRIVATE)
+                .jsonPath("$.data.memo").doesNotExist()
+                .jsonPath("$.data.createdAt").exists()
+                .jsonPath("$.data.updatedAt").exists();
         }
 
         @Test
@@ -116,7 +148,7 @@ class BeanControllerTest extends IntegrationSupportTest {
                 .expectStatus().isBadRequest()
                 .expectBody()
                 .jsonPath("$.success").isEqualTo(false)
-                .jsonPath("$.message").value(org.hamcrest.Matchers.containsString("원두 이름은 필수입니다"))
+                .jsonPath("$.message").value(containsString("원두 이름은 필수입니다"))
                 .jsonPath("$.data").isEmpty();
         }
 
@@ -148,7 +180,7 @@ class BeanControllerTest extends IntegrationSupportTest {
                 .expectStatus().isBadRequest()
                 .expectBody()
                 .jsonPath("$.success").isEqualTo(false)
-                .jsonPath("$.message").value(org.hamcrest.Matchers.containsString("원두 이름은 필수입니다"))
+                .jsonPath("$.message").value(containsString("원두 이름은 필수입니다"))
                 .jsonPath("$.data").isEmpty();
         }
 
@@ -177,7 +209,7 @@ class BeanControllerTest extends IntegrationSupportTest {
                 .expectStatus().isBadRequest()
                 .expectBody()
                 .jsonPath("$.success").isEqualTo(false)
-                .jsonPath("$.message").value(org.hamcrest.Matchers.containsString("원두 원산지는 필수입니다"))
+                .jsonPath("$.message").value(containsString("원두 원산지는 필수입니다"))
                 .jsonPath("$.data").isEmpty();
         }
 
@@ -209,7 +241,7 @@ class BeanControllerTest extends IntegrationSupportTest {
                 .expectStatus().isBadRequest()
                 .expectBody()
                 .jsonPath("$.success").isEqualTo(false)
-                .jsonPath("$.message").value(org.hamcrest.Matchers.containsString("원두 로스터는 필수입니다"))
+                .jsonPath("$.message").value(containsString("원두 로스터는 필수입니다"))
                 .jsonPath("$.data").isEmpty();
         }
 
@@ -242,7 +274,7 @@ class BeanControllerTest extends IntegrationSupportTest {
                 .expectBody()
                 .jsonPath("$.success").isEqualTo(false)
                 .jsonPath("$.message")
-                .value(org.hamcrest.Matchers.containsString("원두 로스팅 일자는 필수입니다"))
+                .value(containsString("원두 로스팅 일자는 필수입니다"))
                 .jsonPath("$.data").isEmpty();
         }
 
@@ -275,7 +307,7 @@ class BeanControllerTest extends IntegrationSupportTest {
                 .expectBody()
                 .jsonPath("$.success").isEqualTo(false)
                 .jsonPath("$.message")
-                .value(org.hamcrest.Matchers.containsString("원두 그램은 0g 이상이어야 합니다"))
+                .value(containsString("원두 그램은 0g 이상이어야 합니다"))
                 .jsonPath("$.data").isEmpty();
         }
 
@@ -307,7 +339,7 @@ class BeanControllerTest extends IntegrationSupportTest {
                 .expectStatus().isBadRequest()
                 .expectBody()
                 .jsonPath("$.success").isEqualTo(false)
-                .jsonPath("$.message").value(org.hamcrest.Matchers.containsString("원산지 국가는 필수입니다"))
+                .jsonPath("$.message").value(containsString("원산지 국가는 필수입니다"))
                 .jsonPath("$.data").isEmpty();
         }
 
@@ -352,7 +384,6 @@ class BeanControllerTest extends IntegrationSupportTest {
 
         @BeforeEach
         void setUp() {
-            cleanUpDatabase();
             createBeans(15);
         }
 
@@ -589,7 +620,6 @@ class BeanControllerTest extends IntegrationSupportTest {
 
         @BeforeEach
         void setUp() {
-            cleanUpDatabase();
             bean = createBean();
         }
 
@@ -639,7 +669,7 @@ class BeanControllerTest extends IntegrationSupportTest {
                 .expectBody()
                 .jsonPath("$.success").isEqualTo(false)
                 .jsonPath("$.message")
-                .value(org.hamcrest.Matchers.containsString("원두를 찾을 수 없습니다"))
+                .value(containsString("원두를 찾을 수 없습니다"))
                 .jsonPath("$.data").isEmpty();
         }
 
@@ -665,7 +695,6 @@ class BeanControllerTest extends IntegrationSupportTest {
 
         @BeforeEach
         void setUp() {
-            cleanUpDatabase();
             bean = createBean();
         }
 
@@ -693,8 +722,26 @@ class BeanControllerTest extends IntegrationSupportTest {
                 .jsonPath("$.success").isEqualTo(true)
                 .jsonPath("$.message").isEqualTo(null)
                 .jsonPath("$.data").exists()
-                .jsonPath("$.data.beanId").isEqualTo(beanId)
-                .jsonPath("$.data.name").isEqualTo("수정된 원두 이름");
+                // 수정된 필드 검증
+                .jsonPath("$.data.name").isEqualTo("수정된 원두 이름")
+                // 수정되지 않은 필드들이 기존 값을 유지하는지 검증
+                .jsonPath("$.data.beanId").isEqualTo(bean.id())
+                .jsonPath("$.data.origin").exists()
+                .jsonPath("$.data.origin.country").isEqualTo(bean.origin().country())
+                .jsonPath("$.data.origin.region").isEqualTo(bean.origin().region())
+                .jsonPath("$.data.roaster").isEqualTo(bean.roaster())
+                .jsonPath("$.data.roastDate").isEqualTo(bean.roastDate())
+                .jsonPath("$.data.grams").isEqualTo(bean.grams())
+                .jsonPath("$.data.roastLevel").isEqualTo(bean.roastLevel())
+                .jsonPath("$.data.processType").isEqualTo(bean.processType())
+                .jsonPath("$.data.blendType").isEqualTo(bean.blendType())
+                .jsonPath("$.data.isDecaf").isEqualTo(bean.isDecaf())
+                .jsonPath("$.data.memo").isEqualTo(bean.memo())
+                .jsonPath("$.data.status").isEqualTo(bean.status())
+                .jsonPath("$.data.accessType").isEqualTo(bean.accessType())
+                .jsonPath("$.data.flavors.length()").isEqualTo(bean.flavors().size())
+                .jsonPath("$.data.createdAt").isEqualTo(bean.createdAt())
+                .jsonPath("$.data.updatedAt").value(greaterThanOrEqualTo(bean.createdAt().toString()));
         }
 
         @Test
@@ -828,7 +875,7 @@ class BeanControllerTest extends IntegrationSupportTest {
                 .expectBody()
                 .jsonPath("$.success").isEqualTo(false)
                 .jsonPath("$.message")
-                .value(org.hamcrest.Matchers.containsString("원두를 찾을 수 없습니다"))
+                .value(containsString("원두를 찾을 수 없습니다"))
                 .jsonPath("$.data").isEmpty();
         }
 
@@ -875,7 +922,7 @@ class BeanControllerTest extends IntegrationSupportTest {
                 .expectBody()
                 .jsonPath("$.success").isEqualTo(false)
                 .jsonPath("$.message")
-                .value(org.hamcrest.Matchers.containsString("원두 그램은 0g 이상이어야 합니다"))
+                .value(containsString("원두 그램은 0g 이상이어야 합니다"))
                 .jsonPath("$.data").isEmpty();
         }
 
