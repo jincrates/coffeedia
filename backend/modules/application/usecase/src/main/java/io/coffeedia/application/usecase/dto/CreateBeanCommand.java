@@ -12,7 +12,9 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import java.time.LocalDate;
 import java.util.List;
+import lombok.Builder;
 
+@Builder
 public record CreateBeanCommand(
     @NotBlank(message = "원두 이름은 필수입니다.")
     String name,
