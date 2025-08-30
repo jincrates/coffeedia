@@ -34,7 +34,9 @@ public final class TestContainerManager {
         registry.add("spring.datasource.replica.hikari.jdbc-url", POSTGRES_CONTAINER::getJdbcUrl);
         registry.add("spring.datasource.replica.hikari.username", POSTGRES_CONTAINER::getUsername);
         registry.add("spring.datasource.replica.hikari.password", POSTGRES_CONTAINER::getPassword);
+    }
 
+    static void registerRedisProperties(DynamicPropertyRegistry registry) {
         // redis
         registry.add("spring.data.redis.host", REDIS_CONTAINER::getHost);
         registry.add("spring.data.redis.port", () -> REDIS_CONTAINER.getMappedPort(6379));

@@ -10,9 +10,7 @@ public interface CacheClient {
 
     <T> T read(String key, Class<T> valueType);
 
-    void write(String key, String value, Duration ttl);
-
-    void write(String key, Object value, Duration ttl);
+    <T> void write(String key, T value, Duration ttl);
 
     void delete(String key);
 }

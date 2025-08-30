@@ -51,6 +51,7 @@ public abstract class IntegrationSupportTest {
     @DynamicPropertySource
     private static void registerProperties(DynamicPropertyRegistry registry) {
         TestContainerManager.registerPostgresProperties(registry);
+        TestContainerManager.registerRedisProperties(registry);
     }
 
     protected void cleanUpDatabase() {
