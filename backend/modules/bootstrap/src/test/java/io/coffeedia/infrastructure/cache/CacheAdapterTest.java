@@ -132,7 +132,6 @@ public class CacheAdapterTest extends IntegrationSupportTest {
 
             // when
             cacheAdapter.write(key, list, Duration.ofMinutes(1));
-            @SuppressWarnings("unchecked")
             List<String> result = cacheAdapter.read(key, List.class);
 
             // then
@@ -152,7 +151,6 @@ public class CacheAdapterTest extends IntegrationSupportTest {
 
             // when
             cacheAdapter.write(key, map, Duration.ofMinutes(1));
-            @SuppressWarnings("unchecked")
             Map<String, Object> result = cacheAdapter.read(key, Map.class);
 
             // then

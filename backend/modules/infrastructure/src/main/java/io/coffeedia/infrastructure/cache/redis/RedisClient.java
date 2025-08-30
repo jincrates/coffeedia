@@ -1,6 +1,6 @@
 package io.coffeedia.infrastructure.cache.redis;
 
-import io.coffeedia.common.util.ObjectMapperProvider;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.coffeedia.infrastructure.cache.CacheClient;
 import java.time.Duration;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 class RedisClient implements CacheClient {
 
     private final RedisTemplate<String, Object> redisTemplate;
+    private final ObjectMapper objectMapper;
 
     @Override
     public boolean exists(final String key) {
@@ -43,7 +44,7 @@ class RedisClient implements CacheClient {
                 return valueType.cast(value);
             }
 
-            return ObjectMapperProvider.getInstance().convertValue(value, valueType);
+            return objectMapper.convertValue(value, valueType);
         } catch (Exception e) {
             log.error("Redis read operation failed for key: {} with type: {}", key,
                 valueType.getSimpleName(), e);
