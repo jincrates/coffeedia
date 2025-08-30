@@ -142,6 +142,14 @@ services:
     networks:
       - coffeedia-network
 
+  coffeedia-redis:
+    image: redis:7.0
+    container_name: coffeedia-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - coffeedia-network
+
 networks:
   coffeedia-network:
     driver: bridge

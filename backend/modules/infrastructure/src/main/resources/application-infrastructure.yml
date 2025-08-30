@@ -25,6 +25,12 @@ spring:
         idle-timeout: 300000
         pool-name: ReplicaHikariPool
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 1s
+
 ---
 spring.config.activate.on-profile: local
 
