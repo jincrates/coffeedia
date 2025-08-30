@@ -2,6 +2,7 @@ package io.coffeedia;
 
 import io.coffeedia.application.port.repository.BeanRepositoryPort;
 import io.coffeedia.application.port.repository.FlavorRepositoryPort;
+import io.coffeedia.bootstrap.Application;
 import io.coffeedia.domain.model.Bean;
 import io.coffeedia.domain.model.Flavor;
 import io.coffeedia.domain.vo.AccessType;
@@ -24,7 +25,10 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 @Tag("integration")
 @ActiveProfiles("test")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(
+    webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+    classes = Application.class
+)
 public abstract class IntegrationSupportTest {
 
     @Autowired
@@ -41,11 +45,13 @@ public abstract class IntegrationSupportTest {
 
     static {
         TestContainerManager.POSTGRES_CONTAINER.start();
+        TestContainerManager.REDIS_CONTAINER.start();
     }
 
     @DynamicPropertySource
     private static void registerProperties(DynamicPropertyRegistry registry) {
         TestContainerManager.registerPostgresProperties(registry);
+        TestContainerManager.registerRedisProperties(registry);
     }
 
     protected void cleanUpDatabase() {
