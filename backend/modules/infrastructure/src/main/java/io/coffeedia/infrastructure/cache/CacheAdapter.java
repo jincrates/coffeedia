@@ -27,7 +27,7 @@ class CacheAdapter implements CachePort {
     }
 
     @Override
-    public void write(final String key, final Object value, final Duration ttl) {
+    public <T> void write(final String key, final T value, final Duration ttl) {
         cacheClient.write(key, value, ttl);
     }
 
