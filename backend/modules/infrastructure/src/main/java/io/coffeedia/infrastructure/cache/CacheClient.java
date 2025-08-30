@@ -1,8 +1,8 @@
-package io.coffeedia.application.port.cache;
+package io.coffeedia.infrastructure.cache;
 
 import java.time.Duration;
 
-public interface CachePort {
+public interface CacheClient {
 
     boolean exists(String key);
 
