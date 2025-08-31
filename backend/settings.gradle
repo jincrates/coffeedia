@@ -5,7 +5,8 @@ def modulePaths = [
         "modules/application/usecase",
         "modules/application/port",
         "modules/infrastructure",
-        "modules/bootstrap",
+        "modules/bootstrap/api",
+        "modules/bootstrap/gateway",
         "modules/common"
 ]
 
