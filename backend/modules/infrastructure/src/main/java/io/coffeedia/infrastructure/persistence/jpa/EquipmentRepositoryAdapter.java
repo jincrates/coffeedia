@@ -3,7 +3,7 @@ package io.coffeedia.infrastructure.persistence.jpa;
 import io.coffeedia.application.port.repository.EquipmentRepositoryPort;
 import io.coffeedia.domain.model.Equipment;
 import io.coffeedia.infrastructure.persistence.jpa.entity.EquipmentJpaEntity;
-import io.coffeedia.infrastructure.persistence.jpa.mapper.EquipmentJapMapper;
+import io.coffeedia.infrastructure.persistence.jpa.mapper.EquipmentJpaMapper;
 import io.coffeedia.infrastructure.persistence.jpa.repository.EquipmentJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -16,8 +16,8 @@ class EquipmentRepositoryAdapter implements EquipmentRepositoryPort {
 
     @Override
     public Equipment save(final Equipment equipment) {
-        EquipmentJpaEntity entity = EquipmentJapMapper.toEntity(equipment);
+        EquipmentJpaEntity entity = EquipmentJpaMapper.toEntity(equipment);
         EquipmentJpaEntity saved = repository.save(entity);
-        return EquipmentJapMapper.toDomain(saved);
+        return EquipmentJpaMapper.toDomain(saved);
     }
 }

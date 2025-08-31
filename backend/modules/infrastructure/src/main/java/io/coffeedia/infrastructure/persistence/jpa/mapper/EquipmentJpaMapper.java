@@ -6,7 +6,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class EquipmentJapMapper {
+public class EquipmentJpaMapper {
 
     public static EquipmentJpaEntity toEntity(final Equipment equipment) {
         return EquipmentJpaEntity.builder()

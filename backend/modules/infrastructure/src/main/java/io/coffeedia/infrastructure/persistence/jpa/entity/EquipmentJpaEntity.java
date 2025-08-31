@@ -56,7 +56,6 @@ public class EquipmentJpaEntity extends BaseEntity {
     @Comment("설명")
     private String description;
 
-    @Column(nullable = false)
     @Comment("구매일자")
     private LocalDate purchaseDate;
 
