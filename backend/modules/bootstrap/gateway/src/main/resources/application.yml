@@ -10,6 +10,17 @@ server:
 ---
 spring.config.activate.on-profile: local
 
+spring:
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: coffeedia-backend-api
+              uri: http://localhost:8090
+              predicates:
+                - Path=/api/**
+
 ---
 spring.config.activate.on-profile: dev
 
