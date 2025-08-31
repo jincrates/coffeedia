@@ -1,5 +1,6 @@
 package io.coffeedia.application.usecase.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.coffeedia.domain.vo.AccessType;
 import io.coffeedia.domain.vo.ActiveStatus;
 import io.coffeedia.domain.vo.BlendType;
@@ -17,6 +18,7 @@ public record BeanResponse(
     String name,
     Origin origin,
     String roaster,
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
     LocalDate roastDate,
     int grams,
     RoastLevel roastLevel,
@@ -27,7 +29,9 @@ public record BeanResponse(
     String memo,
     ActiveStatus status,
     AccessType accessType,
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     LocalDateTime createdAt,
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     LocalDateTime updatedAt
 ) {
 

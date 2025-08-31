@@ -1,3 +1,4 @@
+### ==================================== 원두 관리 ====================================
 ### 원두 등록
 < {%
   // 과거 1년 내의 랜덤한 날짜 생성
@@ -49,3 +50,44 @@ Content-Type: application/json
 {
  "name": "{{$random.commerce.productName}}"
 }
+
+
+### ==================================== 장비 관리 ====================================
+### 장비 등록
+< {%
+  // 과거 2년 내의 랜덤한 날짜 생성
+  const today = new Date();
+  const twoYearsAgo = new Date(today.getFullYear() - 2, today.getMonth(), today.getDate());
+  const randomTime = twoYearsAgo.getTime() + Math.random() * (today.getTime() - twoYearsAgo.getTime());
+  const randomDate = new Date(randomTime);
+  const formattedPurchaseDate = randomDate.toISOString().split('T')[0]; // YYYY-MM-DD 형식
+
+  // 장비 타입 랜덤 선택
+  const equipmentTypes = ["MACHINE", "GRINDER"];
+  const randomType = equipmentTypes[Math.floor(Math.random() * equipmentTypes.length)];
+
+  // 장비 브랜드 랜덤 선택
+  const equipmentBrands = ["브레빌", "드롱기", "라마르조코", "누오바시모넬리", "로켓", "커맨단테", "바라타", "니체", "훌리오"];
+  const randomBrand = equipmentBrands[Math.floor(Math.random() * equipmentBrands.length)];
+
+  request.variables.set("randomPurchaseDate", formattedPurchaseDate);
+  request.variables.set("randomEquipmentType", randomType);
+  request.variables.set("randomBrand", randomBrand);
+%}
+POST {{backend-api}}/api/equipments
+Content-Type: application/json
+
+{
+  "type": "{{randomEquipmentType}}",
+  "name": "{{$random.commerce.productName}}",
+  "brand": "{{randomBrand}}",
+  "status": "ACTIVE",
+  "description": "{{$random.lorem.sentence}}",
+  "purchaseDate": "{{randomPurchaseDate}}",
+  "purchaseUrl": "https://{{$random.internet.domainName}}/products/{{$random.integer(1000, 9999)}}"
+}
+
+> {%
+  client.log('equipmentId', response.body.data.id);
+  client.global.set("equipmentId", response.body.data.id);
+%}
