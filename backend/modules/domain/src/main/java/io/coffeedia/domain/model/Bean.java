@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.List;
 import lombok.Builder;
 
+// TODO: userId 추가
 @Builder
 public record Bean(
     Long id,

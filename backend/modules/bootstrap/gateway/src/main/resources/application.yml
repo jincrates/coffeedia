@@ -6,7 +6,35 @@ server:
   shutdown: graceful
   netty:
     connection-timeout: 2s
+    idle-timeout: 15s
 
+spring:
+  lifecycle:
+    timeout-per-shutdown-phase: 15s
+  cloud:
+    gateway:
+      server:
+        webflux:
+          httpclient:
+            connect-timeout: 2000
+            response-timeout: 5s
+            pool:
+              type: elastic
+              max-idle-time: 15s
+              max-life-time: 60s
+          default-filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter:
+                  replenish-rate: 10  # 초당 버킷에 떨어지는 토큰의 수
+                  burst-capacity: 20  # 최대 20개 요청까지 허용
+                  requested-tokens: 1 # 하나의 요청 처리에 몇 개의 토큰이 사용되는지 지정
+  data:
+    redis:
+      connect-timeout: 2s
+      host: localhost
+      port: 6379
+      timeout: 1s
 ---
 spring.config.activate.on-profile: local
 
