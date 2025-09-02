@@ -29,12 +29,19 @@ spring:
                   replenish-rate: 10  # 초당 버킷에 떨어지는 토큰의 수
                   burst-capacity: 20  # 최대 20개 요청까지 허용
                   requested-tokens: 1 # 하나의 요청 처리에 몇 개의 토큰이 사용되는지 지정
+            - SaveSession
   data:
     redis:
       connect-timeout: 2s
       host: localhost
       port: 6379
       timeout: 1s
+
+  session:
+    store-type: redis
+    timeout: 10m
+    redis:
+      namespace: spring:session
 ---
 spring.config.activate.on-profile: local
 
