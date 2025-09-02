@@ -42,6 +42,19 @@ spring:
     timeout: 10m
     redis:
       namespace: spring:session
+
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            client-id: coffeedia-gateway
+            client-secret: coffeedia-keycloak-secret
+            scope: openid
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8080/realms/Coffeedia
+
 ---
 spring.config.activate.on-profile: local
 
