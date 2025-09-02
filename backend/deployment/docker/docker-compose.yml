@@ -9,14 +9,14 @@ services:
       - "5432:5432"
     volumes:
       - "./postgresql/volumes/main:/bitnami/postgresql"
-      - ./postgresql/init.sql:/docker-entrypoint-initdb. d/db.sql
+      - ./postgresql/init.sql:/docker-entrypoint-initdb.d/db.sql
     environment:
       POSTGRESQL_REPLICATION_MODE: master
-      POSTGRESQL_REPLICATION_USER: replicator_user
-      POSTGRESQL_REPLICATION_PASSWORD: replicator_password
-      POSTGRESQL_USER: user
-      POSTGRESQL_PASSWORD: password
-      POSTGRESQL_DATABASE: coffeedia_db
+      POSTGRESQL_REPLICATION_USER: ${POSTGRES_REPLICATION_USER}
+      POSTGRESQL_REPLICATION_PASSWORD: ${POSTGRES_REPLICATION_PASSWORD}
+      POSTGRESQL_USER: ${POSTGRES_USER}
+      POSTGRESQL_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRESQL_DATABASE: ${POSTGRES_DATABASE}
     networks:
       - coffeedia-network
 
@@ -32,12 +32,12 @@ services:
       - "./postgresql/volumes/replica:/bitnami/postgresql"
     environment:
       POSTGRESQL_REPLICATION_MODE: slave
-      POSTGRESQL_REPLICATION_USER: replicator_user
-      POSTGRESQL_REPLICATION_PASSWORD: replicator_password
+      POSTGRESQL_REPLICATION_USER: ${POSTGRES_REPLICATION_USER}
+      POSTGRESQL_REPLICATION_PASSWORD: ${POSTGRES_REPLICATION_PASSWORD}
       POSTGRESQL_MASTER_HOST: coffeedia-postgres-main
       POSTGRESQL_MASTER_PORT_NUMBER: 5432
-      POSTGRESQL_USER: user
-      POSTGRESQL_PASSWORD: password
+      POSTGRESQL_USER: ${POSTGRES_USER}
+      POSTGRESQL_PASSWORD: ${POSTGRES_PASSWORD}
     networks:
       - coffeedia-network
 
@@ -48,11 +48,11 @@ services:
     ports:
       - "2181:2181"
     environment:
-      ZOOKEEPER_SERVER_ID: 1
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-      ZOOKEEPER_INIT_LIMIT: 5
-      ZOOKEEPER_SYNC_LIMIT: 2
+      ZOOKEEPER_SERVER_ID: ${ZOOKEEPER_SERVER_ID}
+      ZOOKEEPER_CLIENT_PORT: ${ZOOKEEPER_CLIENT_PORT}
+      ZOOKEEPER_TICK_TIME: ${ZOOKEEPER_TICK_TIME}
+      ZOOKEEPER_INIT_LIMIT: ${ZOOKEEPER_INIT_LIMIT}
+      ZOOKEEPER_SYNC_LIMIT: ${ZOOKEEPER_SYNC_LIMIT}
       ZOOKEEPER_SERVERS: coffeedia-zookeeper:2888:3888
       KAFKA_OPTS: "-Dzookeeper.4lw.commands.whitelist=ruok"
     volumes:
@@ -73,9 +73,9 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: coffeedia-zookeeper:2181
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://coffeedia-kafka-broker-1:9092,EXTERNAL://localhost:19092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: ${KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR}
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      KAFKA_COMPRESSION_TYPE: producer
+      KAFKA_COMPRESSION_TYPE: ${KAFKA_COMPRESSION_TYPE}
     volumes:
       - "./kafka/volumes/broker-1:/var/lib/kafka/data"
     networks:
@@ -93,9 +93,9 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: coffeedia-zookeeper:2181
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://coffeedia-kafka-broker-2:9092,EXTERNAL://localhost:29092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: ${KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR}
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      KAFKA_COMPRESSION_TYPE: producer
+      KAFKA_COMPRESSION_TYPE: ${KAFKA_COMPRESSION_TYPE}
     volumes:
       - "./kafka/volumes/broker-2:/var/lib/kafka/data"
     networks:
@@ -113,9 +113,9 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: coffeedia-zookeeper:2181
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://coffeedia-kafka-broker-3:9092,EXTERNAL://localhost:39092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 3
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: ${KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR}
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      KAFKA_COMPRESSION_TYPE: producer
+      KAFKA_COMPRESSION_TYPE: ${KAFKA_COMPRESSION_TYPE}
     volumes:
       - "./kafka/volumes/broker-3:/var/lib/kafka/data"
     networks:
@@ -129,7 +129,7 @@ services:
       - coffeedia-kafka-broker-2
       - coffeedia-kafka-broker-3
     ports:
-      - "9000:9000"
+      - "9000:8080"
     restart: always
     environment:
       KAFKA_CLUSTERS_0_NAME: local
@@ -155,8 +155,8 @@ services:
     volumes:
       - ./keycloak:/opt/keycloak/data/import
     environment:
-      KEYCLOAK_ADMIN: user
-      KEYCLOAK_ADMIN_PASSWORD: password
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
     networks:
       - coffeedia-network
 

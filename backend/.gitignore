@@ -38,4 +38,5 @@ out/
 .vscode/
 
 **/docker/*/volumes/**
+**/docker/.env
 /src/main/generated/
