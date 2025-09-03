@@ -28,16 +28,19 @@ graph LR
     :application:port["port"]
     :application:usecase["usecase"]
   end
+  subgraph :bootstrap
+    :bootstrap:api["api"]
+    :bootstrap:gateway["gateway"]
+  end
   :domain -->|api| :common
-  :infrastructure -->|api| :application:port
-  :bootstrap -->|implementation| :application:usecase
-  :bootstrap -->|implementation| :infrastructure
   :application:usecase -->|api| :domain
-  :application:usecase -->|api| :application:port
+  :application:usecase -->|implementation| :application:port
   :application:port -->|api| :domain
-```
 
-<br/>
+  :infrastructure -->|api| :application:port
+  :bootstrap:api -->|implementation| :application:usecase
+  :bootstrap:api -->|runtimeOnly| :infrastructure
+```
 
 ## 아키텍처 설계
 
@@ -127,4 +130,3 @@ graph TD
 | `ci`       | CI/CD 설정 변경       | `ci: GitHub Actions 워크플로 수정`    |
 | `build`    | 빌드 시스템 변경         | `build: webpack 설정 변경`          |
 | `revert`   | 이전 커밋 되돌리기        | `revert: "feat: 새로운 기능" 커밋 되돌림` |
-

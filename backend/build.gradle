@@ -97,6 +97,6 @@ subprojects {
 
 moduleGraphConfig {
     readmePath.set("${rootDir}/README.md")
-    heading.set("### Module Graph")
+    heading.set("## Module Graph")
     showFullPath.set(false)
 }
