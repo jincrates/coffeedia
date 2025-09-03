@@ -14,10 +14,6 @@ public class AuthController {
     public Mono<AuthUser> getUser(
         @AuthenticationPrincipal OidcUser oidcUser
     ) {
-        if (oidcUser == null) {
-            return Mono.error(new IllegalArgumentException("인증된 사용자 정보가 필요합니다."));
-        }
-
         AuthUser user = AuthUser.builder()
             .username(oidcUser.getPreferredUsername())
             .firstName(oidcUser.getGivenName())

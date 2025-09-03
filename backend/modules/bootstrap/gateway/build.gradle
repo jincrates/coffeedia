@@ -16,5 +16,5 @@ dependencies {
     implementation("org.springframework.session:spring-session-data-redis")
 
     testImplementation("io.projectreactor:reactor-test")
-    testImplementation("org.springframework.boot:spring-boot-starter-security-test")
+    testImplementation("org.springframework.security:spring-security-test")
 }
