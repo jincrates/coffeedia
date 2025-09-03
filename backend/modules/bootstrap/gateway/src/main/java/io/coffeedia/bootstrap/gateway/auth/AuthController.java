@@ -14,11 +14,15 @@ public class AuthController {
     public Mono<AuthUser> getUser(
         @AuthenticationPrincipal OidcUser oidcUser
     ) {
+        if (oidcUser == null) {
+            return Mono.error(new IllegalArgumentException("인증된 사용자 정보가 필요합니다."));
+        }
+
         AuthUser user = AuthUser.builder()
             .username(oidcUser.getPreferredUsername())
             .firstName(oidcUser.getGivenName())
             .lastName(oidcUser.getFamilyName())
-            .roles(List.of("employee", "customer"))
+            .roles(List.of("employee", "customer"))  // TODO: 임시 하드코딩
             .build();
 
         return Mono.just(user);

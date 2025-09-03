@@ -147,7 +147,7 @@ services:
       - coffeedia-network
 
   coffeedia-keycloak:
-    image: quay.io/keycloak/keycloak:19.0
+    image: quay.io/keycloak/keycloak:24.0.4
     container_name: coffeedia-keycloak
     ports:
       - "8080:8080"
