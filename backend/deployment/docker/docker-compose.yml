@@ -171,8 +171,8 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - GF_SECURITY_ADMIN_USER=user
-      - GF_SECURITY_ADMIN_PASSWORD=password
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
     volumes:
       - ./observability/grafana/datasources:/etc/grafana/provisioning/datasources
       - ./observability/grafana/dashboards:/etc/grafana/provisioning/dashboards
@@ -183,14 +183,14 @@ services:
   coffeedia-loki:
     image: grafana/loki:2.9.8
     container_name: coffeedia-loki
-    depends_on:
-      - coffeedia-fluent-bit
     ports:
       - "3100:3100"
 
   coffeedia-fluent-bit:
     image: grafana/fluent-bit-plugin-loki:2.9.8
     container_name: coffeedia-fluent-bit
+    depends_on:
+      - coffeedia-loki
     ports:
       - "24224:24224"
     environment:
