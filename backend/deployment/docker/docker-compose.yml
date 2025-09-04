@@ -179,6 +179,7 @@ services:
       - ./observability/grafana/grafana.ini:/etc/grafana/grafana.ini
     networks:
       - coffeedia-network
+
   coffeedia-loki:
     image: grafana/loki:2.9.8
     container_name: coffeedia-loki
