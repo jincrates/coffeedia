@@ -16,6 +16,23 @@ spring:
     import:
       - application-infrastructure.yml
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, metrics
+  endpoint:
+    health:
+      show-details: always
+      show-components: always
+      probes:
+        enabled: true
+      group:
+        readiness:
+          include: readinessState,redis
+  metrics:
+    tags:
+      application: ${spring.application.name}
 ---
 spring.config.activate.on-profile: local
 
