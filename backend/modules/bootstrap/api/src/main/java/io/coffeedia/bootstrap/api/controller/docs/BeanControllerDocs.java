@@ -246,7 +246,7 @@ public interface BeanControllerDocs {
                     value = """
                         {
                             "success": false,
-                            "message": "해당 원두를 삭제할 권한이 없습니다. (id: 1)",
+                            "message": "권한이 없습니다. (id: 1)",
                             "data": null
                         }
                         """
