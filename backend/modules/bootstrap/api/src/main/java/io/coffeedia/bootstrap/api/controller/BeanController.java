@@ -34,12 +34,14 @@ public class BeanController extends BaseController implements BeanControllerDocs
     private final GetBeanUseCase getUseCase;
     private final UpdateBeanUseCase updateUseCase;
 
+    public static final Long USER_ID = 1L;
+
     @Override
     @PostMapping
     public ResponseEntity<BaseResponse<BeanResponse>> createBean(
         @Valid @RequestBody CreateBeanCommand command
     ) {
-        return created(createUseCase.invoke(command));
+        return created(createUseCase.invoke(command.withUserId(USER_ID)));
     }
 
     @Override
@@ -67,6 +69,6 @@ public class BeanController extends BaseController implements BeanControllerDocs
         @PathVariable Long beanId,
         @Valid @RequestBody UpdateBeanCommand command
     ) {
-        return ok(updateUseCase.invoke(command.withId(beanId)));
+        return ok(updateUseCase.invoke(command.withId(beanId).withUserId(USER_ID)));
     }
 }

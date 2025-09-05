@@ -47,7 +47,11 @@ public class BeanJpaEntity extends BaseEntity {
     @Comment("PK")
     private Long id;
 
-    @Column(nullable = false, length = 80)
+    @Column(nullable = false)
+    @Comment("사용자 ID")
+    private Long userId;
+
+    @Column(nullable = false, length = 40)
     @Comment("이름")
     private String name;
 

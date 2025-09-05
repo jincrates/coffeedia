@@ -12,6 +12,8 @@ import lombok.With;
 public record UpdateBeanCommand(
     @With
     Long id,
+    @With
+    Long userId,
     String name,
     Origin origin,
     String roaster,

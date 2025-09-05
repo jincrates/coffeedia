@@ -66,6 +66,7 @@ public abstract class IntegrationSupportTest {
 
         return beanRepository.create(
             Bean.builder()
+                .userId(1L)
                 .name("조회용 에티오피아 예가체프")
                 .origin(Origin.builder()
                     .country("에티오피아")
@@ -95,6 +96,7 @@ public abstract class IntegrationSupportTest {
         List<Bean> beans = new ArrayList<>();
         for (int i = 0; i < count; i++) {
             Bean bean = Bean.builder()
+                .userId(1L)
                 .name("조회용 에티오피아 예가체프" + i)
                 .origin(Origin.builder()
                     .country("에티오피아")
