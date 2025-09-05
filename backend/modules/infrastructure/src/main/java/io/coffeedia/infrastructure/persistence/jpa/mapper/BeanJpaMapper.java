@@ -19,6 +19,7 @@ public class BeanJpaMapper {
     public static BeanJpaEntity toEntity(final Bean bean) {
         BeanJpaEntity entity = BeanJpaEntity.builder()
             .id(bean.id())
+            .userId(bean.userId())
             .name(bean.name())
             .origin(bean.origin())
             .roaster(bean.roaster())
@@ -48,6 +49,7 @@ public class BeanJpaMapper {
     public static Bean toDomain(final BeanJpaEntity bean) {
         return Bean.builder()
             .id(bean.getId())
+            .userId(bean.getUserId())
             .name(bean.getName())
             .origin(bean.getOrigin())
             .roaster(bean.getRoaster())

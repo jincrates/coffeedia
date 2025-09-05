@@ -12,10 +12,10 @@ import java.util.Collections;
 import java.util.List;
 import lombok.Builder;
 
-// TODO: userId 추가
 @Builder
 public record Bean(
     Long id,
+    Long userId,
     String name,
     Origin origin,
     String roaster,
@@ -34,6 +34,9 @@ public record Bean(
 ) {
 
     public Bean {
+        if (userId == null) {
+            throw new IllegalArgumentException("사용자 ID는 필수입니다.");
+        }
         if (name == null || name.isBlank()) {
             throw new IllegalArgumentException("원두 이름은 필수입니다.");
         }

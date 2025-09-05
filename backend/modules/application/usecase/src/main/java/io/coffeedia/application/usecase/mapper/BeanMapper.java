@@ -17,6 +17,7 @@ public class BeanMapper {
 
     public static Bean toDomain(final CreateBeanCommand command, final List<Flavor> flavors) {
         return Bean.builder()
+            .userId(command.userId())
             .name(command.name())
             .origin(command.origin())
             .roaster(command.roaster())
@@ -70,6 +71,7 @@ public class BeanMapper {
     public static Bean toDomain(final UpdateBeanCommand command, final Bean existing) {
         return Bean.builder()
             .id(existing.id())
+            .userId(existing.userId())
             .name(defaultIfNull(command.name(), existing.name()))
             .origin(defaultIfNull(command.origin(), existing.origin()))
             .roaster(defaultIfNull(command.roaster(), existing.roaster()))

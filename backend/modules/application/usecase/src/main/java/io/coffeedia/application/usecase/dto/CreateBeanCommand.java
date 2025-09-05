@@ -13,9 +13,12 @@ import jakarta.validation.constraints.PositiveOrZero;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.Builder;
+import lombok.With;
 
 @Builder
 public record CreateBeanCommand(
+    @With
+    Long userId,
     @NotBlank(message = "원두 이름은 필수입니다.")
     String name,
     @NotNull(message = "원두 원산지는 필수입니다.")
