@@ -20,4 +20,12 @@ public interface BeanEvent extends DomainEvent {
     ) implements BeanEvent {
 
     }
+
+    @Builder
+    record BeanDeleted(
+        Long beanId,
+        LocalDateTime issuedAt
+    ) implements BeanEvent {
+
+    }
 }

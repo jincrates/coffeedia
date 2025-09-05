@@ -1,6 +1,7 @@
 package io.coffeedia.bootstrap.api.advice;
 
 import io.coffeedia.bootstrap.api.controller.dto.BaseResponse;
+import io.coffeedia.domain.exception.AccessDeniedException;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -97,6 +98,22 @@ class GlobalControllerAdvice extends ResponseEntityExceptionHandler {
         return error(
             HttpStatus.INTERNAL_SERVER_ERROR,
             INTERNAL_SERVER_ERROR_MESSAGE
+        );
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    protected ResponseEntity<?> handleAccessDeniedException(
+        AccessDeniedException exception,
+        WebRequest request
+    ) {
+        log.warn(
+            "Access denied - path: {}, message: {}",
+            getRequestPath(request),
+            exception.getMessage()
+        );
+        return error(
+            HttpStatus.FORBIDDEN,  // 403 Forbidden
+            exception.getMessage()
         );
     }
 

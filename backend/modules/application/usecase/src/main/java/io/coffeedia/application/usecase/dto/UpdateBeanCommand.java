@@ -7,8 +7,10 @@ import io.coffeedia.domain.vo.Origin;
 import io.coffeedia.domain.vo.ProcessType;
 import io.coffeedia.domain.vo.RoastLevel;
 import java.time.LocalDate;
+import lombok.Builder;
 import lombok.With;
 
+@Builder
 public record UpdateBeanCommand(
     @With
     Long id,

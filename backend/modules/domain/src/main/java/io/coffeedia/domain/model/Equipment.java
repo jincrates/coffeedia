@@ -9,6 +9,7 @@ import lombok.Builder;
 @Builder
 public record Equipment(
     Long id,
+    Long userId,
     EquipmentType type,
     String name,
     String brand,
@@ -22,6 +23,9 @@ public record Equipment(
 
     public Equipment {
         // 필수 필드 검증
+        if (userId == null) {
+            throw new IllegalArgumentException("사용자 ID는 필수입니다.");
+        }
         if (type == null) {
             throw new IllegalArgumentException("장비 타입은 필수입니다.");
         }

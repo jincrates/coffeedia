@@ -8,15 +8,17 @@ import java.util.Optional;
 
 public interface BeanRepositoryPort {
 
-    Bean create(final Bean bean);
+    Bean create(Bean bean);
 
     List<Bean> createAll(List<Bean> beans);
 
-    Bean update(final Bean bean);
+    Bean update(Bean bean);
 
     void deleteAll();
 
-    Optional<Bean> findById(final Long beanId);
+    Optional<Bean> findById(Long beanId);
 
     List<Bean> findAll(PageSize pageSize, List<BeanSortType> sorts);
+
+    void delete(Long beanId);
 }

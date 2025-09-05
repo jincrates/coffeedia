@@ -2,6 +2,7 @@ package io.coffeedia.bootstrap.api.controller.docs;
 
 import io.coffeedia.application.usecase.dto.BeanResponse;
 import io.coffeedia.application.usecase.dto.CreateBeanCommand;
+import io.coffeedia.application.usecase.dto.DeleteBeanResponse;
 import io.coffeedia.application.usecase.dto.UpdateBeanCommand;
 import io.coffeedia.bootstrap.api.controller.dto.BaseResponse;
 import io.coffeedia.bootstrap.api.controller.dto.PageResponse;
@@ -10,6 +11,9 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -193,5 +197,65 @@ public interface BeanControllerDocs {
         @PathVariable Long beanId,
         @Parameter(description = "원두 수정 요청 데이터", required = true)
         @Valid @RequestBody UpdateBeanCommand command
+    );
+
+    @Operation(
+        summary = "원두 삭제",
+        description = "특정 원두를 삭제합니다. 삭제 요청 시 해당 원두가 현재 사용자의 소유인지 확인하며, " +
+            "권한이 없는 경우 삭제가 거부됩니다. 삭제 후 원두 삭제 이벤트가 발행됩니다."
+    )
+    @ApiResponses(value = {
+        @ApiResponse(
+            responseCode = "200",
+            description = "원두 삭제 성공",
+            content = @Content(
+                schema = @Schema(implementation = BaseResponse.class),
+                examples = @ExampleObject(
+                    value = """
+                        {
+                            "success": true,
+                            "message": "",
+                            "data": {
+                                "beanId": 1
+                            }
+                        }
+                        """
+                )
+            )
+        ),
+        @ApiResponse(
+            responseCode = "400",
+            description = "잘못된 요청 - 존재하지 않는 원두 ID",
+            content = @Content(
+                examples = @ExampleObject(
+                    value = """
+                        {
+                            "success": false,
+                            "message": "원두를 찾을 수 없습니다. (id: 999)",
+                            "data": null
+                        }
+                        """
+                )
+            )
+        ),
+        @ApiResponse(
+            responseCode = "403",
+            description = "권한 없음 - 다른 사용자의 원두 삭제 시도",
+            content = @Content(
+                examples = @ExampleObject(
+                    value = """
+                        {
+                            "success": false,
+                            "message": "해당 원두를 삭제할 권한이 없습니다. (id: 1)",
+                            "data": null
+                        }
+                        """
+                )
+            )
+        )
+    })
+    ResponseEntity<BaseResponse<DeleteBeanResponse>> deleteBean(
+        @Parameter(description = "삭제할 원두 ID", required = true, in = ParameterIn.PATH, example = "1")
+        @PathVariable Long beanId
     );
 }

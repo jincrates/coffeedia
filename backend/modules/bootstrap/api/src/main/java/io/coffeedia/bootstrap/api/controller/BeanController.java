@@ -1,12 +1,17 @@
 package io.coffeedia.bootstrap.api.controller;
 
+import static io.coffeedia.common.constant.CommonConstant.USER_ID;
+
 import io.coffeedia.application.usecase.CreateBeanUseCase;
+import io.coffeedia.application.usecase.DeleteBeanUseCase;
 import io.coffeedia.application.usecase.GetAllBeanUseCase;
 import io.coffeedia.application.usecase.GetBeanUseCase;
 import io.coffeedia.application.usecase.UpdateBeanUseCase;
 import io.coffeedia.application.usecase.dto.BeanResponse;
 import io.coffeedia.application.usecase.dto.BeanSearchQuery;
 import io.coffeedia.application.usecase.dto.CreateBeanCommand;
+import io.coffeedia.application.usecase.dto.DeleteBeanCommand;
+import io.coffeedia.application.usecase.dto.DeleteBeanResponse;
 import io.coffeedia.application.usecase.dto.UpdateBeanCommand;
 import io.coffeedia.bootstrap.api.controller.docs.BeanControllerDocs;
 import io.coffeedia.bootstrap.api.controller.dto.BaseResponse;
@@ -15,6 +20,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,8 +39,7 @@ public class BeanController extends BaseController implements BeanControllerDocs
     private final GetAllBeanUseCase getAllUseCase;
     private final GetBeanUseCase getUseCase;
     private final UpdateBeanUseCase updateUseCase;
-
-    public static final Long USER_ID = 1L;
+    private final DeleteBeanUseCase deleteUseCase;
 
     @Override
     @PostMapping
@@ -70,5 +75,13 @@ public class BeanController extends BaseController implements BeanControllerDocs
         @Valid @RequestBody UpdateBeanCommand command
     ) {
         return ok(updateUseCase.invoke(command.withId(beanId).withUserId(USER_ID)));
+    }
+
+    @Override
+    @DeleteMapping("/{beanId}")
+    public ResponseEntity<BaseResponse<DeleteBeanResponse>> deleteBean(
+        @PathVariable Long beanId
+    ) {
+        return ok(deleteUseCase.invoke(new DeleteBeanCommand(beanId, USER_ID)));
     }
 }

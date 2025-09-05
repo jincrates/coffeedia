@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 class UpdateBeanService implements UpdateBeanUseCase {
 
-    private final BeanRepositoryPort beanRepository;
+    private final BeanRepositoryPort repository;
     private final ApplicationEventPublisher eventPublisher;
 
     @Override
@@ -25,13 +25,13 @@ class UpdateBeanService implements UpdateBeanUseCase {
     public BeanResponse invoke(final UpdateBeanCommand command) {
         validate(command);
 
-        Bean existing = beanRepository.findById(command.id())
+        Bean existing = repository.findById(command.id())
             .orElseThrow(() -> new IllegalArgumentException(
                 "원두를 찾을 수 없습니다. (id: " + command.id() + ")"
             ));
 
         Bean bean = BeanMapper.toDomain(command, existing);
-        Bean updated = beanRepository.update(bean);
+        Bean updated = repository.update(bean);
 
         eventPublisher.publishEvent(BeanUpdated.builder()
             .beanId(updated.id())

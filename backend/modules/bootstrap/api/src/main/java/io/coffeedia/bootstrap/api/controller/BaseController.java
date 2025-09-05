@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 
 abstract class BaseController {
 
-    protected <T> ResponseEntity<BaseResponse<T>> ok(T data) {
+    protected <T> ResponseEntity<BaseResponse<T>> ok(final T data) {
         return response(
             HttpStatus.OK,
             null,
@@ -15,7 +15,7 @@ abstract class BaseController {
         );
     }
 
-    protected <T> ResponseEntity<BaseResponse<T>> created(T data) {
+    protected <T> ResponseEntity<BaseResponse<T>> created(final T data) {
         return response(
             HttpStatus.CREATED,
             null,
@@ -24,9 +24,9 @@ abstract class BaseController {
     }
 
     protected <T> ResponseEntity<BaseResponse<T>> response(
-        HttpStatusCode httpStatus,
-        String message,
-        T data
+        final HttpStatusCode httpStatus,
+        final String message,
+        final T data
     ) {
         return ResponseEntity.status(httpStatus)
             .body(BaseResponse.of(

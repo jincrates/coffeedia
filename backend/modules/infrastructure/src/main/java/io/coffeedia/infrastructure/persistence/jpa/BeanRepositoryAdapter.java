@@ -75,6 +75,11 @@ class BeanRepositoryAdapter implements BeanRepositoryPort {
             .toList();
     }
 
+    @Override
+    public void delete(final Long beanId) {
+        beanRepository.deleteById(beanId);
+    }
+
     private Sort toSort(final List<BeanSortType> sorts) {
         List<Sort.Order> orders = sorts.stream()
             .map(sort -> new Sort.Order(

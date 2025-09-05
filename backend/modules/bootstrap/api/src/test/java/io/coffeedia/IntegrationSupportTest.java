@@ -1,5 +1,7 @@
 package io.coffeedia;
 
+import static io.coffeedia.common.constant.CommonConstant.USER_ID;
+
 import io.coffeedia.application.port.repository.BeanRepositoryPort;
 import io.coffeedia.application.port.repository.FlavorRepositoryPort;
 import io.coffeedia.bootstrap.ApiApplication;
@@ -54,7 +56,7 @@ public abstract class IntegrationSupportTest {
         TestContainerManager.registerRedisProperties(registry);
     }
 
-    protected void cleanUpDatabase() {
+    protected void cleanUpBeans() {
         beanRepository.deleteAll();
     }
 
@@ -66,7 +68,7 @@ public abstract class IntegrationSupportTest {
 
         return beanRepository.create(
             Bean.builder()
-                .userId(1L)
+                .userId(USER_ID)
                 .name("조회용 에티오피아 예가체프")
                 .origin(Origin.builder()
                     .country("에티오피아")
@@ -96,7 +98,7 @@ public abstract class IntegrationSupportTest {
         List<Bean> beans = new ArrayList<>();
         for (int i = 0; i < count; i++) {
             Bean bean = Bean.builder()
-                .userId(1L)
+                .userId(USER_ID)
                 .name("조회용 에티오피아 예가체프" + i)
                 .origin(Origin.builder()
                     .country("에티오피아")

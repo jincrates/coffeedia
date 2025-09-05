@@ -8,9 +8,12 @@ import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Pattern;
 import java.time.LocalDate;
 import lombok.Builder;
+import lombok.With;
 
 @Builder
 public record CreateEquipmentCommand(
+    @With
+    Long userId,
     @NotNull(message = "장비 타입은 필수입니다.")
     EquipmentType type,
     @NotBlank(message = "장비 이름은 필수입니다.")
