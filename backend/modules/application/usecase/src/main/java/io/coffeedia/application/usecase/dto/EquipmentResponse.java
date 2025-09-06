@@ -16,8 +16,8 @@ public record EquipmentResponse(
     ActiveStatus status,
     String description,
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
-    LocalDate purchaseDate,
-    String purchaseUrl,
+    LocalDate buyDate,
+    String buyUrl,
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     LocalDateTime createdAt,
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")

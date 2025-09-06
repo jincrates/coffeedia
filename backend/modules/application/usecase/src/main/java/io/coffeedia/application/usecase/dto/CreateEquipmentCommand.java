@@ -23,9 +23,9 @@ public record CreateEquipmentCommand(
     ActiveStatus status,
     String description,
     @PastOrPresent(message = "구매일자는 현재 날짜보다 이후일 수 없습니다.")
-    LocalDate purchaseDate,
+    LocalDate buyDate,
     @Pattern(regexp = "^https?://.*", message = "유효한 URL 형식이어야 합니다.")
-    String purchaseUrl
+    String buyUrl
 ) {
 
 }

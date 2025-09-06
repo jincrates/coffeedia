@@ -34,6 +34,10 @@ public class EquipmentJpaEntity extends BaseEntity {
     @Comment("PK")
     private Long id;
 
+    @Column(nullable = false)
+    @Comment("사용자 ID")
+    private Long userId;
+
     @Column(nullable = false, length = 40)
     @Comment("타입")
     @Enumerated(EnumType.STRING)
@@ -57,9 +61,9 @@ public class EquipmentJpaEntity extends BaseEntity {
     private String description;
 
     @Comment("구매일자")
-    private LocalDate purchaseDate;
+    private LocalDate buyDate;
 
     @Column(length = 500)
     @Comment("구매 URL")
-    private String purchaseUrl;
+    private String buyUrl;
 }

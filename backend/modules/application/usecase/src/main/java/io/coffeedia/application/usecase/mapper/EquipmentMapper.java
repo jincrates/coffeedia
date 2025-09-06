@@ -11,13 +11,14 @@ public class EquipmentMapper {
 
     public static Equipment toDomain(final CreateEquipmentCommand command) {
         return Equipment.builder()
+            .userId(command.userId())
             .type(command.type())
             .name(command.name())
             .brand(command.brand())
             .status(command.status())
             .description(command.description())
-            .purchaseDate(command.purchaseDate())
-            .purchaseUrl(command.purchaseUrl())
+            .buyDate(command.buyDate())
+            .buyUrl(command.buyUrl())
             .build();
     }
 
@@ -29,8 +30,8 @@ public class EquipmentMapper {
             .brand(equipment.brand())
             .status(equipment.status())
             .description(equipment.description())
-            .purchaseDate(equipment.purchaseDate())
-            .purchaseUrl(equipment.purchaseUrl())
+            .buyDate(equipment.buyDate())
+            .buyUrl(equipment.buyUrl())
             .createdAt(equipment.createdAt())
             .updatedAt(equipment.updatedAt())
             .build();
