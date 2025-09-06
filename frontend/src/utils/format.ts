@@ -1,14 +1,13 @@
 import { format, parseISO } from 'date-fns';
-import { ko } from 'date-fns/locale';
 
 // 날짜 포맷팅
 export const formatDate = (dateString: string, formatStr = 'yyyy년 MM월 dd일'): string => {
-  return format(parseISO(dateString), formatStr, { locale: ko });
+  return format(parseISO(dateString), formatStr);
 };
 
 // 날짜시간 포맷팅
 export const formatDateTime = (dateString: string, formatStr = 'yyyy년 MM월 dd일 HH:mm'): string => {
-  return format(parseISO(dateString), formatStr, { locale: ko });
+  return format(parseISO(dateString), formatStr);
 };
 
 // 상대적 날짜 포맷팅 (예: 3일 전, 1주일 전)
