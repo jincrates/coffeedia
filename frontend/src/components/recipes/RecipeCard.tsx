@@ -2,21 +2,24 @@ import React from 'react';
 import { RecipeSummaryResponse } from '@/types/api';
 import Card, { CardContent, CardFooter } from '@/components/common/Card';
 import Button from '@/components/common/Button';
-import { Eye, Users, Clock, Tag } from 'lucide-react';
+import { Eye, Users, Clock, Tag, Loader2 } from 'lucide-react';
 import { formatRelativeDate, getCategoryTypeKorean } from '@/utils/format';
 
 interface RecipeCardProps {
   recipe: RecipeSummaryResponse;
+  loading?: boolean;
   onView?: (recipe: RecipeSummaryResponse) => void;
 }
 
-const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onView }) => {
+const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, loading = false, onView }) => {
   const handleView = () => {
-    onView?.(recipe);
+    if (!loading) {
+      onView?.(recipe);
+    }
   };
 
   return (
-    <Card hover={!!onView} onClick={handleView} className="h-full">
+    <Card hover={!!onView && !loading} onClick={handleView} className="h-full">
       <CardContent className="space-y-3">
         {/* 썸네일 이미지 */}
         {recipe.thumbnailUrl ? (
@@ -97,10 +100,11 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onView }) => {
             variant="outline"
             size="sm"
             onClick={handleView}
-            leftIcon={<Eye className="h-4 w-4" />}
+            disabled={loading}
+            leftIcon={loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Eye className="h-4 w-4" />}
             className="w-full"
           >
-            레시피 보기
+            {loading ? '로딩 중...' : '레시피 보기'}
           </Button>
         </CardFooter>
       )}

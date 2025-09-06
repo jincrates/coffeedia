@@ -5,12 +5,14 @@ import RecipeCard from './RecipeCard';
 interface RecipeListProps {
   recipes: RecipeSummaryResponse[];
   loading?: boolean;
+  loadingRecipeId?: number | null;
   onView?: (recipe: RecipeSummaryResponse) => void;
 }
 
 const RecipeList: React.FC<RecipeListProps> = ({
   recipes,
   loading = false,
+  loadingRecipeId = null,
   onView,
 }) => {
   if (loading) {
@@ -44,6 +46,7 @@ const RecipeList: React.FC<RecipeListProps> = ({
           key={recipe.id}
           recipe={recipe}
           onView={onView}
+          loading={loadingRecipeId === recipe.id}
         />
       ))}
     </div>
