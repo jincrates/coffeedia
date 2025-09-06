@@ -1,0 +1,63 @@
+package io.coffeedia.infrastructure.persistence.jpa;
+
+import io.coffeedia.application.port.repository.RecipeRepositoryPort;
+import io.coffeedia.domain.model.Recipe;
+import io.coffeedia.infrastructure.persistence.jpa.entity.RecipeJpaEntity;
+import io.coffeedia.infrastructure.persistence.jpa.entity.TagJpaEntity;
+import io.coffeedia.infrastructure.persistence.jpa.mapper.RecipeJpaMapper;
+import io.coffeedia.infrastructure.persistence.jpa.repository.RecipeJpaRepository;
+import io.coffeedia.infrastructure.persistence.jpa.repository.TagJpaRepository;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+
+@Component
+@RequiredArgsConstructor
+class RecipeRepositoryAdapter implements RecipeRepositoryPort {
+
+    private final RecipeJpaRepository recipeRepository;
+    private final TagJpaRepository tagRepository;
+
+    @Override
+    public Recipe save(final Recipe recipe) {
+        List<TagJpaEntity> tags = findOrCreateTagsByNames(recipe.tags());
+        RecipeJpaEntity entity = RecipeJpaMapper.toEntity(recipe, tags);
+        RecipeJpaEntity saved = recipeRepository.save(entity);
+        return RecipeJpaMapper.toDomain(saved);
+    }
+
+    private List<TagJpaEntity> findOrCreateTagsByNames(final List<String> tagNames) {
+        if (tagNames == null || tagNames.isEmpty()) {
+            return List.of();
+        }
+
+        List<TagJpaEntity> existingTags = tagRepository.findAllByNameIn(tagNames);
+
+        if (tagNames.size() == existingTags.size()) {
+            return existingTags;
+        }
+
+        // 기존에 있는 태그 이름들 추출
+        Set<String> existingTagNames = existingTags.stream()
+            .map(TagJpaEntity::getName)
+            .collect(Collectors.toSet());
+
+        // 없는 태그들 찾아서 새로 생성
+        List<TagJpaEntity> newTags = tagNames.stream()
+            .filter(tagName -> !existingTagNames.contains(tagName))
+            .map(tagName -> TagJpaEntity.builder()
+                .name(tagName)
+                .build())
+            .toList();
+
+        // 새로운 태그들 저장
+        List<TagJpaEntity> savedNewTags = tagRepository.saveAll(newTags);
+
+        // 불변 리스트로 반환 (기존 리스트를 수정하지 않음)
+        return Stream.concat(existingTags.stream(), savedNewTags.stream())
+            .toList();
+    }
+}

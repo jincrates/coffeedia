@@ -1,7 +1,6 @@
 package io.coffeedia.infrastructure.persistence.jpa.entity;
 
 import io.coffeedia.domain.model.Bean;
-import io.coffeedia.domain.vo.AccessType;
 import io.coffeedia.domain.vo.ActiveStatus;
 import io.coffeedia.domain.vo.BlendType;
 import io.coffeedia.domain.vo.Origin;
@@ -74,17 +73,17 @@ public class BeanJpaEntity extends BaseEntity {
     @Comment("그램")
     private int grams;
 
-    @Column(nullable = false, length = 40)
+    @Column(nullable = false, length = 20)
     @Comment("로스팅레벨")
     @Enumerated(EnumType.STRING)
     private RoastLevel roastLevel;
 
-    @Column(nullable = false, length = 40)
+    @Column(nullable = false, length = 20)
     @Comment("가공타입")
     @Enumerated(EnumType.STRING)
     private ProcessType processType;
 
-    @Column(nullable = false, length = 40)
+    @Column(nullable = false, length = 20)
     @Comment("블렌드타입")
     @Enumerated(EnumType.STRING)
     private BlendType blendType;
@@ -97,15 +96,10 @@ public class BeanJpaEntity extends BaseEntity {
     @Comment("메모")
     private String memo;
 
-    @Column(nullable = false, length = 40)
+    @Column(nullable = false, length = 20)
     @Comment("상태")
     @Enumerated(EnumType.STRING)
     private ActiveStatus status;
-
-    @Column(nullable = false, length = 40)
-    @Comment("접근권한")
-    @Enumerated(EnumType.STRING)
-    private AccessType accessType;
 
     @Default
     @OneToMany(mappedBy = "bean", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -163,9 +157,6 @@ public class BeanJpaEntity extends BaseEntity {
         }
         if (bean.status() != null) {
             this.status = bean.status();
-        }
-        if (bean.accessType() != null) {
-            this.accessType = bean.accessType();
         }
     }
 }

@@ -1,6 +1,5 @@
 package io.coffeedia.domain.model;
 
-import io.coffeedia.domain.vo.AccessType;
 import io.coffeedia.domain.vo.ActiveStatus;
 import io.coffeedia.domain.vo.BlendType;
 import io.coffeedia.domain.vo.Origin;
@@ -28,7 +27,6 @@ public record Bean(
     List<Flavor> flavors,
     String memo,
     ActiveStatus status,
-    AccessType accessType,
     LocalDateTime createdAt,
     LocalDateTime updatedAt
 ) {
@@ -66,9 +64,6 @@ public record Bean(
         }
         if (status == null) {
             status = ActiveStatus.ACTIVE;
-        }
-        if (accessType == null) {
-            accessType = AccessType.PRIVATE;
         }
     }
 }

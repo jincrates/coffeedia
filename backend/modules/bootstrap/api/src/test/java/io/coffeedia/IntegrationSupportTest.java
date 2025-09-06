@@ -7,7 +7,6 @@ import io.coffeedia.application.port.repository.FlavorRepositoryPort;
 import io.coffeedia.bootstrap.ApiApplication;
 import io.coffeedia.domain.model.Bean;
 import io.coffeedia.domain.model.Flavor;
-import io.coffeedia.domain.vo.AccessType;
 import io.coffeedia.domain.vo.ActiveStatus;
 import io.coffeedia.domain.vo.BlendType;
 import io.coffeedia.domain.vo.Origin;
@@ -84,7 +83,6 @@ public abstract class IntegrationSupportTest {
                 .isDecaf(false)
                 .memo("조회 테스트용 메모")
                 .status(ActiveStatus.ACTIVE)
-                .accessType(AccessType.PUBLIC)
                 .build()
         );
     }
@@ -114,7 +112,6 @@ public abstract class IntegrationSupportTest {
                 .isDecaf(false)
                 .memo("조회 테스트용 메모")
                 .status(ActiveStatus.ACTIVE)
-                .accessType(AccessType.PUBLIC)
                 .build();
             beans.add(bean);
         }

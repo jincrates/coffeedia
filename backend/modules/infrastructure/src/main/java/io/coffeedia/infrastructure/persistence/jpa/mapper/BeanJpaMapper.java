@@ -31,7 +31,6 @@ public class BeanJpaMapper {
             .isDecaf(bean.isDecaf())
             .memo(bean.memo())
             .status(bean.status())
-            .accessType(bean.accessType())
             .build();
 
         List<FlavorJpaEntity> flavors = FlavorJpaMapper.toEntity(bean.flavors());
@@ -62,7 +61,6 @@ public class BeanJpaMapper {
             .flavors(FlavorJpaMapper.toDomain(bean.getFlavors()))
             .memo(bean.getMemo())
             .status(bean.getStatus())
-            .accessType(bean.getAccessType())
             .createdAt(bean.getCreatedAt())
             .updatedAt(bean.getUpdatedAt())
             .build();

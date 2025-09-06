@@ -18,31 +18,28 @@ VALUES (1, '블루베리', NOW(), NOW()),
 
 -- beans 테이블 샘플 데이터 삽입
 INSERT INTO beans (id, user_id, name, origin_country, origin_region, roaster, roast_date, grams,
-                   roast_level,
-                   process_type, blend_type, is_decaf, memo, status, access_type, created_at,
+                   roast_level, process_type, blend_type, is_decaf, memo, status, created_at,
                    updated_at)
 VALUES (1, 1, '에티오피아 예가체프', '에티오피아', '예가체프', '스페셜티 로스터', '2024-08-20', 250, 'MEDIUM', 'WASHED',
-        'SINGLE_ORIGIN', FALSE, '밝은 산미와 꽃향이 특징적인 원두', 'ACTIVE', 'PUBLIC', NOW(), NOW()),
+        'SINGLE_ORIGIN', FALSE, '밝은 산미와 꽃향이 특징적인 원두', 'ACTIVE', NOW(), NOW()),
        (2, 1, '콜롬비아 수프리모', '콜롬비아', '나리뇨', '프리미엄 로스터', '2024-08-19', 200, 'MEDIUM', 'WASHED',
-        'SINGLE_ORIGIN', FALSE, '균형잡힌 바디감과 단맛', 'ACTIVE', 'PUBLIC', NOW(), NOW()),
+        'SINGLE_ORIGIN', FALSE, '균형잡힌 바디감과 단맛', 'ACTIVE', NOW(), NOW()),
        (3, 1, '브라질 산토스', '브라질', '산토스', '클래식 로스터', '2024-08-18', 300, 'MEDIUM_DARK', 'NATURAL',
-        'SINGLE_ORIGIN', FALSE, '견과류 향과 초콜릿 노트', 'ACTIVE', 'PRIVATE', NOW(), NOW()),
+        'SINGLE_ORIGIN', FALSE, '견과류 향과 초콜릿 노트', 'ACTIVE', NOW(), NOW()),
        (4, 1, '케냐 AA', '케냐', '키암부', '아프리카 로스터', '2024-08-17', 180, 'MEDIUM', 'WASHED',
-        'SINGLE_ORIGIN',
-        FALSE, '강한 산미와 와인 같은 바디감', 'ACTIVE', 'PUBLIC', NOW(), NOW()),
+        'SINGLE_ORIGIN', FALSE, '강한 산미와 와인 같은 바디감', 'ACTIVE', NOW(), NOW()),
        (5, 1, '과테말라 안티구아', '과테말라', '안티구아', '중앙아메리카 로스터', '2024-08-16', 220, 'MEDIUM_DARK', 'WASHED',
-        'SINGLE_ORIGIN', FALSE, '스파이시하고 풀바디', 'ACTIVE', 'PUBLIC', NOW(), NOW()),
+        'SINGLE_ORIGIN', FALSE, '스파이시하고 풀바디', 'ACTIVE', NOW(), NOW()),
        (6, 1, '하우스 블렌드', '복합', '블렌드', '하우스 로스터', '2024-08-15', 500, 'MEDIUM', 'WASHED', 'BLEND',
-        FALSE,
-        '매일 마시기 좋은 균형잡힌 블렌드', 'ACTIVE', 'PUBLIC', NOW(), NOW()),
+        FALSE, '매일 마시기 좋은 균형잡힌 블렌드', 'ACTIVE', NOW(), NOW()),
        (7, 1, '디카페인 콜롬비아', '콜롬비아', '우일라', '디카페인 전문 로스터', '2024-08-14', 150, 'MEDIUM', 'WASHED',
-        'SINGLE_ORIGIN', TRUE, '카페인 없이도 풍부한 맛', 'ACTIVE', 'PUBLIC', NOW(), NOW()),
+        'SINGLE_ORIGIN', TRUE, '카페인 없이도 풍부한 맛', 'ACTIVE', NOW(), NOW()),
        (8, 1, '자메이카 블루마운틴', '자메이카', '블루마운틴', '프리미엄 로스터', '2024-08-13', 100, 'LIGHT', 'WASHED',
-        'SINGLE_ORIGIN', FALSE, '세계 최고급 원두 중 하나', 'ACTIVE', 'PRIVATE', NOW(), NOW()),
+        'SINGLE_ORIGIN', FALSE, '세계 최고급 원두 중 하나', 'ACTIVE', NOW(), NOW()),
        (9, 1, '하와이 코나', '미국', '하와이 코나', '태평양 로스터', '2024-08-12', 120, 'MEDIUM', 'WASHED',
-        'SINGLE_ORIGIN', FALSE, '부드럽고 달콤한 맛', 'ACTIVE', 'PRIVATE', NOW(), NOW()),
+        'SINGLE_ORIGIN', FALSE, '부드럽고 달콤한 맛', 'ACTIVE', NOW(), NOW()),
        (10, 1, '예멘 모카', '예멘', '모카', '중동 로스터', '2024-08-11', 200, 'DARK', 'NATURAL', 'SINGLE_ORIGIN',
-        FALSE, '와인 같은 바디와 초콜릿 향', 'INACTIVE', 'PUBLIC', NOW(), NOW());
+        FALSE, '와인 같은 바디와 초콜릿 향', 'INACTIVE', NOW(), NOW());
 
 -- bean_flavors 테이블 샘플 데이터 삽입 (다대다 관계)
 INSERT INTO bean_flavors (id, bean_id, flavor_id, created_at, updated_at)
