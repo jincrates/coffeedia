@@ -123,6 +123,7 @@ public class RecipeJpaMapper {
         return ingredients.stream()
             .map(it -> Ingredient.builder()
                 .id(it.getId())
+                .recipeId(it.getRecipe().getId())
                 .name(it.getName())
                 .amount(it.getAmount())
                 .unit(it.getUnit())

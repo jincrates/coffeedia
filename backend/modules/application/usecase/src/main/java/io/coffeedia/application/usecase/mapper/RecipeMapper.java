@@ -4,9 +4,11 @@ import io.coffeedia.application.usecase.dto.CreateRecipeCommand;
 import io.coffeedia.application.usecase.dto.CreateRecipeCommand.CreateIngredientCommand;
 import io.coffeedia.application.usecase.dto.CreateRecipeCommand.CreateStepCommand;
 import io.coffeedia.application.usecase.dto.RecipeResponse;
+import io.coffeedia.application.usecase.dto.RecipeSummaryResponse;
 import io.coffeedia.domain.model.Ingredient;
 import io.coffeedia.domain.model.Recipe;
 import io.coffeedia.domain.model.RecipeStep;
+import io.coffeedia.domain.model.RecipeSummary;
 import io.coffeedia.domain.vo.ActiveStatus;
 import java.util.Collections;
 import java.util.List;
@@ -72,6 +74,17 @@ public class RecipeMapper {
             .steps(recipe.steps())
             .tips(recipe.tips())
             .status(recipe.status())
+            .createdAt(recipe.createdAt())
+            .updatedAt(recipe.updatedAt())
+            .build();
+    }
+
+    public static RecipeSummaryResponse toResponse(final RecipeSummary recipe) {
+        return RecipeSummaryResponse.builder()
+            .id(recipe.id())
+            .category(recipe.category())
+            .title(recipe.title())
+            .thumbnailUrl(recipe.thumbnailUrl())
             .createdAt(recipe.createdAt())
             .updatedAt(recipe.updatedAt())
             .build();

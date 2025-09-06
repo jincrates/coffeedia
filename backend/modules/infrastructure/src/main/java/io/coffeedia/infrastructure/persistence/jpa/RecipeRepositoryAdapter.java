@@ -2,6 +2,9 @@ package io.coffeedia.infrastructure.persistence.jpa;
 
 import io.coffeedia.application.port.repository.RecipeRepositoryPort;
 import io.coffeedia.domain.model.Recipe;
+import io.coffeedia.domain.model.RecipeSummary;
+import io.coffeedia.domain.vo.PageSize;
+import io.coffeedia.domain.vo.SortType;
 import io.coffeedia.infrastructure.persistence.jpa.entity.RecipeJpaEntity;
 import io.coffeedia.infrastructure.persistence.jpa.entity.TagJpaEntity;
 import io.coffeedia.infrastructure.persistence.jpa.mapper.RecipeJpaMapper;
@@ -12,6 +15,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -27,6 +33,16 @@ class RecipeRepositoryAdapter implements RecipeRepositoryPort {
         RecipeJpaEntity entity = RecipeJpaMapper.toEntity(recipe, tags);
         RecipeJpaEntity saved = recipeRepository.save(entity);
         return RecipeJpaMapper.toDomain(saved);
+    }
+
+    @Override
+    public List<RecipeSummary> findAll(final PageSize pageSize, final List<SortType> sorts) {
+        Pageable pageable = PageRequest.of(
+            pageSize.page(),
+            pageSize.size() + 1,  // 다음 페이지가 있는지 확인하기 위해 +1
+            toSort(sorts)
+        );
+        return recipeRepository.findAllSummaries(pageable);
     }
 
     private List<TagJpaEntity> findOrCreateTagsByNames(final List<String> tagNames) {
@@ -59,5 +75,14 @@ class RecipeRepositoryAdapter implements RecipeRepositoryPort {
         // 불변 리스트로 반환 (기존 리스트를 수정하지 않음)
         return Stream.concat(existingTags.stream(), savedNewTags.stream())
             .toList();
+    }
+
+    private Sort toSort(final List<SortType> sorts) {
+        List<Sort.Order> orders = sorts.stream()
+            .map(sort -> new Sort.Order(
+                Sort.Direction.fromString(sort.getDirection()), sort.getField())
+            )
+            .toList();
+        return Sort.by(orders);
     }
 }
