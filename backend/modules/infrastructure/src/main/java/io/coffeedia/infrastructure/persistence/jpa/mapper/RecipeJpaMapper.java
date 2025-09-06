@@ -62,6 +62,7 @@ public class RecipeJpaMapper {
                 .name(ingredient.name())
                 .amount(ingredient.amount())
                 .unit(ingredient.unit())
+                .buyUrl(ingredient.buyUrl())
                 .build())
             .toList();
     }

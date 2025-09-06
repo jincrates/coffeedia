@@ -10,7 +10,6 @@ import io.coffeedia.application.usecase.dto.EquipmentSearchQuery;
 import io.coffeedia.bootstrap.api.controller.dto.BaseResponse;
 import io.coffeedia.bootstrap.api.controller.dto.PageResponse;
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,11 +37,9 @@ public class EquipmentController extends BaseController {
     @GetMapping
     public ResponseEntity<BaseResponse<PageResponse<EquipmentResponse>>> getAllEquipments(
         @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "10") int size,
-        @RequestParam(required = false) String sort  // field1:asc,field2:desc
+        @RequestParam(defaultValue = "10") int size
     ) {
-        List<EquipmentResponse> response = getAllUseCase.invoke(
-            EquipmentSearchQuery.of(page, size));
+        var response = getAllUseCase.invoke(EquipmentSearchQuery.of(page, size));
         return ok(PageResponse.of(page, size, response));
     }
 }
