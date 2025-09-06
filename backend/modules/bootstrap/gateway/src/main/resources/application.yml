@@ -53,7 +53,7 @@ spring:
             scope: openid
         provider:
           keycloak:
-            issuer-uri: http://localhost:8080/realms/Coffeedia
+            issuer-uri: http://localhost:8090/realms/Coffeedia
 
 ---
 spring.config.activate.on-profile: local
