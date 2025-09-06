@@ -25,7 +25,7 @@ const Navigation: React.FC = () => {
   ];
 
   return (
-    <nav className="bg-white shadow-sm border-b">
+    <nav className="bg-white shadow-sm border-b md:block hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">
@@ -64,22 +64,8 @@ const Navigation: React.FC = () => {
           </div>
 
           {/* Mobile menu button - 향후 구현 */}
-          <div className="flex items-center sm:hidden">
-            <button className="text-gray-400 hover:text-gray-500">
-              <svg
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="1.5"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
-                />
-              </svg>
-            </button>
+          <div className="flex items-center md:hidden">
+            {/* 모바일에서는 로고만 표시 */}
           </div>
         </div>
       </div>

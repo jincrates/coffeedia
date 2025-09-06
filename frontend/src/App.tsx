@@ -3,10 +3,14 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { Toaster } from 'react-hot-toast';
 import Navigation from '@/components/common/Navigation';
+import MobileHeader from '@/components/common/MobileHeader';
+import BottomNavigation from '@/components/common/BottomNavigation';
 import HomePage from '@/pages/HomePage';
 import BeansPage from '@/pages/BeansPage';
 import RecipesPage from '@/pages/RecipesPage';
 import RecipeDetailPage from '@/pages/RecipeDetailPage';
+import BeanDetailPage from '@/pages/BeanDetailPage';
+import BeanEditPage from '@/pages/BeanEditPage';
 import EquipmentsPage from '@/pages/EquipmentsPage';
 
 // React Query 클라이언트 설정
@@ -25,11 +29,18 @@ const App: React.FC = () => {
     <QueryClientProvider client={queryClient}>
       <Router>
         <div className="min-h-screen bg-gray-50">
+          {/* 데스크톱 네비게이션 */}
           <Navigation />
-          <main>
+          
+          {/* 모바일 헤더 */}
+          <MobileHeader />
+          
+          <main className="pb-16 md:pb-0">
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/beans" element={<BeansPage />} />
+              <Route path="/beans/:id" element={<BeanDetailPage />} />
+              <Route path="/beans/:id/edit" element={<BeanEditPage />} />
               <Route path="/recipes" element={<RecipesPage />} />
               <Route path="/recipes/:id" element={<RecipeDetailPage />} />
               <Route path="/equipments" element={<EquipmentsPage />} />
@@ -50,6 +61,9 @@ const App: React.FC = () => {
               } />
             </Routes>
           </main>
+          
+          {/* 모바일 하단 네비게이션 */}
+          <BottomNavigation />
           
           {/* Toast 알림 */}
           <Toaster
