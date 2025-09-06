@@ -1,6 +1,5 @@
 package io.coffeedia.application.usecase.dto;
 
-import io.coffeedia.domain.vo.AccessType;
 import io.coffeedia.domain.vo.ActiveStatus;
 import io.coffeedia.domain.vo.BlendType;
 import io.coffeedia.domain.vo.Origin;
@@ -26,8 +25,7 @@ public record UpdateBeanCommand(
     BlendType blendType,
     Boolean isDecaf,
     String memo,
-    ActiveStatus status,
-    AccessType accessType
+    ActiveStatus status
 ) {
 
 }

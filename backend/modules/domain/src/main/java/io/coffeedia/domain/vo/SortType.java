@@ -6,17 +6,15 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum BeanSortType {
+public enum SortType {
     CREATED_AT_ASC("createdAt", "asc"),
     CREATED_AT_DESC("createdAt", "desc"),
-    ROAST_DATE_ASC("roastDate", "asc"),
-    ROAST_DATE_DESC("roastDate", "desc"),
     ;
 
     private final String field;
     private final String direction;
 
-    public static BeanSortType sortType(final String field, final String direction) {
+    public static SortType sortType(final String field, final String direction) {
         return Arrays.stream(values())
             .filter(sortType -> isMatching(sortType, field, direction))
             .findFirst()
@@ -30,7 +28,7 @@ public enum BeanSortType {
     }
 
     private static boolean isMatching(
-        final BeanSortType sortType,
+        final SortType sortType,
         final String field,
         final String direction
     ) {

@@ -30,7 +30,6 @@ public class BeanMapper {
             .flavors(flavors)
             .memo(command.memo())
             .status(command.status())
-            .accessType(command.accessType())
             .build();
     }
 
@@ -49,7 +48,6 @@ public class BeanMapper {
             .flavors(toResponse(bean.flavors()))
             .memo(bean.memo())
             .status(bean.status())
-            .accessType(bean.accessType())
             .createdAt(bean.createdAt())
             .updatedAt(bean.updatedAt())
             .build();
@@ -84,7 +82,6 @@ public class BeanMapper {
             .flavors(existing.flavors())
             .memo(defaultIfNull(command.memo(), existing.memo()))
             .status(defaultIfNull(command.status(), existing.status()))
-            .accessType(defaultIfNull(command.accessType(), existing.accessType()))
             .createdAt(existing.createdAt())
             .updatedAt(existing.updatedAt())  // 기존값을 넣어줘도 Auditing으로 최신화됨
             .build();

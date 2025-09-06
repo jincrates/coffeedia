@@ -1,7 +1,7 @@
 package io.coffeedia.application.usecase.service;
 
 import io.coffeedia.application.port.repository.BeanRepositoryPort;
-import io.coffeedia.application.usecase.GetAllBeanUseCase;
+import io.coffeedia.application.usecase.GetAllBeansUseCase;
 import io.coffeedia.application.usecase.dto.BeanResponse;
 import io.coffeedia.application.usecase.dto.BeanSearchQuery;
 import io.coffeedia.application.usecase.mapper.BeanMapper;
@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-class GetAllBeanService implements GetAllBeanUseCase {
+class GetAllBeansService implements GetAllBeansUseCase {
 
     private final BeanRepositoryPort repository;
 

@@ -2,8 +2,8 @@ package io.coffeedia.infrastructure.persistence.jpa;
 
 import io.coffeedia.application.port.repository.BeanRepositoryPort;
 import io.coffeedia.domain.model.Bean;
-import io.coffeedia.domain.vo.BeanSortType;
 import io.coffeedia.domain.vo.PageSize;
+import io.coffeedia.domain.vo.SortType;
 import io.coffeedia.infrastructure.persistence.jpa.entity.BeanJpaEntity;
 import io.coffeedia.infrastructure.persistence.jpa.mapper.BeanJpaMapper;
 import io.coffeedia.infrastructure.persistence.jpa.repository.BeanJpaRepository;
@@ -63,7 +63,7 @@ class BeanRepositoryAdapter implements BeanRepositoryPort {
     }
 
     @Override
-    public List<Bean> findAll(final PageSize pageSize, final List<BeanSortType> sorts) {
+    public List<Bean> findAll(final PageSize pageSize, final List<SortType> sorts) {
         Pageable pageable = PageRequest.of(
             pageSize.page(),
             pageSize.size() + 1,  // 다음 페이지가 있는지 확인하기 위해 +1
@@ -80,7 +80,7 @@ class BeanRepositoryAdapter implements BeanRepositoryPort {
         beanRepository.deleteById(beanId);
     }
 
-    private Sort toSort(final List<BeanSortType> sorts) {
+    private Sort toSort(final List<SortType> sorts) {
         List<Sort.Order> orders = sorts.stream()
             .map(sort -> new Sort.Order(
                 Sort.Direction.fromString(sort.getDirection()), sort.getField())

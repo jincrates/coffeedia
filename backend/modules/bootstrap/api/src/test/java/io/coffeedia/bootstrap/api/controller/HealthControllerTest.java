@@ -3,11 +3,9 @@ package io.coffeedia.bootstrap.api.controller;
 import io.coffeedia.IntegrationSupportTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 
-@Tag("integration")
 class HealthControllerTest extends IntegrationSupportTest {
 
     @Nested

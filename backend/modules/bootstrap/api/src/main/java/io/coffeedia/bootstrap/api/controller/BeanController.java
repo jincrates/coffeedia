@@ -4,7 +4,7 @@ import static io.coffeedia.common.constant.CommonConstant.USER_ID;
 
 import io.coffeedia.application.usecase.CreateBeanUseCase;
 import io.coffeedia.application.usecase.DeleteBeanUseCase;
-import io.coffeedia.application.usecase.GetAllBeanUseCase;
+import io.coffeedia.application.usecase.GetAllBeansUseCase;
 import io.coffeedia.application.usecase.GetBeanUseCase;
 import io.coffeedia.application.usecase.UpdateBeanUseCase;
 import io.coffeedia.application.usecase.dto.BeanResponse;
@@ -36,7 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class BeanController extends BaseController implements BeanControllerDocs {
 
     private final CreateBeanUseCase createUseCase;
-    private final GetAllBeanUseCase getAllUseCase;
+    private final GetAllBeansUseCase getAllUseCase;
     private final GetBeanUseCase getUseCase;
     private final UpdateBeanUseCase updateUseCase;
     private final DeleteBeanUseCase deleteUseCase;

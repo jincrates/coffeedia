@@ -9,18 +9,18 @@ import lombok.AccessLevel;
 import lombok.Builder;
 
 @Builder(access = AccessLevel.PRIVATE)
-public record BeanSearchQuery(
+public record RecipeSearchQuery(
     PageSize pageSize,
     List<SortType> sort
 ) {
 
-    public static BeanSearchQuery of(
+    public static RecipeSearchQuery of(
         int page,
         int size,
         String sort
     ) {
         List<SortType> validSort = parseSort(sort);
-        return BeanSearchQuery.builder()
+        return RecipeSearchQuery.builder()
             .pageSize(new PageSize(page, size))
             .sort(validSort)
             .build();
@@ -35,7 +35,7 @@ public record BeanSearchQuery(
         }
         String[] sortParameters = sort.split(",");
         return Arrays.stream(sortParameters)
-            .map(BeanSearchQuery::parseSingleSort)
+            .map(RecipeSearchQuery::parseSingleSort)
             .collect(Collectors.toList());
     }
 

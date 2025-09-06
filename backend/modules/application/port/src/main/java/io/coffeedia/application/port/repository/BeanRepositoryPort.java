@@ -1,8 +1,8 @@
 package io.coffeedia.application.port.repository;
 
 import io.coffeedia.domain.model.Bean;
-import io.coffeedia.domain.vo.BeanSortType;
 import io.coffeedia.domain.vo.PageSize;
+import io.coffeedia.domain.vo.SortType;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,7 +18,7 @@ public interface BeanRepositoryPort {
 
     Optional<Bean> findById(Long beanId);
 
-    List<Bean> findAll(PageSize pageSize, List<BeanSortType> sorts);
+    List<Bean> findAll(PageSize pageSize, List<SortType> sorts);
 
     void delete(Long beanId);
 }

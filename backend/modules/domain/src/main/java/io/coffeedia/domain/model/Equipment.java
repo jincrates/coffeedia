@@ -15,8 +15,8 @@ public record Equipment(
     String brand,
     ActiveStatus status,
     String description,
-    LocalDate purchaseDate,
-    String purchaseUrl,
+    LocalDate buyDate,
+    String buyUrl,
     LocalDateTime createdAt,
     LocalDateTime updatedAt
 ) {
@@ -37,12 +37,12 @@ public record Equipment(
         }
 
         // 구매 일자 검증 (미래 날짜 불가)
-        if (purchaseDate != null && purchaseDate.isAfter(LocalDate.now())) {
+        if (buyDate != null && buyDate.isAfter(LocalDate.now())) {
             throw new IllegalArgumentException("구매일자는 현재 날짜보다 이후일 수 없습니다.");
         }
 
         // URL 형식 간단 검증
-        if (purchaseUrl != null && !purchaseUrl.isBlank() && !isValidUrl(purchaseUrl)) {
+        if (buyUrl != null && !buyUrl.isBlank() && !isValidUrl(buyUrl)) {
             throw new IllegalArgumentException("유효하지 않은 구매 URL 형식입니다.");
         }
 

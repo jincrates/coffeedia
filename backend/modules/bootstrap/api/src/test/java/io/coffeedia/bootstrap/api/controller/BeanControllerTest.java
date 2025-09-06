@@ -11,7 +11,6 @@ import io.coffeedia.application.usecase.dto.UpdateBeanCommand;
 import io.coffeedia.bootstrap.api.controller.dto.BaseResponse;
 import io.coffeedia.bootstrap.api.controller.dto.PageResponse;
 import io.coffeedia.domain.model.Bean;
-import io.coffeedia.domain.vo.AccessType;
 import io.coffeedia.domain.vo.ActiveStatus;
 import io.coffeedia.domain.vo.BlendType;
 import io.coffeedia.domain.vo.Origin;
@@ -22,12 +21,10 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 
-@Tag("integration")
 class BeanControllerTest extends IntegrationSupportTest {
 
     @BeforeEach
@@ -84,7 +81,6 @@ class BeanControllerTest extends IntegrationSupportTest {
                         () -> assertThat(data.blendType()).isEqualTo(BlendType.UNKNOWN),
                         () -> assertThat(data.isDecaf()).isFalse(),
                         () -> assertThat(data.status()).isEqualTo(ActiveStatus.ACTIVE),
-                        () -> assertThat(data.accessType()).isEqualTo(AccessType.PRIVATE),
                         () -> assertThat(data.memo()).isNull(),
                         () -> assertThat(data.createdAt()).isNotNull(),
                         () -> assertThat(data.updatedAt()).isNotNull()
@@ -109,7 +105,6 @@ class BeanControllerTest extends IntegrationSupportTest {
                 .isDecaf(false)
                 .memo("산미가 좋은 원두")
                 .status(ActiveStatus.ACTIVE)
-                .accessType(AccessType.PUBLIC)
                 .build();
 
             // when
@@ -144,7 +139,6 @@ class BeanControllerTest extends IntegrationSupportTest {
                         () -> assertThat(data.blendType()).isEqualTo(command.blendType()),
                         () -> assertThat(data.isDecaf()).isEqualTo(command.isDecaf()),
                         () -> assertThat(data.status()).isEqualTo(command.status()),
-                        () -> assertThat(data.accessType()).isEqualTo(command.accessType()),
                         () -> assertThat(data.memo()).isEqualTo(command.memo()),
                         () -> assertThat(data.createdAt()).isNotNull(),
                         () -> assertThat(data.updatedAt()).isNotNull()
@@ -385,7 +379,6 @@ class BeanControllerTest extends IntegrationSupportTest {
                         () -> assertThat(data.blendType()).isEqualTo(BlendType.UNKNOWN),
                         () -> assertThat(data.isDecaf()).isEqualTo(command.isDecaf()),
                         () -> assertThat(data.status()).isEqualTo(ActiveStatus.ACTIVE),
-                        () -> assertThat(data.accessType()).isEqualTo(AccessType.PRIVATE),
                         () -> assertThat(data.memo()).isEqualTo(command.memo()),
                         () -> assertThat(data.createdAt()).isNotNull(),
                         () -> assertThat(data.updatedAt()).isNotNull()
@@ -664,32 +657,6 @@ class BeanControllerTest extends IntegrationSupportTest {
                         () -> assertThat(data.memo()).isEqualTo("여러 필드 수정 테스트"),
                         () -> assertThat(data.status()).isEqualTo(ActiveStatus.INACTIVE)
                     );
-                });
-        }
-
-        @Test
-        @DisplayName("접근 권한을 수정한다")
-        void updateBeanAccessType() {
-            // given
-            UpdateBeanCommand command = UpdateBeanCommand.builder()
-                .accessType(AccessType.PRIVATE)
-                .build();
-
-            // when
-            webTestClient.put()
-                .uri("/api/beans/{beanId}", bean.id())
-                .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(command)
-                .exchange()
-                // then
-                .expectStatus().isOk()
-                .expectBody(new ParameterizedTypeReference<BaseResponse<BeanResponse>>() {
-                })
-                .value(response -> {
-                    assertThat(response).isNotNull();
-                    assertThat(response.success()).isTrue();
-                    assertThat(response.data()).isNotNull();
-                    assertThat(response.data().accessType()).isEqualTo(AccessType.PRIVATE);
                 });
         }
 
