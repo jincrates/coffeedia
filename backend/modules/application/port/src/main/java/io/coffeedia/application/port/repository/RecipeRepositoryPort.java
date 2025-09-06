@@ -11,4 +11,6 @@ public interface RecipeRepositoryPort {
     Recipe save(Recipe recipe);
 
     List<RecipeSummary> findAll(PageSize pageSize, List<SortType> sorts);
+
+    void deleteAll();
 }

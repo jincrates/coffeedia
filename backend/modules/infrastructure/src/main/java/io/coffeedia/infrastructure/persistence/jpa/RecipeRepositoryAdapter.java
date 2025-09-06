@@ -45,6 +45,11 @@ class RecipeRepositoryAdapter implements RecipeRepositoryPort {
         return recipeRepository.findAllSummaries(pageable);
     }
 
+    @Override
+    public void deleteAll() {
+        recipeRepository.deleteAll();
+    }
+
     private List<TagJpaEntity> findOrCreateTagsByNames(final List<String> tagNames) {
         if (tagNames == null || tagNames.isEmpty()) {
             return List.of();
