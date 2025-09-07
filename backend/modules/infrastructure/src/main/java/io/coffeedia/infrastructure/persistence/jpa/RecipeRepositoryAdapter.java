@@ -53,6 +53,11 @@ class RecipeRepositoryAdapter implements RecipeRepositoryPort {
     }
 
     @Override
+    public void deleteById(final Long id) {
+        recipeRepository.deleteById(id);
+    }
+
+    @Override
     public void deleteAll() {
         recipeRepository.deleteAll();
     }

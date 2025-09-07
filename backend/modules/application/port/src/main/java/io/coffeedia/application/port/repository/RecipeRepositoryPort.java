@@ -21,5 +21,12 @@ public interface RecipeRepositoryPort {
 
     List<RecipeSummary> findAll(PageSize pageSize, List<SortType> sorts);
 
+    /**
+     * 레시피를 삭제합니다.
+     *
+     * @param id 삭제할 레시피 ID
+     */
+    void deleteById(Long id);
+
     void deleteAll();
 }

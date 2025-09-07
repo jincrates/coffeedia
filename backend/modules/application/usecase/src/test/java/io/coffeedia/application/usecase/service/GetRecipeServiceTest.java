@@ -2,7 +2,6 @@ package io.coffeedia.application.usecase.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 import io.coffeedia.application.port.repository.RecipeRepositoryPort;
@@ -14,6 +13,7 @@ import io.coffeedia.domain.model.Recipe;
 import io.coffeedia.domain.model.RecipeStep;
 import io.coffeedia.domain.vo.ActiveStatus;
 import io.coffeedia.domain.vo.CategoryType;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -48,7 +48,7 @@ class GetRecipeServiceTest {
             // given
             Long recipeId = 1L;
             Recipe recipe = createSampleRecipe(recipeId);
-            
+
             given(repository.findById(recipeId)).willReturn(Optional.of(recipe));
 
             // when
@@ -106,13 +106,13 @@ class GetRecipeServiceTest {
         List<Ingredient> ingredients = List.of(
             Ingredient.builder()
                 .name("에스프레소 원두")
-                .amount("18")
+                .amount(BigDecimal.valueOf(18))
                 .unit("g")
                 .buyUrl("https://example.com/beans")
                 .build(),
             Ingredient.builder()
                 .name("물")
-                .amount("36")
+                .amount(BigDecimal.valueOf(36))
                 .unit("ml")
                 .buyUrl(null)
                 .build()
