@@ -1,4 +1,4 @@
-import { format, parseISO } from 'date-fns';
+import {format, parseISO} from 'date-fns';
 
 // 날짜 포맷팅
 export const formatDate = (dateString: string, formatStr = 'yyyy년 MM월 dd일'): string => {
@@ -16,7 +16,7 @@ export const formatRelativeDate = (dateString: string): string => {
   const now = new Date();
   const diffInMs = now.getTime() - date.getTime();
   const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
-  
+
   if (diffInDays === 0) return '오늘';
   if (diffInDays === 1) return '어제';
   if (diffInDays < 7) return `${diffInDays}일 전`;
@@ -58,9 +58,10 @@ export const getBlendTypeKorean = (type: string): string => {
 
 export const getCategoryTypeKorean = (type: string): string => {
   const categoryTypes: Record<string, string> = {
-    BREW: '브루잉',
+    HAND_DRIP: '핸드드립',
     ESPRESSO: '에스프레소',
-    DESSERT: '디저트',
+    COLD_BREW: '콜드브루',
+    MOCHA_POT: '모카포트',
   };
   return categoryTypes[type] || type;
 };

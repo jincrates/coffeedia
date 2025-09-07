@@ -9,6 +9,7 @@ import HomePage from '@/pages/HomePage';
 import BeansPage from '@/pages/BeansPage';
 import RecipesPage from '@/pages/RecipesPage';
 import RecipeDetailPage from '@/pages/RecipeDetailPage';
+import RecipeEditPage from '@/pages/RecipeEditPage';
 import BeanDetailPage from '@/pages/BeanDetailPage';
 import BeanEditPage from '@/pages/BeanEditPage';
 import EquipmentsPage from '@/pages/EquipmentsPage';
@@ -43,6 +44,7 @@ const App: React.FC = () => {
               <Route path="/beans/:id/edit" element={<BeanEditPage />} />
               <Route path="/recipes" element={<RecipesPage />} />
               <Route path="/recipes/:id" element={<RecipeDetailPage />} />
+              <Route path="/recipes/:id/edit" element={<RecipeEditPage />} />
               <Route path="/equipments" element={<EquipmentsPage />} />
               {/* 404 페이지 */}
               <Route path="*" element={

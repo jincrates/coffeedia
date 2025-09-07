@@ -3,7 +3,7 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { Plus, Minus, Upload } from 'lucide-react';
-import { CreateRecipeCommand, CategoryType } from '@/types/api';
+import { CreateRecipeCommand, UpdateRecipeCommand, CategoryType, RecipeResponse } from '@/types/api';
 import Button from '@/components/common/Button';
 import Input from '@/components/common/Input';
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/common/Card';
@@ -34,12 +34,20 @@ const recipeSchema = yup.object({
 });
 
 interface RecipeFormProps {
-  onSubmit: (data: CreateRecipeCommand) => void;
+  onSubmit: (data: CreateRecipeCommand | UpdateRecipeCommand) => void;
   onCancel: () => void;
   loading?: boolean;
+  initialData?: RecipeResponse;
+  isEdit?: boolean;
 }
 
-const RecipeForm: React.FC<RecipeFormProps> = ({ onSubmit, onCancel, loading = false }) => {
+const RecipeForm: React.FC<RecipeFormProps> = ({ 
+  onSubmit, 
+  onCancel, 
+  loading = false, 
+  initialData,
+  isEdit = false 
+}) => {
   const {
     register,
     control,
@@ -47,9 +55,19 @@ const RecipeForm: React.FC<RecipeFormProps> = ({ onSubmit, onCancel, loading = f
     watch,
     setValue,
     formState: { errors },
-  } = useForm<CreateRecipeCommand>({
+  } = useForm<CreateRecipeCommand | UpdateRecipeCommand>({
     resolver: yupResolver(recipeSchema),
-    defaultValues: {
+    defaultValues: initialData ? {
+      category: initialData.category,
+      title: initialData.title,
+      thumbnailUrl: initialData.thumbnailUrl || '',
+      description: initialData.description || '',
+      serving: initialData.serving,
+      tags: initialData.tags || [],
+      ingredients: initialData.ingredients.length > 0 ? initialData.ingredients : [{ name: '', amount: 0, unit: '', buyUrl: '' }],
+      steps: initialData.steps.length > 0 ? initialData.steps : [{ description: '', imageUrl: '' }],
+      tips: initialData.tips || '',
+    } : {
       category: CategoryType.BREW,
       serving: 1,
       tags: [],
@@ -367,7 +385,7 @@ const RecipeForm: React.FC<RecipeFormProps> = ({ onSubmit, onCancel, loading = f
           취소
         </Button>
         <Button type="submit" loading={loading}>
-          레시피 저장
+          {isEdit ? '레시피 수정' : '레시피 저장'}
         </Button>
       </div>
     </form>

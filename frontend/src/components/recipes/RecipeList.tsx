@@ -7,6 +7,9 @@ interface RecipeListProps {
   loading?: boolean;
   loadingRecipeId?: number | null;
   onView?: (recipe: RecipeSummaryResponse) => void;
+  onEdit?: (recipe: RecipeSummaryResponse) => void;
+  onDelete?: (recipe: RecipeSummaryResponse) => void;
+  showActions?: boolean;
 }
 
 const RecipeList: React.FC<RecipeListProps> = ({
@@ -14,6 +17,9 @@ const RecipeList: React.FC<RecipeListProps> = ({
   loading = false,
   loadingRecipeId = null,
   onView,
+  onEdit,
+  onDelete,
+  showActions = false,
 }) => {
   if (loading) {
     return (
@@ -46,6 +52,9 @@ const RecipeList: React.FC<RecipeListProps> = ({
           key={recipe.id}
           recipe={recipe}
           onView={onView}
+          onEdit={onEdit}
+          onDelete={onDelete}
+          showActions={showActions}
           loading={loadingRecipeId === recipe.id}
         />
       ))}

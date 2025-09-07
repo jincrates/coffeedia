@@ -5,6 +5,7 @@ import {
   RecipeResponse,
   RecipeSummaryResponse,
   CreateRecipeCommand,
+  UpdateRecipeCommand,
   RecipeSearchQuery,
 } from '@/types/api';
 
@@ -35,10 +36,21 @@ class RecipeService {
     return response.data.data;
   }
 
-  // Recipe 상세 조회 (향후 구현 예정)
+  // Recipe 상세 조회
   async getRecipe(recipeId: number): Promise<RecipeResponse> {
     const response = await api.get<BaseResponse<RecipeResponse>>(`${this.BASE_URL}/${recipeId}`);
     return response.data.data;
+  }
+
+  // Recipe 수정
+  async updateRecipe(recipeId: number, command: UpdateRecipeCommand): Promise<RecipeResponse> {
+    const response = await api.put<BaseResponse<RecipeResponse>>(`${this.BASE_URL}/${recipeId}`, command);
+    return response.data.data;
+  }
+
+  // Recipe 삭제
+  async deleteRecipe(recipeId: number): Promise<void> {
+    await api.delete(`${this.BASE_URL}/${recipeId}`);
   }
 }
 

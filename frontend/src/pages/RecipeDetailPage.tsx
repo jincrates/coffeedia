@@ -1,15 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery } from 'react-query';
-import { ArrowLeft, Loader2, Users, Clock, Tag, ChefHat, ShoppingCart, ExternalLink, Lightbulb } from 'lucide-react';
+import { useQuery, useMutation, useQueryClient } from 'react-query';
+import { ArrowLeft, Loader2, Users, Clock, Tag, ChefHat, ShoppingCart, ExternalLink, Lightbulb, Edit, Trash2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { recipeService } from '@/services/recipeService';
 import Button from '@/components/common/Button';
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/common/Card';
+import DeleteConfirmModal from '@/components/common/DeleteConfirmModal';
 import { formatDateTime, getCategoryTypeKorean } from '@/utils/format';
 
 const RecipeDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const {
     data: recipe,
@@ -23,8 +27,40 @@ const RecipeDetailPage: React.FC = () => {
     }
   );
 
+  const deleteMutation = useMutation(
+    () => recipeService.deleteRecipe(Number(id)),
+    {
+      onSuccess: () => {
+        toast.success('레시피가 성공적으로 삭제되었습니다!');
+        queryClient.invalidateQueries(['recipes']);
+        navigate('/recipes');
+      },
+      onError: (error: any) => {
+        console.error('레시피 삭제 실패:', error);
+        toast.error(error.response?.data?.message || '레시피 삭제에 실패했습니다.');
+      },
+    }
+  );
+
   const handleBack = () => {
     navigate('/recipes');
+  };
+
+  const handleEdit = () => {
+    navigate(`/recipes/${id}/edit`);
+  };
+
+  const handleDelete = () => {
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = () => {
+    deleteMutation.mutate();
+    setShowDeleteModal(false);
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
   };
 
   if (isLoading) {
@@ -71,11 +107,32 @@ const RecipeDetailPage: React.FC = () => {
 
         {/* 헤더 */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <div className="flex items-center gap-3 mb-4">
-            <h1 className="text-3xl font-bold text-gray-900">{recipe.title}</h1>
-            <span className="inline-flex px-3 py-1 text-sm font-medium bg-blue-100 text-blue-800 rounded-full">
-              {getCategoryTypeKorean(recipe.category)}
-            </span>
+          <div className="flex justify-between items-start mb-4">
+            <div className="flex items-center gap-3">
+              <h1 className="text-3xl font-bold text-gray-900">{recipe.title}</h1>
+              <span className="inline-flex px-3 py-1 text-sm font-medium bg-blue-100 text-blue-800 rounded-full">
+                {getCategoryTypeKorean(recipe.category)}
+              </span>
+            </div>
+            {/* 수정/삭제 버튼 */}
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleEdit}
+                leftIcon={<Edit className="h-4 w-4" />}
+              >
+                수정
+              </Button>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={handleDelete}
+                leftIcon={<Trash2 className="h-4 w-4" />}
+              >
+                삭제
+              </Button>
+            </div>
           </div>
           <div className="flex items-center text-sm text-gray-500 space-x-4">
             <div className="flex items-center">
@@ -252,6 +309,16 @@ const RecipeDetailPage: React.FC = () => {
             </Card>
           )}
         </div>
+
+        {/* 삭제 확인 모달 */}
+        <DeleteConfirmModal
+          isOpen={showDeleteModal}
+          title="레시피 삭제 확인"
+          message="정말로 이 레시피를 삭제하시겠습니까? 삭제된 레시피는 복구할 수 없습니다."
+          onConfirm={confirmDelete}
+          onCancel={cancelDelete}
+          loading={deleteMutation.isLoading}
+        />
       </div>
     </div>
   );

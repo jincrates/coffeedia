@@ -39,9 +39,10 @@ export enum BlendType {
 }
 
 export enum CategoryType {
-  BREW = 'BREW',
+  HAND_DRIP = 'HAND_DRIP',
   ESPRESSO = 'ESPRESSO',
-  DESSERT = 'DESSERT',
+  COLD_BREW = 'COLD_BREW',
+  MOCHA_POT = 'MOCHA_POT',
 }
 
 export enum EquipmentType {
@@ -172,6 +173,18 @@ export interface CreateIngredientCommand {
 export interface CreateStepCommand {
   imageUrl?: string;
   description: string;
+}
+
+export interface UpdateRecipeCommand {
+  category: CategoryType;
+  title: string;
+  thumbnailUrl?: string;
+  description?: string;
+  serving: number;
+  tags: string[];
+  ingredients: CreateIngredientCommand[];
+  steps: CreateStepCommand[];
+  tips?: string;
 }
 
 // Equipment Types

@@ -9,12 +9,14 @@ import RecipeForm from '@/components/recipes/RecipeForm';
 import RecipeDetail from '@/components/recipes/RecipeDetail';
 import Button from '@/components/common/Button';
 import Input from '@/components/common/Input';
+import DeleteConfirmModal from '@/components/common/DeleteConfirmModal';
 import toast from 'react-hot-toast';
 
 const RecipesPage: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState<RecipeResponse | null>(null);
   const [loadingRecipeId, setLoadingRecipeId] = useState<number | null>(null);
+  const [deleteRecipe, setDeleteRecipe] = useState<RecipeSummaryResponse | null>(null);
   const [searchQuery, setSearchQuery] = useState<RecipeSearchQuery>({
     page: 0,
     size: 12,
@@ -52,6 +54,21 @@ const RecipesPage: React.FC = () => {
     }
   );
 
+  // 레시피 삭제 뮤테이션
+  const deleteRecipeMutation = useMutation(
+    (recipeId: number) => recipeService.deleteRecipe(recipeId),
+    {
+      onSuccess: () => {
+        toast.success('레시피가 성공적으로 삭제되었습니다!');
+        queryClient.invalidateQueries(['recipes']);
+        setDeleteRecipe(null);
+      },
+      onError: (error: any) => {
+        toast.error(error.response?.data?.message || '레시피 삭제에 실패했습니다.');
+      },
+    }
+  );
+
   const handleCreateRecipe = () => {
     setShowForm(true);
   };
@@ -83,6 +100,24 @@ const RecipesPage: React.FC = () => {
 
   const handleCloseDetail = () => {
     setSelectedRecipe(null);
+  };
+
+  const handleEditRecipe = (recipe: RecipeSummaryResponse) => {
+    navigate(`/recipes/${recipe.id}/edit`);
+  };
+
+  const handleDeleteRecipe = (recipe: RecipeSummaryResponse) => {
+    setDeleteRecipe(recipe);
+  };
+
+  const confirmDelete = () => {
+    if (deleteRecipe) {
+      deleteRecipeMutation.mutate(deleteRecipe.id);
+    }
+  };
+
+  const cancelDelete = () => {
+    setDeleteRecipe(null);
   };
 
   const handleSearch = (query: string) => {
@@ -182,6 +217,9 @@ const RecipesPage: React.FC = () => {
             recipes={recipesData?.content || []}
             loading={isLoading}
             onView={handleViewRecipe}
+            onEdit={handleEditRecipe}
+            onDelete={handleDeleteRecipe}
+            showActions={true}
             loadingRecipeId={loadingRecipeId}
           />
 
@@ -203,6 +241,16 @@ const RecipesPage: React.FC = () => {
           onClose={handleCloseDetail}
         />
       )}
+
+      {/* 삭제 확인 모달 */}
+      <DeleteConfirmModal
+        isOpen={!!deleteRecipe}
+        title="레시피 삭제 확인"
+        message={`정말로 "${deleteRecipe?.title}"를 삭제하시겠습니까? 삭제된 레시피는 복구할 수 없습니다.`}
+        onConfirm={confirmDelete}
+        onCancel={cancelDelete}
+        loading={deleteRecipeMutation.isLoading}
+      />
     </>
   );
 };
