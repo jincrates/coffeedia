@@ -36,7 +36,7 @@ class RecipeMapperAmountValidationTest {
             );
 
             // when
-            List<Ingredient> ingredients = RecipeMapper.toIngredients(commands);
+            List<Ingredient> ingredients = RecipeMapper.toIngredientsForCreate(commands);
 
             // then
             assertThat(ingredients).hasSize(2);
@@ -57,7 +57,7 @@ class RecipeMapperAmountValidationTest {
             );
 
             // when & then
-            assertThatThrownBy(() -> RecipeMapper.toIngredients(commands))
+            assertThatThrownBy(() -> RecipeMapper.toIngredientsForCreate(commands))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("재료 '커피 원두'의 양은 필수입니다.");
         }
@@ -75,7 +75,7 @@ class RecipeMapperAmountValidationTest {
             );
 
             // when & then
-            assertThatThrownBy(() -> RecipeMapper.toIngredients(zeroCommands))
+            assertThatThrownBy(() -> RecipeMapper.toIngredientsForCreate(zeroCommands))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("재료 '커피 원두'의 양은 0보다 커야 합니다. 입력값: 0");
 
@@ -89,7 +89,7 @@ class RecipeMapperAmountValidationTest {
             );
 
             // when & then
-            assertThatThrownBy(() -> RecipeMapper.toIngredients(negativeCommands))
+            assertThatThrownBy(() -> RecipeMapper.toIngredientsForCreate(negativeCommands))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("재료 '설탕'의 양은 0보다 커야 합니다. 입력값: -1.5");
         }
@@ -107,7 +107,7 @@ class RecipeMapperAmountValidationTest {
             );
 
             // when & then
-            assertThatThrownBy(() -> RecipeMapper.toIngredients(commands))
+            assertThatThrownBy(() -> RecipeMapper.toIngredientsForCreate(commands))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("재료 '바닐라 시럽'의 양은 소수점 이하 3자리까지만 입력 가능합니다. 입력값: 1.2345");
         }
@@ -125,7 +125,7 @@ class RecipeMapperAmountValidationTest {
             );
 
             // when & then
-            assertThatThrownBy(() -> RecipeMapper.toIngredients(commands))
+            assertThatThrownBy(() -> RecipeMapper.toIngredientsForCreate(commands))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("재료 '물'의 양이 너무 큽니다. 최대 999,999.999까지 입력 가능합니다. 입력값: 1000000");
         }
@@ -143,7 +143,7 @@ class RecipeMapperAmountValidationTest {
             );
 
             // when
-            List<Ingredient> ingredients = RecipeMapper.toIngredients(commands);
+            List<Ingredient> ingredients = RecipeMapper.toIngredientsForUpdate(commands);
 
             // then
             assertThat(ingredients).hasSize(1);
@@ -168,7 +168,7 @@ class RecipeMapperAmountValidationTest {
             );
 
             // when
-            List<Ingredient> ingredients = RecipeMapper.toIngredients(commands);
+            List<Ingredient> ingredients = RecipeMapper.toIngredientsForCreate(commands);
 
             // then
             assertThat(ingredients).hasSize(2);
