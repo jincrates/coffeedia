@@ -7,8 +7,10 @@ import io.coffeedia.IntegrationSupportTest;
 import io.coffeedia.application.usecase.dto.CreateRecipeCommand;
 import io.coffeedia.application.usecase.dto.CreateRecipeCommand.CreateIngredientCommand;
 import io.coffeedia.application.usecase.dto.CreateRecipeCommand.CreateStepCommand;
+import io.coffeedia.application.usecase.dto.DeleteRecipeResponse;
 import io.coffeedia.application.usecase.dto.RecipeResponse;
 import io.coffeedia.application.usecase.dto.RecipeSummaryResponse;
+import io.coffeedia.application.usecase.dto.UpdateRecipeCommand;
 import io.coffeedia.bootstrap.api.controller.dto.BaseResponse;
 import io.coffeedia.bootstrap.api.controller.dto.PageResponse;
 import io.coffeedia.domain.vo.ActiveStatus;
@@ -568,6 +570,129 @@ class RecipeControllerTest extends IntegrationSupportTest {
                     assertThat(response.success()).isTrue();
                     assertThat(response.data()).isNotNull();
                     assertThat(response.data().content()).isEmpty();
+                });
+        }
+    }
+
+    @Nested
+    @DisplayName("레시피 수정")
+    class UpdateRecipeTest {
+
+        private Long recipeId;
+
+        @BeforeEach
+        void setUp() {
+            recipeId = createRecipe().id();
+        }
+
+        @Test
+        @DisplayName("레시피를 정상적으로 수정할 수 있다")
+        void updateRecipeSuccessfully() {
+            // given
+            UpdateRecipeCommand command = UpdateRecipeCommand.builder()
+                .title("수정된 레시피 제목")
+                .description("수정된 설명")
+                .serving(2)
+                .build();
+
+            // when
+            webTestClient.put()
+                .uri("/api/recipes/{recipeId}", recipeId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(command)
+                .exchange()
+                // then
+                .expectStatus().isOk()
+                .expectBody(new ParameterizedTypeReference<BaseResponse<RecipeResponse>>() {
+                })
+                .value(response -> {
+                    assertThat(response.success()).isTrue();
+                    assertThat(response.data()).isNotNull();
+                    RecipeResponse data = response.data();
+                    assertAll(
+                        () -> assertThat(data.title()).isEqualTo("수정된 레시피 제목"),
+                        () -> assertThat(data.description()).isEqualTo("수정된 설명"),
+                        () -> assertThat(data.serving()).isEqualTo(2),
+                        () -> assertThat(data.updatedAt()).isNotNull()
+                    );
+                });
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 레시피를 수정하면 실패한다")
+        void failToUpdateNonExistentRecipe() {
+            // given
+            UpdateRecipeCommand command = UpdateRecipeCommand.builder()
+                .title("없는 레시피")
+                .build();
+
+            // when
+            webTestClient.put()
+                .uri("/api/recipes/{recipeId}", 99999L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(command)
+                .exchange()
+                // then
+                .expectStatus().isNotFound()
+                .expectBody(new ParameterizedTypeReference<BaseResponse<Void>>() {
+                })
+                .value(response -> {
+                    assertThat(response.success()).isFalse();
+                    assertThat(response.message()).contains("레시피를 찾을 수 없습니다. ID: 99999");
+                });
+        }
+    }
+
+    @Nested
+    @DisplayName("레시피 삭제")
+    class DeleteRecipeTest {
+
+        private Long recipeId;
+
+        @BeforeEach
+        void setUp() {
+            // 테스트용 레시피 하나 등록 후 ID 확보
+            recipeId = createRecipe().id();
+        }
+
+        @Test
+        @DisplayName("레시피를 정상적으로 삭제할 수 있다")
+        void deleteRecipeSuccessfully() {
+            // when
+            webTestClient.delete()
+                .uri("/api/recipes/{recipeId}", recipeId)
+                .exchange()
+                // then
+                .expectStatus().isOk()
+                .expectBody(new ParameterizedTypeReference<BaseResponse<DeleteRecipeResponse>>() {
+                })
+                .value(response -> {
+                    assertThat(response.success()).isTrue();
+                    assertThat(response.data()).isNotNull();
+                    assertThat(response.data().recipeId()).isEqualTo(recipeId);
+                });
+
+            // 삭제 후 조회 시 빈 결과 확인
+            webTestClient.get()
+                .uri("/api/recipes/{recipeId}", recipeId)
+                .exchange()
+                .expectStatus().isNotFound();
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 레시피를 삭제하면 실패한다")
+        void failToDeleteNonExistentRecipe() {
+            // when
+            webTestClient.delete()
+                .uri("/api/recipes/{recipeId}", 99999L)
+                .exchange()
+                // then
+                .expectStatus().isNotFound()
+                .expectBody(new ParameterizedTypeReference<BaseResponse<Void>>() {
+                })
+                .value(response -> {
+                    assertThat(response.success()).isFalse();
+                    assertThat(response.message()).contains("레시피를 찾을 수 없습니다. ID: 99999");
                 });
         }
     }

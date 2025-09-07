@@ -29,6 +29,8 @@ public class RecipeJpaMapper {
             .serving(recipe.serving())
             .tips(recipe.tips())
             .status(recipe.status())
+            .createdAt(recipe.createdAt())
+            .updatedAt(recipe.updatedAt())
             .build();
 
         // 재료 추가

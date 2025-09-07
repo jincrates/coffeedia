@@ -124,7 +124,7 @@ public abstract class IntegrationSupportTest {
         return beanRepository.createAll(beans);
     }
 
-    private Recipe createRecipe() {
+    protected Recipe createRecipe() {
         Recipe recipe = Recipe.builder()
             .userId(1L)
             .category(CategoryType.HAND_DRIP)
