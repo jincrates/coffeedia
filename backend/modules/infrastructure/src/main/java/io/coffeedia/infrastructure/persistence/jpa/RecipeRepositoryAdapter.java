@@ -11,6 +11,7 @@ import io.coffeedia.infrastructure.persistence.jpa.mapper.RecipeJpaMapper;
 import io.coffeedia.infrastructure.persistence.jpa.repository.RecipeJpaRepository;
 import io.coffeedia.infrastructure.persistence.jpa.repository.TagJpaRepository;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -33,6 +34,12 @@ class RecipeRepositoryAdapter implements RecipeRepositoryPort {
         RecipeJpaEntity entity = RecipeJpaMapper.toEntity(recipe, tags);
         RecipeJpaEntity saved = recipeRepository.save(entity);
         return RecipeJpaMapper.toDomain(saved);
+    }
+
+    @Override
+    public Optional<Recipe> findById(final Long id) {
+        return recipeRepository.findById(id)
+            .map(RecipeJpaMapper::toDomain);
     }
 
     @Override
