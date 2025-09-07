@@ -70,6 +70,7 @@ export interface FlavorResponse {
 export interface BeanResponse {
   beanId: number;
   name: string;
+  thumbnailUrl?: string;
   origin: Origin;
   roaster: string;
   roastDate: string; // ISO date string
@@ -87,6 +88,7 @@ export interface BeanResponse {
 
 export interface CreateBeanCommand {
   name: string;
+  thumbnailUrl?: string;
   origin: Origin;
   roaster: string;
   roastDate: string;

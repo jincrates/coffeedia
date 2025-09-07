@@ -11,6 +11,7 @@ import io.coffeedia.infrastructure.persistence.jpa.mapper.RecipeJpaMapper;
 import io.coffeedia.infrastructure.persistence.jpa.repository.RecipeJpaRepository;
 import io.coffeedia.infrastructure.persistence.jpa.repository.TagJpaRepository;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -36,6 +37,12 @@ class RecipeRepositoryAdapter implements RecipeRepositoryPort {
     }
 
     @Override
+    public Optional<Recipe> findById(final Long id) {
+        return recipeRepository.findById(id)
+            .map(RecipeJpaMapper::toDomain);
+    }
+
+    @Override
     public List<RecipeSummary> findAll(final PageSize pageSize, final List<SortType> sorts) {
         Pageable pageable = PageRequest.of(
             pageSize.page(),
@@ -43,6 +50,11 @@ class RecipeRepositoryAdapter implements RecipeRepositoryPort {
             toSort(sorts)
         );
         return recipeRepository.findAllSummaries(pageable);
+    }
+
+    @Override
+    public void deleteById(final Long id) {
+        recipeRepository.deleteById(id);
     }
 
     @Override

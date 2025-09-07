@@ -2,6 +2,7 @@ package io.coffeedia.bootstrap.api.advice;
 
 import io.coffeedia.bootstrap.api.controller.dto.BaseResponse;
 import io.coffeedia.domain.exception.AccessDeniedException;
+import io.coffeedia.domain.exception.RecipeNotFoundException;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -80,6 +81,26 @@ class GlobalControllerAdvice extends ResponseEntityExceptionHandler {
 
         return error(
             HttpStatus.BAD_REQUEST,
+            exception.getMessage()
+        );
+    }
+
+    /**
+     * RecipeNotFoundException 에러 - 레시피를 찾을 수 없는 경우
+     */
+    @ExceptionHandler(RecipeNotFoundException.class)
+    protected ResponseEntity<?> handleRecipeNotFoundException(
+        RecipeNotFoundException exception,
+        WebRequest request
+    ) {
+        log.warn(
+            "Recipe not found - path: {}, message: {}",
+            getRequestPath(request),
+            exception.getMessage()
+        );
+
+        return error(
+            HttpStatus.NOT_FOUND,
             exception.getMessage()
         );
     }

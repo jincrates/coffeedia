@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { BeanResponse } from '@/types/api';
 import Card, { CardContent, CardFooter } from '@/components/common/Card';
 import Button from '@/components/common/Button';
-import { Edit, Trash2, Eye, MapPin } from 'lucide-react';
+import { Edit, Trash2, Eye, MapPin, Coffee } from 'lucide-react';
 import { formatDate, formatRelativeDate, getRoastLevelKorean, getProcessTypeKorean, getBlendTypeKorean } from '@/utils/format';
 
 interface BeanCardProps {
@@ -18,6 +19,9 @@ const BeanCard: React.FC<BeanCardProps> = ({
   onDelete,
   onView,
 }) => {
+  const navigate = useNavigate();
+  const [imageError, setImageError] = useState(false);
+
   const handleEdit = (e: React.MouseEvent) => {
     e.stopPropagation();
     onEdit?.(bean);
@@ -29,32 +33,90 @@ const BeanCard: React.FC<BeanCardProps> = ({
   };
 
   const handleView = () => {
-    onView?.(bean);
+    if (onView) {
+      onView(bean);
+    } else {
+      navigate(`/beans/${bean.beanId}`);
+    }
+  };
+
+  const handleCardClick = () => {
+    navigate(`/beans/${bean.beanId}`);
+  };
+
+  const handleImageError = () => {
+    setImageError(true);
   };
 
   return (
     <Card 
-      hover={!!onView} 
-      onClick={handleView}
-      className="transition-all duration-200"
+      hover={true} 
+      onClick={handleCardClick}
+      className="transition-all duration-200 cursor-pointer overflow-hidden"
     >
-      <CardContent className="space-y-3">
+        {/* 이미지가 있는 경우만 표시 */}
+        {bean.thumbnailUrl && (
+          <div className="relative h-48 bg-gray-100 overflow-hidden">
+            {!imageError ? (
+              <img
+                src={bean.thumbnailUrl}
+                alt={bean.name}
+                className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                onError={handleImageError}
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-coffee-100 to-coffee-200">
+                <Coffee className="h-16 w-16 text-coffee-400" />
+              </div>
+            )}
+            
+            {/* 상태 배지 */}
+            <div className="absolute top-3 right-3">
+              <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full backdrop-blur-sm ${
+                bean.status === 'ACTIVE' 
+                  ? 'bg-green-100/80 text-green-800' 
+                  : 'bg-gray-100/80 text-gray-800'
+              }`}>
+                {bean.status === 'ACTIVE' ? '활성' : '비활성'}
+              </span>
+            </div>
+            
+            {/* 디카페인 배지 */}
+            {bean.isDecaf && (
+              <div className="absolute top-3 left-3">
+                <span className="inline-flex px-2 py-1 text-xs font-medium bg-orange-100/80 text-orange-800 rounded-full backdrop-blur-sm">
+                  디카페인
+                </span>
+              </div>
+            )}
+          </div>
+        )}
+      <CardContent className={`space-y-3 ${bean.thumbnailUrl ? 'p-4' : 'p-6'}`}>
         {/* Header */}
         <div className="flex justify-between items-start">
           <div className="flex-1">
-            <h3 className="font-semibold text-lg text-gray-900 truncate">
-              {bean.name}
-            </h3>
-            <p className="text-sm text-gray-600">{bean.roaster}</p>
-          </div>
-          <div className="text-right">
-            <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-              bean.status === 'ACTIVE' 
-                ? 'bg-green-100 text-green-800' 
-                : 'bg-gray-100 text-gray-800'
-            }`}>
-              {bean.status === 'ACTIVE' ? '활성' : '비활성'}
-            </span>
+            <div className="flex items-center gap-2 mb-1">
+              <h3 className="font-semibold text-lg text-gray-900 truncate">
+                {bean.name}
+              </h3>
+              {/* 이미지가 없을 때 상태 배지 */}
+              {!bean.thumbnailUrl && (
+                <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+                  bean.status === 'ACTIVE' 
+                    ? 'bg-green-100 text-green-800' 
+                    : 'bg-gray-100 text-gray-800'
+                }`}>
+                  {bean.status === 'ACTIVE' ? '활성' : '비활성'}
+                </span>
+              )}
+              {/* 이미지가 없을 때 디카페인 배지 */}
+              {!bean.thumbnailUrl && bean.isDecaf && (
+                <span className="inline-flex px-2 py-1 text-xs font-medium bg-orange-100 text-orange-800 rounded-full">
+                  디카페인
+                </span>
+              )}
+            </div>
+            <p className="text-sm text-coffee-600 font-medium">{bean.roaster}</p>
           </div>
         </div>
 
