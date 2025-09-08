@@ -4,6 +4,8 @@ import {
   PageResponse,
   EquipmentResponse,
   CreateEquipmentCommand,
+  UpdateEquipmentCommand,
+  DeleteEquipmentResponse,
   EquipmentSearchQuery,
 } from '@/types/api';
 
@@ -34,9 +36,21 @@ class EquipmentService {
     return response.data.data;
   }
 
-  // Equipment 상세 조회 (향후 구현 예정)
+  // Equipment 상세 조회
   async getEquipment(equipmentId: number): Promise<EquipmentResponse> {
     const response = await api.get<BaseResponse<EquipmentResponse>>(`${this.BASE_URL}/${equipmentId}`);
+    return response.data.data;
+  }
+
+  // Equipment 수정
+  async updateEquipment(equipmentId: number, command: UpdateEquipmentCommand): Promise<EquipmentResponse> {
+    const response = await api.put<BaseResponse<EquipmentResponse>>(`${this.BASE_URL}/${equipmentId}`, command);
+    return response.data.data;
+  }
+
+  // Equipment 삭제
+  async deleteEquipment(equipmentId: number): Promise<DeleteEquipmentResponse> {
+    const response = await api.delete<BaseResponse<DeleteEquipmentResponse>>(`${this.BASE_URL}/${equipmentId}`);
     return response.data.data;
   }
 }

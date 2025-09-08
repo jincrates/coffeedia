@@ -77,3 +77,11 @@ export const getEquipmentTypeKorean = (type: string): string => {
   };
   return equipmentTypes[type] || type;
 };
+
+export const getActiveStatusKorean = (status: string): string => {
+  const statusTypes: Record<string, string> = {
+    ACTIVE: '활성',
+    INACTIVE: '비활성',
+  };
+  return statusTypes[status] || status;
+};

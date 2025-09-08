@@ -210,6 +210,20 @@ export interface CreateEquipmentCommand {
   buyUrl?: string;
 }
 
+export interface UpdateEquipmentCommand {
+  type: EquipmentType;
+  name: string;
+  brand: string;
+  description?: string;
+  buyDate?: string;
+  buyUrl?: string;
+}
+
+export interface DeleteEquipmentResponse {
+  id: number;
+  message: string;
+}
+
 // Search Query Types
 export interface BeanSearchQuery {
   page?: number;
