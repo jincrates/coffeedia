@@ -7,6 +7,7 @@ import io.coffeedia.infrastructure.persistence.jpa.entity.EquipmentJpaEntity;
 import io.coffeedia.infrastructure.persistence.jpa.mapper.EquipmentJpaMapper;
 import io.coffeedia.infrastructure.persistence.jpa.repository.EquipmentJpaRepository;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +24,12 @@ class EquipmentRepositoryAdapter implements EquipmentRepositoryPort {
         EquipmentJpaEntity entity = EquipmentJpaMapper.toEntity(equipment);
         EquipmentJpaEntity saved = repository.save(entity);
         return EquipmentJpaMapper.toDomain(saved);
+    }
+
+    @Override
+    public Optional<Equipment> findById(final Long equipmentId) {
+        return repository.findById(equipmentId)
+            .map(EquipmentJpaMapper::toDomain);
     }
 
     @Override

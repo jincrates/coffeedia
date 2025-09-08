@@ -15,12 +15,13 @@ import org.springframework.transaction.annotation.Transactional;
 class GetAllEquipmentsService implements GetAllEquipmentsUseCase {
 
     private final EquipmentRepositoryPort repository;
+    private final EquipmentMapper equipmentMapper;
 
     @Override
     @Transactional(readOnly = true)
     public List<EquipmentResponse> invoke(final EquipmentSearchQuery query) {
         return repository.findAll(query.pageSize()).stream()
-            .map(EquipmentMapper::toResponse)
+            .map(equipmentMapper::toResponse)
             .toList();
     }
 }

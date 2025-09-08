@@ -18,12 +18,13 @@ import org.springframework.transaction.annotation.Transactional;
 class CreateEquipmentService implements CreateEquipmentUseCase {
 
     private final EquipmentRepositoryPort repository;
+    private final EquipmentMapper equipmentMapper;
     private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
     public EquipmentResponse invoke(final CreateEquipmentCommand command) {
-        Equipment equipment = EquipmentMapper.toDomain(command);
+        Equipment equipment = equipmentMapper.toDomain(command);
         Equipment saved = repository.save(equipment);
 
         eventPublisher.publishEvent(
@@ -33,6 +34,6 @@ class CreateEquipmentService implements CreateEquipmentUseCase {
                 .build()
         );
 
-        return EquipmentMapper.toResponse(saved);
+        return equipmentMapper.toResponse(saved);
     }
 }
