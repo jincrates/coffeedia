@@ -142,6 +142,7 @@ const BeansPage: React.FC = () => {
           onCancel={handleFormCancel}
           loading={createBeanMutation.isLoading || updateBeanMutation.isLoading}
           mode={editingBean ? 'edit' : 'create'}
+          showButtons={false}
         />
       </FormLayout>
     );

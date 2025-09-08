@@ -165,6 +165,7 @@ const RecipesPage: React.FC = () => {
           onCancel={handleFormCancel}
           loading={createRecipeMutation.isLoading || updateRecipeMutation.isLoading}
           isEdit={!!editingRecipe}
+          showButtons={false}
         />
       </FormLayout>
     );

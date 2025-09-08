@@ -30,6 +30,7 @@ interface EquipmentFormProps {
   onCancel: () => void;
   loading?: boolean;
   mode?: 'create' | 'edit';
+  showButtons?: boolean;
 }
 
 const EquipmentForm: React.FC<EquipmentFormProps> = ({
@@ -38,6 +39,7 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({
   onCancel,
   loading = false,
   mode = 'create',
+  showButtons = true,
 }) => {
   const {
     register,
@@ -184,14 +186,16 @@ const EquipmentForm: React.FC<EquipmentFormProps> = ({
       )}
 
       {/* 버튼 */}
-      <div className="flex justify-end space-x-3">
-        <Button type="button" variant="outline" onClick={onCancel}>
-          취소
-        </Button>
-        <Button type="submit" loading={loading}>
-          {mode === 'create' ? '장비 저장' : '장비 수정'}
-        </Button>
-      </div>
+      {showButtons && (
+        <div className="flex justify-end space-x-3">
+          <Button type="button" variant="outline" onClick={onCancel}>
+            취소
+          </Button>
+          <Button type="submit" loading={loading}>
+            {mode === 'create' ? '장비 저장' : '장비 수정'}
+          </Button>
+        </div>
+      )}
     </form>
   );
 };

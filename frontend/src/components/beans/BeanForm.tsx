@@ -35,6 +35,7 @@ interface BeanFormProps {
   onCancel: () => void;
   loading?: boolean;
   mode?: 'create' | 'edit';
+  showButtons?: boolean;
 }
 
 const BeanForm: React.FC<BeanFormProps> = ({ 
@@ -42,7 +43,8 @@ const BeanForm: React.FC<BeanFormProps> = ({
   onSubmit, 
   onCancel, 
   loading = false,
-  mode = 'create' 
+  mode = 'create',
+  showButtons = true
 }) => {
   const {
     register,
@@ -306,14 +308,16 @@ const BeanForm: React.FC<BeanFormProps> = ({
       </Card>
 
       {/* 버튼 */}
-      <div className="flex justify-end space-x-3">
-        <Button type="button" variant="outline" onClick={onCancel}>
-          취소
-        </Button>
-        <Button type="submit" loading={loading}>
-          {mode === 'create' ? '원두 저장' : '원두 수정'}
-        </Button>
-      </div>
+      {showButtons && (
+        <div className="flex justify-end space-x-3">
+          <Button type="button" variant="outline" onClick={onCancel}>
+            취소
+          </Button>
+          <Button type="submit" loading={loading}>
+            {mode === 'create' ? '원두 저장' : '원두 수정'}
+          </Button>
+        </div>
+      )}
     </form>
   );
 };

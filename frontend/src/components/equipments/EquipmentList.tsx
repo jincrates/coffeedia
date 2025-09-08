@@ -4,15 +4,14 @@ import { equipmentService } from '@/services/equipmentService';
 import EquipmentCard from './EquipmentCard';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import Button from '@/components/common/Button';
-import { Plus, Search, Settings } from 'lucide-react';
-import Input from '@/components/common/Input';
-import DeleteConfirmModal from '@/components/common/DeleteConfirmModal';
+import { Plus, Settings } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 interface EquipmentListProps {
   onAddEquipment: () => void;
   onEditEquipment: (equipment: EquipmentResponse) => void;
   onViewEquipment: (equipmentId: number) => void;
+  onDeleteEquipment: (equipment: EquipmentResponse) => void;
   refreshTrigger?: number;
 }
 
@@ -20,6 +19,7 @@ const EquipmentList: React.FC<EquipmentListProps> = ({
   onAddEquipment,
   onEditEquipment,
   onViewEquipment,
+  onDeleteEquipment,
   refreshTrigger = 0,
 }) => {
   const [equipments, setEquipments] = useState<EquipmentResponse[]>([]);
@@ -27,9 +27,6 @@ const EquipmentList: React.FC<EquipmentListProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [equipmentToDelete, setEquipmentToDelete] = useState<number | null>(null);
-  const [deleting, setDeleting] = useState(false);
 
   const pageSize = 12;
 
@@ -71,32 +68,7 @@ const EquipmentList: React.FC<EquipmentListProps> = ({
   };
 
   const handleDeleteClick = (equipment: EquipmentResponse) => {
-    setEquipmentToDelete(equipment.id);
-    setDeleteModalOpen(true);
-  };
-
-  const handleDeleteConfirm = async () => {
-    if (!equipmentToDelete) return;
-
-    try {
-      setDeleting(true);
-      await equipmentService.deleteEquipment(equipmentToDelete);
-      
-      setEquipments(prev => prev.filter(eq => eq.id !== equipmentToDelete));
-      toast.success('장비가 삭제되었습니다.');
-    } catch (error) {
-      console.error('장비 삭제 실패:', error);
-      toast.error('장비 삭제에 실패했습니다.');
-    } finally {
-      setDeleting(false);
-      setDeleteModalOpen(false);
-      setEquipmentToDelete(null);
-    }
-  };
-
-  const handleDeleteCancel = () => {
-    setDeleteModalOpen(false);
-    setEquipmentToDelete(null);
+    onDeleteEquipment(equipment);
   };
 
   const filteredEquipments = equipments.filter(equipment =>
@@ -114,27 +86,6 @@ const EquipmentList: React.FC<EquipmentListProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* 헤더 */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">장비 관리</h1>
-          <p className="text-gray-600 mt-1">커피 장비를 관리하고 추적하세요</p>
-        </div>
-        <Button onClick={onAddEquipment} leftIcon={<Plus className="h-4 w-4" />}>
-          장비 추가
-        </Button>
-      </div>
-
-      {/* 검색 */}
-      <div className="max-w-md">
-        <Input
-          placeholder="장비명 또는 브랜드로 검색..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          leftIcon={<Search className="h-4 w-4" />}
-        />
-      </div>
-
       {/* 장비 그리드 */}
       {filteredEquipments.length === 0 ? (
         <div className="text-center py-12">
@@ -161,6 +112,8 @@ const EquipmentList: React.FC<EquipmentListProps> = ({
                 onEdit={onEditEquipment}
                 onDelete={handleDeleteClick}
                 onView={onViewEquipment}
+                actionsPosition="dropdown"
+                loading={loading}
               />
             ))}
           </div>
@@ -179,16 +132,6 @@ const EquipmentList: React.FC<EquipmentListProps> = ({
           )}
         </>
       )}
-
-      {/* 삭제 확인 모달 */}
-      <DeleteConfirmModal
-        isOpen={deleteModalOpen}
-        onConfirm={handleDeleteConfirm}
-        onCancel={handleDeleteCancel}
-        loading={deleting}
-        title="장비 삭제"
-        message="정말로 이 장비를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다."
-      />
     </div>
   );
 };

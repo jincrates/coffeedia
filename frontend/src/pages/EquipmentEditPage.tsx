@@ -1,131 +1,118 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { EquipmentResponse, UpdateEquipmentCommand } from '@/types/api';
-import { equipmentService } from '@/services/equipmentService';
-import EquipmentForm from '@/components/equipments/EquipmentForm';
-import LoadingSpinner from '@/components/common/LoadingSpinner';
-import MobileHeader from '@/components/common/MobileHeader';
+import React from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useQuery, useMutation, useQueryClient } from 'react-query';
 import toast from 'react-hot-toast';
+import { equipmentService } from '@/services/equipmentService';
+import { UpdateEquipmentCommand } from '@/types/api';
+import EquipmentForm from '@/components/equipments/EquipmentForm';
+import FormLayout from '@/components/common/FormLayout';
 
 const EquipmentEditPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const location = useLocation();
-  
-  const [equipment, setEquipment] = useState<EquipmentResponse | null>(
-    location.state?.equipment || null
-  );
-  const [loading, setLoading] = useState(!equipment);
-  const [saving, setSaving] = useState(false);
+  const queryClient = useQueryClient();
 
-  const equipmentId = id ? parseInt(id, 10) : 0;
+  const equipmentId = id ? parseInt(id, 10) : null;
 
-  useEffect(() => {
-    // 상태로 전달된 장비 정보가 없으면 API에서 조회
-    if (!equipment && equipmentId) {
-      const fetchEquipment = async () => {
-        try {
-          setLoading(true);
-          const data = await equipmentService.getEquipment(equipmentId);
-          setEquipment(data);
-        } catch (error) {
-          console.error('장비 정보 조회 실패:', error);
-          toast.error('장비 정보를 불러오는데 실패했습니다.');
-          navigate('/equipments');
-        } finally {
-          setLoading(false);
-        }
-      };
-
-      fetchEquipment();
+  const {
+    data: equipment,
+    isLoading,
+    error,
+  } = useQuery(
+    ['equipment', equipmentId],
+    () => equipmentId ? equipmentService.getEquipment(equipmentId) : Promise.reject('Invalid equipment ID'),
+    {
+      enabled: !!equipmentId,
+      retry: 1,
     }
-  }, [equipment, equipmentId, navigate]);
+  );
+
+  const updateMutation = useMutation(
+    (data: UpdateEquipmentCommand) => equipmentService.updateEquipment(Number(id), data),
+    {
+      onSuccess: (updatedEquipment) => {
+        toast.success('장비가 성공적으로 수정되었습니다!');
+        queryClient.invalidateQueries(['equipment', id]);
+        queryClient.invalidateQueries(['equipments']);
+        navigate(`/equipments/${updatedEquipment.id}`);
+      },
+      onError: (error: any) => {
+        console.error('장비 수정 실패:', error);
+        toast.error(error.response?.data?.message || '장비 수정에 실패했습니다.');
+      },
+    }
+  );
+
+  const handleSubmit = (data: UpdateEquipmentCommand) => {
+    updateMutation.mutate(data);
+  };
+
+  const handleCancel = () => {
+    navigate(`/equipments/${id}`);
+  };
 
   const handleBack = () => {
-    navigate(`/equipments/${equipmentId}`);
+    navigate('/equipments');
   };
 
-  const handleSubmit = async (data: UpdateEquipmentCommand) => {
-    if (!equipment) return;
-
-    try {
-      setSaving(true);
-      await equipmentService.updateEquipment(equipment.id, data);
-      toast.success('장비 정보가 성공적으로 수정되었습니다.');
-      navigate(`/equipments/${equipment.id}`);
-    } catch (error) {
-      console.error('장비 수정 실패:', error);
-      toast.error('장비 수정에 실패했습니다.');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  if (!equipmentId) {
+  if (error || !equipment) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-xl font-semibold text-gray-900">잘못된 접근입니다</h2>
-          <button
-            onClick={() => navigate('/equipments')}
-            className="mt-4 text-coffee-600 hover:text-coffee-700"
-          >
-            목록으로 돌아가기
-          </button>
+      <FormLayout
+        title="장비를 찾을 수 없습니다"
+        subtitle="요청하신 장비가 존재하지 않거나 삭제되었습니다."
+        onBack={handleBack}
+        onCancel={handleBack}
+        onSubmit={() => {}}
+        submitLabel="목록으로"
+      >
+        <div className="text-center py-12">
+          <p className="text-gray-600">
+            다른 장비를 찾아보세요.
+          </p>
         </div>
-      </div>
+      </FormLayout>
     );
   }
 
-  if (loading) {
+  if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <MobileHeader title="장비 수정" onBack={handleBack} />
-        <div className="flex justify-center items-center h-64">
-          <LoadingSpinner size="lg" />
-        </div>
-      </div>
-    );
-  }
-
-  if (!equipment) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <MobileHeader title="장비 수정" onBack={handleBack} />
+      <FormLayout
+        title="장비 수정"
+        subtitle="장비 정보를 불러오는 중..."
+        onBack={handleBack}
+        onCancel={handleCancel}
+        onSubmit={() => {}}
+        submitLabel="저장"
+      >
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
-            <h2 className="text-xl font-semibold text-gray-900">장비를 찾을 수 없습니다</h2>
-            <button
-              onClick={handleBack}
-              className="mt-4 text-coffee-600 hover:text-coffee-700"
-            >
-              뒤로 가기
-            </button>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-coffee-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">장비를 불러오는 중...</p>
           </div>
         </div>
-      </div>
+      </FormLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <MobileHeader title="장비 수정" onBack={handleBack} />
-      
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">장비 수정</h1>
-          <p className="text-gray-600 mt-1">{equipment.name} 정보를 수정하세요</p>
-        </div>
-        
-        <EquipmentForm
-          initialData={equipment}
-          onSubmit={handleSubmit}
-          onCancel={handleBack}
-          loading={saving}
-          mode="edit"
-        />
-      </div>
-    </div>
+    <FormLayout
+      title="장비 수정"
+      subtitle={`${equipment.name}의 정보를 수정해보세요`}
+      onBack={handleBack}
+      onCancel={handleCancel}
+      onSubmit={() => {}} // 폼 내부에서 처리
+      submitLabel="장비 수정"
+      isLoading={updateMutation.isLoading}
+    >
+      <EquipmentForm
+        initialData={equipment}
+        onSubmit={handleSubmit}
+        onCancel={handleCancel}
+        loading={updateMutation.isLoading}
+        mode="edit"
+        showButtons={false}
+      />
+    </FormLayout>
   );
 };
 

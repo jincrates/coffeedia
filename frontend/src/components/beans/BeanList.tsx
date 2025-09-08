@@ -50,7 +50,8 @@ const BeanList: React.FC<BeanListProps> = ({
           onEdit={onEdit}
           onDelete={onDelete ? () => onDelete(bean) : undefined}
           onView={onView}
-          actionsPosition="buttons"
+          actionsPosition="dropdown"
+          loading={loading}
         />
       ))}
     </div>

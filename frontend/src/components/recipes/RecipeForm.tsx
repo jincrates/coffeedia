@@ -39,15 +39,17 @@ interface RecipeFormProps {
   loading?: boolean;
   initialData?: RecipeResponse;
   isEdit?: boolean;
+  showButtons?: boolean;
 }
 
-const RecipeForm: React.FC<RecipeFormProps> = ({
-                                                 onSubmit,
-                                                 onCancel,
-                                                 loading = false,
-                                                 initialData,
-                                                 isEdit = false
-                                               }) => {
+const RecipeForm: React.FC<RecipeFormProps> = ({ 
+onSubmit, 
+onCancel, 
+loading = false, 
+initialData,
+isEdit = false,
+  showButtons = true
+}) => {
   const {
     register,
     control,
@@ -385,14 +387,16 @@ const RecipeForm: React.FC<RecipeFormProps> = ({
         </Card>
 
         {/* 버튼 */}
+        {showButtons && (
         <div className="flex justify-end space-x-3">
-          <Button type="button" variant="outline" onClick={onCancel}>
+        <Button type="button" variant="outline" onClick={onCancel}>
             취소
           </Button>
-          <Button type="submit" loading={loading}>
+        <Button type="submit" loading={loading}>
             {isEdit ? '레시피 수정' : '레시피 저장'}
-          </Button>
+            </Button>
         </div>
+      )}
       </form>
   );
 };

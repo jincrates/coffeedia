@@ -4,47 +4,35 @@ import { BeanResponse } from '@/types/api';
 import Card, { CardContent, CardFooter } from '@/components/common/Card';
 import CardActions from '@/components/common/CardActions';
 import Button from '@/components/common/Button';
-import { MapPin, Coffee } from 'lucide-react';
+import { MapPin, Coffee, Calendar, Scale, Tag } from 'lucide-react';
 import { formatDate, formatRelativeDate, getRoastLevelKorean, getProcessTypeKorean, getBlendTypeKorean } from '@/utils/format';
 
 interface BeanCardProps {
   bean: BeanResponse;
+  loading?: boolean;
   onEdit?: (bean: BeanResponse) => void;
-  onDelete?: (beanId: number) => void;
+  onDelete?: () => void;
   onView?: (bean: BeanResponse) => void;
   actionsPosition?: 'dropdown' | 'buttons';
 }
 
 const BeanCard: React.FC<BeanCardProps> = ({
   bean,
+  loading = false,
   onEdit,
   onDelete,
   onView,
-  actionsPosition = 'buttons',
+  actionsPosition = 'dropdown',
 }) => {
   const navigate = useNavigate();
   const [imageError, setImageError] = useState(false);
 
-  const handleEdit = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onEdit?.(bean);
-  };
-
-  const handleDelete = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onDelete?.(bean.beanId);
-  };
-
   const handleView = () => {
-    if (onView) {
+    if (!loading && onView) {
       onView(bean);
-    } else {
+    } else if (!loading) {
       navigate(`/beans/${bean.beanId}`);
     }
-  };
-
-  const handleCardClick = () => {
-    navigate(`/beans/${bean.beanId}`);
   };
 
   const handleImageError = () => {
@@ -58,6 +46,7 @@ const BeanCard: React.FC<BeanCardProps> = ({
       type: 'view' as const,
       label: '상세보기',
       onClick: () => onView(bean),
+      disabled: loading,
     });
   }
   
@@ -66,6 +55,7 @@ const BeanCard: React.FC<BeanCardProps> = ({
       type: 'edit' as const,
       label: '수정',
       onClick: () => onEdit(bean),
+      disabled: loading,
     });
   }
   
@@ -73,25 +63,27 @@ const BeanCard: React.FC<BeanCardProps> = ({
     actions.push({
       type: 'delete' as const,
       label: '삭제',
-      onClick: () => onDelete(bean.beanId),
+      onClick: onDelete,
       variant: 'destructive' as const,
+      disabled: loading,
     });
   }
 
   return (
     <Card 
-      hover={true} 
-      onClick={handleCardClick}
-      className="transition-all duration-200 cursor-pointer overflow-hidden"
+      hover={!!onView && !loading || !onView} 
+      onClick={handleView}
+      className="h-full cursor-pointer"
     >
-        {/* 이미지가 있는 경우만 표시 */}
-        {bean.thumbnailUrl && (
-          <div className="relative h-48 bg-gray-100 overflow-hidden">
+      <CardContent className="space-y-3">
+        {/* 썸네일 이미지 */}
+        {bean.thumbnailUrl ? (
+          <div className="aspect-video rounded-lg overflow-hidden bg-gray-100">
             {!imageError ? (
               <img
                 src={bean.thumbnailUrl}
                 alt={bean.name}
-                className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                className="w-full h-full object-cover"
                 onError={handleImageError}
               />
             ) : (
@@ -99,104 +91,84 @@ const BeanCard: React.FC<BeanCardProps> = ({
                 <Coffee className="h-16 w-16 text-coffee-400" />
               </div>
             )}
-            
-            {/* 상태 배지 */}
-            <div className="absolute top-3 right-3">
-              <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full backdrop-blur-sm ${
+          </div>
+        ) : (
+          <div className="aspect-video rounded-lg bg-gradient-to-br from-coffee-100 to-coffee-200 flex items-center justify-center">
+            <Coffee className="h-16 w-16 text-coffee-300" />
+          </div>
+        )}
+
+        {/* 제목과 상태 */}
+        <div>
+          <div className="flex justify-between items-start mb-2">
+            <h3 className="font-semibold text-lg text-gray-900 line-clamp-2 flex-1">
+              {bean.name}
+            </h3>
+            <div className="flex items-center gap-2 ml-2">
+              <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full flex-shrink-0 ${
                 bean.status === 'ACTIVE' 
-                  ? 'bg-green-100/80 text-green-800' 
-                  : 'bg-gray-100/80 text-gray-800'
+                  ? 'bg-green-100 text-green-800' 
+                  : 'bg-gray-100 text-gray-800'
               }`}>
                 {bean.status === 'ACTIVE' ? '활성' : '비활성'}
               </span>
-            </div>
-            
-            {/* 디카페인 배지 */}
-            {bean.isDecaf && (
-              <div className="absolute top-3 left-3">
-                <span className="inline-flex px-2 py-1 text-xs font-medium bg-orange-100/80 text-orange-800 rounded-full backdrop-blur-sm">
-                  디카페인
-                </span>
-              </div>
-            )}
-          </div>
-        )}
-      <CardContent className={`space-y-3 ${bean.thumbnailUrl ? 'p-4' : 'p-6'}`}>
-        {/* Header */}
-        <div className="flex justify-between items-start">
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-1">
-              <h3 className="font-semibold text-lg text-gray-900 truncate">
-                {bean.name}
-              </h3>
-              {/* 이미지가 없을 때 상태 배지 */}
-              {!bean.thumbnailUrl && (
-                <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
-                  bean.status === 'ACTIVE' 
-                    ? 'bg-green-100 text-green-800' 
-                    : 'bg-gray-100 text-gray-800'
-                }`}>
-                  {bean.status === 'ACTIVE' ? '활성' : '비활성'}
-                </span>
-              )}
-              {/* 이미지가 없을 때 디카페인 배지 */}
-              {!bean.thumbnailUrl && bean.isDecaf && (
-                <span className="inline-flex px-2 py-1 text-xs font-medium bg-orange-100 text-orange-800 rounded-full">
+              {bean.isDecaf && (
+                <span className="inline-flex px-2 py-1 text-xs font-medium bg-orange-100 text-orange-800 rounded-full flex-shrink-0">
                   디카페인
                 </span>
               )}
+              {/* 액션 메뉴 */}
+              {actions.length > 0 && actionsPosition === 'dropdown' && (
+                <CardActions actions={actions} position="dropdown" />
+              )}
             </div>
-            <p className="text-sm text-coffee-600 font-medium">{bean.roaster}</p>
+          </div>
+          
+          <p className="text-sm text-coffee-600 font-medium mb-1">{bean.roaster}</p>
+          
+          {/* 원산지 */}
+          <div className="flex items-center text-sm text-gray-600">
+            <MapPin className="h-4 w-4 mr-1" />
+            <span>
+              {bean.origin.country}
+              {bean.origin.region && ` • ${bean.origin.region}`}
+            </span>
           </div>
         </div>
 
-        {/* Origin */}
-        <div className="flex items-center text-sm text-gray-600">
-          <MapPin className="h-4 w-4 mr-1" />
-          <span>
-            {bean.origin.country}
-            {bean.origin.region && ` • ${bean.origin.region}`}
+        {/* 메타 정보 */}
+        <div className="flex items-center text-sm text-gray-500 space-x-4">
+          <div className="flex items-center">
+            <Scale className="h-4 w-4 mr-1" />
+            <span>{bean.grams}g</span>
+          </div>
+          <div className="flex items-center">
+            <Calendar className="h-4 w-4 mr-1" />
+            <span>{formatRelativeDate(bean.roastDate)}</span>
+          </div>
+        </div>
+
+        {/* 가공 정보 태그 */}
+        <div className="flex flex-wrap gap-1">
+          <Tag className="h-3 w-3 text-gray-400 mt-1" />
+          <span className="inline-flex px-2 py-1 text-xs bg-coffee-100 text-coffee-800 rounded-full">
+            {getRoastLevelKorean(bean.roastLevel)}
+          </span>
+          <span className="inline-flex px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">
+            {getProcessTypeKorean(bean.processType)}
+          </span>
+          <span className="inline-flex px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">
+            {getBlendTypeKorean(bean.blendType)}
           </span>
         </div>
 
-        {/* Bean Info */}
-        <div className="grid grid-cols-2 gap-2 text-sm">
-          <div>
-            <span className="text-gray-500">로스팅:</span>
-            <p className="font-medium">{getRoastLevelKorean(bean.roastLevel)}</p>
-          </div>
-          <div>
-            <span className="text-gray-500">가공법:</span>
-            <p className="font-medium">{getProcessTypeKorean(bean.processType)}</p>
-          </div>
-          <div>
-            <span className="text-gray-500">타입:</span>
-            <p className="font-medium">{getBlendTypeKorean(bean.blendType)}</p>
-          </div>
-          <div>
-            <span className="text-gray-500">무게:</span>
-            <p className="font-medium">{bean.grams}g</p>
-          </div>
-        </div>
-
-        {/* Roast Date */}
-        <div className="text-sm">
-          <span className="text-gray-500">로스팅 일자: </span>
-          <span className="font-medium">
-            {formatDate(bean.roastDate, 'yyyy.MM.dd')}
-          </span>
-          <span className="text-gray-400 ml-2">
-            ({formatRelativeDate(bean.roastDate)})
-          </span>
-        </div>
-
-        {/* Flavors */}
+        {/* 향미 태그 */}
         {bean.flavors && bean.flavors.length > 0 && (
           <div className="flex flex-wrap gap-1">
             {bean.flavors.slice(0, 3).map((flavor) => (
               <span
                 key={flavor.id}
-                className="inline-flex px-2 py-1 text-xs bg-coffee-100 text-coffee-800 rounded-full"
+                className="inline-flex px-2 py-1 text-xs bg-purple-100 text-purple-800 rounded-full"
               >
                 {flavor.name}
               </span>
@@ -209,7 +181,7 @@ const BeanCard: React.FC<BeanCardProps> = ({
           </div>
         )}
 
-        {/* Memo */}
+        {/* 메모 */}
         {bean.memo && (
           <p className="text-sm text-gray-600 line-clamp-2">
             {bean.memo}
@@ -217,9 +189,9 @@ const BeanCard: React.FC<BeanCardProps> = ({
         )}
       </CardContent>
 
-      {(onEdit || onDelete || onView) && (
-        <CardFooter className="justify-end">
-          <CardActions actions={actions} position={actionsPosition} />
+      {actions.length > 0 && actionsPosition === 'buttons' && (
+        <CardFooter>
+          <CardActions actions={actions} position="buttons" />
         </CardFooter>
       )}
     </Card>
