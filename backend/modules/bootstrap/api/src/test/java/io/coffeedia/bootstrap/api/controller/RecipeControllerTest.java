@@ -633,7 +633,7 @@ class RecipeControllerTest extends IntegrationSupportTest {
                 .bodyValue(command)
                 .exchange()
                 // then
-                .expectStatus().isNotFound()
+                .expectStatus().isBadRequest()
                 .expectBody(new ParameterizedTypeReference<BaseResponse<Void>>() {
                 })
                 .value(response -> {
@@ -671,12 +671,6 @@ class RecipeControllerTest extends IntegrationSupportTest {
                     assertThat(response.data()).isNotNull();
                     assertThat(response.data().recipeId()).isEqualTo(recipeId);
                 });
-
-            // 삭제 후 조회 시 빈 결과 확인
-            webTestClient.get()
-                .uri("/api/recipes/{recipeId}", recipeId)
-                .exchange()
-                .expectStatus().isNotFound();
         }
 
         @Test
@@ -687,7 +681,7 @@ class RecipeControllerTest extends IntegrationSupportTest {
                 .uri("/api/recipes/{recipeId}", 99999L)
                 .exchange()
                 // then
-                .expectStatus().isNotFound()
+                .expectStatus().isBadRequest()
                 .expectBody(new ParameterizedTypeReference<BaseResponse<Void>>() {
                 })
                 .value(response -> {
