@@ -70,8 +70,8 @@ const EquipmentList: React.FC<EquipmentListProps> = ({
     }
   };
 
-  const handleDeleteClick = (equipmentId: number) => {
-    setEquipmentToDelete(equipmentId);
+  const handleDeleteClick = (equipment: EquipmentResponse) => {
+    setEquipmentToDelete(equipment.id);
     setDeleteModalOpen(true);
   };
 

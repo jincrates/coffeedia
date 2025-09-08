@@ -1,8 +1,8 @@
 import React from 'react';
 import { RecipeSummaryResponse } from '@/types/api';
 import Card, { CardContent, CardFooter } from '@/components/common/Card';
-import Button from '@/components/common/Button';
-import { Eye, Users, Clock, Tag, Loader2, Edit, Trash2, MoreVertical } from 'lucide-react';
+import CardActions from '@/components/common/CardActions';
+import { Users, Clock, Tag, ChefHat } from 'lucide-react';
 import { formatRelativeDate, getCategoryTypeKorean } from '@/utils/format';
 
 interface RecipeCardProps {
@@ -11,7 +11,7 @@ interface RecipeCardProps {
   onView?: (recipe: RecipeSummaryResponse) => void;
   onEdit?: (recipe: RecipeSummaryResponse) => void;
   onDelete?: (recipe: RecipeSummaryResponse) => void;
-  showActions?: boolean;
+  actionsPosition?: 'dropdown' | 'buttons';
 }
 
 const RecipeCard: React.FC<RecipeCardProps> = ({ 
@@ -20,48 +20,46 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
   onView,
   onEdit,
   onDelete,
-  showActions = false 
+  actionsPosition = 'dropdown'
 }) => {
-  const [showActionMenu, setShowActionMenu] = React.useState(false);
-
-  React.useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (showActionMenu) {
-        setShowActionMenu(false);
-      }
-    };
-
-    if (showActionMenu) {
-      document.addEventListener('click', handleClickOutside);
-      return () => document.removeEventListener('click', handleClickOutside);
-    }
-  }, [showActionMenu]);
-
   const handleView = () => {
-    if (!loading) {
-      onView?.(recipe);
+    if (!loading && onView) {
+      onView(recipe);
     }
   };
 
-  const handleEdit = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onEdit?.(recipe);
-    setShowActionMenu(false);
-  };
-
-  const handleDelete = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onDelete?.(recipe);
-    setShowActionMenu(false);
-  };
-
-  const toggleActionMenu = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setShowActionMenu(!showActionMenu);
-  };
+  const actions = [];
+  
+  if (onView) {
+    actions.push({
+      type: 'view' as const,
+      label: '상세보기',
+      onClick: () => onView(recipe),
+      disabled: loading,
+    });
+  }
+  
+  if (onEdit) {
+    actions.push({
+      type: 'edit' as const,
+      label: '수정',
+      onClick: () => onEdit(recipe),
+      disabled: loading,
+    });
+  }
+  
+  if (onDelete) {
+    actions.push({
+      type: 'delete' as const,
+      label: '삭제',
+      onClick: () => onDelete(recipe),
+      variant: 'destructive' as const,
+      disabled: loading,
+    });
+  }
 
   return (
-    <Card hover={!!onView && !loading} onClick={handleView} className="h-full">
+    <Card hover={!!onView && !loading} onClick={onView ? handleView : undefined} className="h-full">
       <CardContent className="space-y-3">
         {/* 썸네일 이미지 */}
         {recipe.thumbnailUrl ? (
@@ -81,7 +79,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
           </div>
         ) : (
           <div className="aspect-video rounded-lg bg-gray-100 flex items-center justify-center">
-            <span className="text-gray-400 text-sm">이미지 없음</span>
+            <ChefHat className="h-16 w-16 text-gray-300" />
           </div>
         )}
 
@@ -96,37 +94,8 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
                 {getCategoryTypeKorean(recipe.category)}
               </span>
               {/* 액션 메뉴 */}
-              {showActions && (onEdit || onDelete) && (
-                <div className="relative">
-                  <button
-                    onClick={toggleActionMenu}
-                    className="p-1 hover:bg-gray-100 rounded-full transition-colors"
-                  >
-                    <MoreVertical className="h-4 w-4 text-gray-500" />
-                  </button>
-                  {showActionMenu && (
-                    <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 min-w-[120px]">
-                      {onEdit && (
-                        <button
-                          onClick={handleEdit}
-                          className="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2"
-                        >
-                          <Edit className="h-3 w-3" />
-                          수정
-                        </button>
-                      )}
-                      {onDelete && (
-                        <button
-                          onClick={handleDelete}
-                          className="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
-                        >
-                          <Trash2 className="h-3 w-3" />
-                          삭제
-                        </button>
-                      )}
-                    </div>
-                  )}
-                </div>
+              {actions.length > 0 && actionsPosition === 'dropdown' && (
+                <CardActions actions={actions} position="dropdown" />
               )}
             </div>
           </div>
@@ -171,31 +140,9 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
         )}
       </CardContent>
 
-      {onView && (
+      {actions.length > 0 && actionsPosition === 'buttons' && (
         <CardFooter>
-          <div className="flex gap-2 w-full">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleView}
-              disabled={loading}
-              leftIcon={loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Eye className="h-4 w-4" />}
-              className="flex-1"
-            >
-              {loading ? '로딩 중...' : '레시피 보기'}
-            </Button>
-            {showActions && onEdit && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleEdit}
-                disabled={loading}
-                leftIcon={<Edit className="h-4 w-4" />}
-              >
-                수정
-              </Button>
-            )}
-          </div>
+          <CardActions actions={actions} position="buttons" />
         </CardFooter>
       )}
     </Card>

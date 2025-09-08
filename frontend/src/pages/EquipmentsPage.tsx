@@ -22,13 +22,11 @@ const EquipmentsPage: React.FC = () => {
   };
 
   const handleEditEquipment = (equipment: EquipmentResponse) => {
-    setSelectedEquipment(equipment);
-    setViewMode('edit');
+    navigate(`/equipments/${equipment.id}/edit`);
   };
 
   const handleViewEquipment = (equipmentId: number) => {
-    setSelectedEquipmentId(equipmentId);
-    setViewMode('detail');
+    navigate(`/equipments/${equipmentId}`);
   };
 
   const handleBackToList = () => {

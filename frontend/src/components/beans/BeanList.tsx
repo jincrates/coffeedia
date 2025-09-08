@@ -6,7 +6,7 @@ interface BeanListProps {
   beans: BeanResponse[];
   loading?: boolean;
   onEdit?: (bean: BeanResponse) => void;
-  onDelete?: (beanId: number) => void;
+  onDelete?: (bean: BeanResponse) => void;
   onView?: (bean: BeanResponse) => void;
 }
 
@@ -48,8 +48,9 @@ const BeanList: React.FC<BeanListProps> = ({
           key={bean.beanId}
           bean={bean}
           onEdit={onEdit}
-          onDelete={onDelete}
+          onDelete={onDelete ? () => onDelete(bean) : undefined}
           onView={onView}
+          actionsPosition="buttons"
         />
       ))}
     </div>

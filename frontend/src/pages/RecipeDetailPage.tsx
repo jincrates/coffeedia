@@ -1,19 +1,18 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
-import { ArrowLeft, Loader2, Users, Clock, Tag, ChefHat, ShoppingCart, ExternalLink, Lightbulb, Edit, Trash2 } from 'lucide-react';
+import { Users, Clock, Tag, ChefHat, ShoppingCart, ExternalLink, Lightbulb } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { recipeService } from '@/services/recipeService';
+import EntityDetailLayout from '@/components/common/EntityDetailLayout';
 import Button from '@/components/common/Button';
 import Card, { CardHeader, CardTitle, CardContent } from '@/components/common/Card';
-import DeleteConfirmModal from '@/components/common/DeleteConfirmModal';
 import { formatDateTime, getCategoryTypeKorean } from '@/utils/format';
 
 const RecipeDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const {
     data: recipe,
@@ -51,132 +50,114 @@ const RecipeDetailPage: React.FC = () => {
   };
 
   const handleDelete = () => {
-    setShowDeleteModal(true);
-  };
-
-  const confirmDelete = () => {
     deleteMutation.mutate();
-    setShowDeleteModal(false);
   };
 
-  const cancelDelete = () => {
-    setShowDeleteModal(false);
+  const handleShare = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: `${recipe?.title} - CoffeeMedia`,
+        text: `${recipe?.title} 레시피를 확인해보세요.`,
+        url: window.location.href,
+      });
+    } else {
+      navigator.clipboard.writeText(window.location.href);
+      toast.success('링크가 클립보드에 복사되었습니다.');
+    }
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-coffee-600" />
-          <p className="text-gray-600">레시피를 불러오는 중...</p>
-        </div>
-      </div>
-    );
-  }
+  const handleFavorite = () => {
+    toast.success('즐겨찾기 기능은 곧 구현됩니다!');
+  };
 
-  if (error || !recipe) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">
-            레시피를 찾을 수 없습니다
-          </h2>
-          <p className="text-gray-600 mb-4">
-            요청하신 레시피가 존재하지 않거나 삭제되었습니다.
-          </p>
-          <Button onClick={handleBack} leftIcon={<ArrowLeft className="h-4 w-4" />}>
-            목록으로 돌아가기
+  const sidebarContent = recipe ? (
+    <div className="space-y-6">
+      {/* 레시피 정보 */}
+      <Card>
+        <CardHeader>
+          <CardTitle>레시피 정보</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="bg-gray-50 rounded-lg p-4">
+            <div className="flex items-center mb-2">
+              <Users className="h-4 w-4 text-gray-600 mr-2" />
+              <span className="text-sm text-gray-500">인분</span>
+            </div>
+            <p className="font-bold text-gray-900 text-xl">{recipe.serving}인분</p>
+          </div>
+
+          <div className="bg-gray-50 rounded-lg p-4">
+            <div className="flex items-center mb-2">
+              <Clock className="h-4 w-4 text-gray-600 mr-2" />
+              <span className="text-sm text-gray-500">등록일</span>
+            </div>
+            <p className="font-medium text-gray-900">
+              {formatDateTime(recipe.createdAt)}
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* 퀵 액션 */}
+      <Card>
+        <CardHeader>
+          <CardTitle>퀵 액션</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <Button
+            variant="outline"
+            className="w-full justify-start"
+            onClick={() => toast.success('요리 시작 기능은 곧 구현됩니다!')}
+          >
+            <ChefHat className="h-4 w-4 mr-2" />
+            요리 시작하기
           </Button>
-        </div>
-      </div>
-    );
-  }
+          <Button
+            variant="outline"
+            className="w-full justify-start"
+            onClick={() => toast.success('장바구니 기능은 곧 구현됩니다!')}
+          >
+            <ShoppingCart className="h-4 w-4 mr-2" />
+            재료 장바구니에 추가
+          </Button>
+        </CardContent>
+      </Card>
+    </div>
+  ) : null;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* 뒤로가기 버튼 */}
-        <Button
-          variant="ghost"
-          onClick={handleBack}
-          leftIcon={<ArrowLeft className="h-4 w-4" />}
-          className="mb-6"
-        >
-          레시피 목록으로
-        </Button>
-
-        {/* 헤더 */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-          <div className="flex justify-between items-start mb-4">
-            <div className="flex items-center gap-3">
-              <h1 className="text-3xl font-bold text-gray-900">{recipe.title}</h1>
-              <span className="inline-flex px-3 py-1 text-sm font-medium bg-blue-100 text-blue-800 rounded-full">
-                {getCategoryTypeKorean(recipe.category)}
-              </span>
-            </div>
-            {/* 수정/삭제 버튼 */}
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleEdit}
-                leftIcon={<Edit className="h-4 w-4" />}
-              >
-                수정
-              </Button>
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={handleDelete}
-                leftIcon={<Trash2 className="h-4 w-4" />}
-              >
-                삭제
-              </Button>
-            </div>
-          </div>
-          <div className="flex items-center text-sm text-gray-500 space-x-4">
-            <div className="flex items-center">
-              <Users className="h-4 w-4 mr-1" />
-              <span>{recipe.serving}인분</span>
-            </div>
-            <div className="flex items-center">
-              <Clock className="h-4 w-4 mr-1" />
-              <span>{formatDateTime(recipe.createdAt)}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* 컨텐츠 */}
+    <EntityDetailLayout
+      title={recipe?.title || ''}
+      subtitle={recipe ? `${recipe.serving}인분 • ${formatDateTime(recipe.createdAt)} 등록` : ''}
+      status={recipe ? {
+        label: recipe.status === 'ACTIVE' ? '활성' : '비활성',
+        variant: recipe.status === 'ACTIVE' ? 'success' : 'inactive'
+      } : undefined}
+      badges={recipe ? [
+        {
+          label: getCategoryTypeKorean(recipe.category),
+          variant: 'primary'
+        }
+      ] : []}
+      thumbnailUrl={recipe?.thumbnailUrl}
+      thumbnailAlt={recipe?.title}
+      fallbackIcon={<ChefHat className="h-16 w-16 text-gray-300" />}
+      onBack={handleBack}
+      onEdit={handleEdit}
+      onDelete={handleDelete}
+      onShare={handleShare}
+      onFavorite={handleFavorite}
+      deleteConfirmTitle="레시피 삭제 확인"
+      deleteConfirmMessage="정말로 이 레시피를 삭제하시겠습니까? 삭제된 레시피는 복구할 수 없습니다."
+      isDeleting={deleteMutation.isLoading}
+      isLoading={isLoading}
+      error={error}
+      sidebarContent={sidebarContent}
+    >
+      {recipe && (
         <div className="space-y-6">
-          {/* 썸네일과 설명 */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* 썸네일 */}
-            <Card>
-              <CardContent>
-                {recipe.thumbnailUrl ? (
-                  <div className="aspect-video rounded-lg overflow-hidden bg-gray-100">
-                    <img
-                      src={recipe.thumbnailUrl}
-                      alt={recipe.title}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none';
-                        e.currentTarget.nextElementSibling?.classList.remove('hidden');
-                      }}
-                    />
-                    <div className="hidden aspect-video rounded-lg bg-gray-100 flex items-center justify-center">
-                      <span className="text-gray-400">이미지 없음</span>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="aspect-video rounded-lg bg-gray-100 flex items-center justify-center">
-                    <ChefHat className="h-16 w-16 text-gray-300" />
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* 설명과 태그 */}
+          {/* 설명과 태그 */}
+          {(recipe.description || (recipe.tags && recipe.tags.length > 0)) && (
             <Card>
               <CardContent className="space-y-4">
                 {recipe.description && (
@@ -204,7 +185,7 @@ const RecipeDetailPage: React.FC = () => {
                 )}
               </CardContent>
             </Card>
-          </div>
+          )}
 
           {/* 재료 */}
           <Card>
@@ -309,18 +290,8 @@ const RecipeDetailPage: React.FC = () => {
             </Card>
           )}
         </div>
-
-        {/* 삭제 확인 모달 */}
-        <DeleteConfirmModal
-          isOpen={showDeleteModal}
-          title="레시피 삭제 확인"
-          message="정말로 이 레시피를 삭제하시겠습니까? 삭제된 레시피는 복구할 수 없습니다."
-          onConfirm={confirmDelete}
-          onCancel={cancelDelete}
-          loading={deleteMutation.isLoading}
-        />
-      </div>
-    </div>
+      )}
+    </EntityDetailLayout>
   );
 };
 

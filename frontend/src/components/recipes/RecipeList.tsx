@@ -9,7 +9,7 @@ interface RecipeListProps {
   onView?: (recipe: RecipeSummaryResponse) => void;
   onEdit?: (recipe: RecipeSummaryResponse) => void;
   onDelete?: (recipe: RecipeSummaryResponse) => void;
-  showActions?: boolean;
+  actionsPosition?: 'dropdown' | 'buttons';
 }
 
 const RecipeList: React.FC<RecipeListProps> = ({
@@ -19,7 +19,7 @@ const RecipeList: React.FC<RecipeListProps> = ({
   onView,
   onEdit,
   onDelete,
-  showActions = false,
+  actionsPosition = 'dropdown',
 }) => {
   if (loading) {
     return (
@@ -54,7 +54,7 @@ const RecipeList: React.FC<RecipeListProps> = ({
           onView={onView}
           onEdit={onEdit}
           onDelete={onDelete}
-          showActions={showActions}
+          actionsPosition={actionsPosition}
           loading={loadingRecipeId === recipe.id}
         />
       ))}

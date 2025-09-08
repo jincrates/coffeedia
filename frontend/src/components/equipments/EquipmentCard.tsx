@@ -8,7 +8,7 @@ import Button from '@/components/common/Button';
 interface EquipmentCardProps {
   equipment: EquipmentResponse;
   onEdit: (equipment: EquipmentResponse) => void;
-  onDelete: (equipmentId: number) => void;
+  onDelete: (equipment: EquipmentResponse) => void;
   onView: (equipmentId: number) => void;
 }
 
@@ -29,7 +29,7 @@ const EquipmentCard: React.FC<EquipmentCardProps> = ({
 
   const handleDeleteClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onDelete(equipment.id);
+    onDelete(equipment);
   };
 
   const handleBuyUrlClick = (e: React.MouseEvent) => {

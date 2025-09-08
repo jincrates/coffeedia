@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BeanResponse } from '@/types/api';
 import Card, { CardContent, CardFooter } from '@/components/common/Card';
+import CardActions from '@/components/common/CardActions';
 import Button from '@/components/common/Button';
-import { Edit, Trash2, Eye, MapPin, Coffee } from 'lucide-react';
+import { MapPin, Coffee } from 'lucide-react';
 import { formatDate, formatRelativeDate, getRoastLevelKorean, getProcessTypeKorean, getBlendTypeKorean } from '@/utils/format';
 
 interface BeanCardProps {
@@ -11,6 +12,7 @@ interface BeanCardProps {
   onEdit?: (bean: BeanResponse) => void;
   onDelete?: (beanId: number) => void;
   onView?: (bean: BeanResponse) => void;
+  actionsPosition?: 'dropdown' | 'buttons';
 }
 
 const BeanCard: React.FC<BeanCardProps> = ({
@@ -18,6 +20,7 @@ const BeanCard: React.FC<BeanCardProps> = ({
   onEdit,
   onDelete,
   onView,
+  actionsPosition = 'buttons',
 }) => {
   const navigate = useNavigate();
   const [imageError, setImageError] = useState(false);
@@ -47,6 +50,33 @@ const BeanCard: React.FC<BeanCardProps> = ({
   const handleImageError = () => {
     setImageError(true);
   };
+
+  const actions = [];
+  
+  if (onView) {
+    actions.push({
+      type: 'view' as const,
+      label: '상세보기',
+      onClick: () => onView(bean),
+    });
+  }
+  
+  if (onEdit) {
+    actions.push({
+      type: 'edit' as const,
+      label: '수정',
+      onClick: () => onEdit(bean),
+    });
+  }
+  
+  if (onDelete) {
+    actions.push({
+      type: 'delete' as const,
+      label: '삭제',
+      onClick: () => onDelete(bean.beanId),
+      variant: 'destructive' as const,
+    });
+  }
 
   return (
     <Card 
@@ -188,37 +218,8 @@ const BeanCard: React.FC<BeanCardProps> = ({
       </CardContent>
 
       {(onEdit || onDelete || onView) && (
-        <CardFooter className="justify-end space-x-2">
-          {onView && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleView}
-              leftIcon={<Eye className="h-4 w-4" />}
-            >
-              상세
-            </Button>
-          )}
-          {onEdit && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleEdit}
-              leftIcon={<Edit className="h-4 w-4" />}
-            >
-              수정
-            </Button>
-          )}
-          {onDelete && (
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={handleDelete}
-              leftIcon={<Trash2 className="h-4 w-4" />}
-            >
-              삭제
-            </Button>
-          )}
+        <CardFooter className="justify-end">
+          <CardActions actions={actions} position={actionsPosition} />
         </CardFooter>
       )}
     </Card>
