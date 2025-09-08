@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 public enum EquipmentType {
     MACHINE("머신"),
     GRINDER("그라인더"),
+    SCALE("저울"),
     ;
 
     private final String description;

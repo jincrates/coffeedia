@@ -12,4 +12,6 @@ public interface EquipmentRepositoryPort {
     Optional<Equipment> findById(Long equipmentId);
 
     List<Equipment> findAll(PageSize pageSize);
+
+    void deleteAll();
 }

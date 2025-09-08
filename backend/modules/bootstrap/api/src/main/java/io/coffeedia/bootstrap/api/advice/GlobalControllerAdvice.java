@@ -2,6 +2,8 @@ package io.coffeedia.bootstrap.api.advice;
 
 import io.coffeedia.bootstrap.api.controller.dto.BaseResponse;
 import io.coffeedia.domain.exception.AccessDeniedException;
+import io.coffeedia.domain.exception.BeanNotFoundException;
+import io.coffeedia.domain.exception.EquipmentNotFoundException;
 import io.coffeedia.domain.exception.RecipeNotFoundException;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
@@ -100,7 +102,47 @@ class GlobalControllerAdvice extends ResponseEntityExceptionHandler {
         );
 
         return error(
-            HttpStatus.NOT_FOUND,
+            HttpStatus.BAD_REQUEST,
+            exception.getMessage()
+        );
+    }
+
+    /**
+     * BeanNotFoundException 에러 - 원두를 찾을 수 없는 경우
+     */
+    @ExceptionHandler(BeanNotFoundException.class)
+    protected ResponseEntity<?> handleBeanNotFoundException(
+        BeanNotFoundException exception,
+        WebRequest request
+    ) {
+        log.warn(
+            "Bean not found - path: {}, message: {}",
+            getRequestPath(request),
+            exception.getMessage()
+        );
+
+        return error(
+            HttpStatus.BAD_REQUEST,
+            exception.getMessage()
+        );
+    }
+
+    /**
+     * EquipmentNotFoundException 에러 - 장비를 찾을 수 없는 경우
+     */
+    @ExceptionHandler(EquipmentNotFoundException.class)
+    protected ResponseEntity<?> handleEquipmentNotFoundException(
+        EquipmentNotFoundException exception,
+        WebRequest request
+    ) {
+        log.warn(
+            "Equipment not found - path: {}, message: {}",
+            getRequestPath(request),
+            exception.getMessage()
+        );
+
+        return error(
+            HttpStatus.BAD_REQUEST,
             exception.getMessage()
         );
     }

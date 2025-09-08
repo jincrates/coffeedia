@@ -42,4 +42,9 @@ class EquipmentRepositoryAdapter implements EquipmentRepositoryPort {
             .map(EquipmentJpaMapper::toDomain)
             .toList();
     }
+
+    @Override
+    public void deleteAll() {
+        repository.deleteAll();
+    }
 }
