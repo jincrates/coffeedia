@@ -22,7 +22,8 @@ public class EquipmentMapper {
             .build();
     }
 
-    public Equipment toDomain(final UpdateEquipmentCommand command, final Equipment existingEquipment) {
+    public Equipment toDomain(final UpdateEquipmentCommand command,
+        final Equipment existingEquipment) {
         return Equipment.builder()
             .id(existingEquipment.id())
             .userId(command.userId())
@@ -40,7 +41,7 @@ public class EquipmentMapper {
 
     public EquipmentResponse toResponse(final Equipment equipment) {
         return EquipmentResponse.builder()
-            .id(equipment.id())
+            .equipmentId(equipment.id())
             .type(equipment.type())
             .name(equipment.name())
             .brand(equipment.brand())
