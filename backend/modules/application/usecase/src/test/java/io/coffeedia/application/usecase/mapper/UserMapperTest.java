@@ -46,16 +46,16 @@ class UserMapperTest {
 
         // then
         assertThat(response).isNotNull();
-        assertThat(response.getId()).isEqualTo("user-id");
-        assertThat(response.getUsername()).isEqualTo("testuser");
-        assertThat(response.getEmail()).isEqualTo("test@example.com");
-        assertThat(response.getFirstName()).isEqualTo("Test");
-        assertThat(response.getLastName()).isEqualTo("User");
-        assertThat(response.getFullName()).isEqualTo("Test User");
-        assertThat(response.getRoles()).containsExactly("customer", "employee");
-        assertThat(response.getStatus()).isEqualTo(ActiveStatus.ACTIVE);
-        assertThat(response.getCreatedAt()).isEqualTo(now);
-        assertThat(response.getUpdatedAt()).isEqualTo(now);
+        assertThat(response.id()).isEqualTo("user-id");
+        assertThat(response.username()).isEqualTo("testuser");
+        assertThat(response.email()).isEqualTo("test@example.com");
+        assertThat(response.firstName()).isEqualTo("Test");
+        assertThat(response.lastName()).isEqualTo("User");
+        assertThat(response.fullName()).isEqualTo("Test User");
+        assertThat(response.roles()).containsExactly("customer", "employee");
+        assertThat(response.status()).isEqualTo(ActiveStatus.ACTIVE);
+        assertThat(response.createdAt()).isEqualTo(now);
+        assertThat(response.updatedAt()).isEqualTo(now);
     }
 
     @Test
@@ -78,11 +78,11 @@ class UserMapperTest {
 
         // then
         assertThat(response).isNotNull();
-        assertThat(response.getId()).isEqualTo("user-id");
-        assertThat(response.getUsername()).isEqualTo("testuser");
-        assertThat(response.getFirstName()).isNull();
-        assertThat(response.getLastName()).isNull();
-        assertThat(response.getFullName()).isEqualTo("testuser"); // fullName은 User 도메인에서 처리
+        assertThat(response.id()).isEqualTo("user-id");
+        assertThat(response.username()).isEqualTo("testuser");
+        assertThat(response.firstName()).isNull();
+        assertThat(response.lastName()).isNull();
+        assertThat(response.fullName()).isEqualTo("testuser"); // fullName은 User 도메인에서 처리
     }
 
     @Test
@@ -104,6 +104,6 @@ class UserMapperTest {
 
         // then
         assertThat(response).isNotNull();
-        assertThat(response.getRoles()).isNull();
+        assertThat(response.roles()).isNull();
     }
 }

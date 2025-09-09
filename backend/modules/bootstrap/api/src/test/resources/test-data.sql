@@ -1,3 +1,11 @@
+-- 기존 테스트 데이터 정리
+DELETE
+FROM user_roles
+WHERE user_id IN ('test-bjorn-id', 'test-isabelle-id', 'test-inactive-id');
+DELETE
+FROM users
+WHERE username IN ('bjorn', 'isabelle', 'inactive');
+
 -- 테스트용 사용자 데이터
 INSERT INTO users (user_id, username, email, first_name, last_name, status, created_at, updated_at)
 VALUES ('test-bjorn-id', 'bjorn', 'bjorn@coffeedia.com', 'Bjorn', 'Vinterberg', 'ACTIVE', NOW(),

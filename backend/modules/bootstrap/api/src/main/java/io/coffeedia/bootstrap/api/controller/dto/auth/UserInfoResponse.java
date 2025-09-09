@@ -2,11 +2,10 @@ package io.coffeedia.bootstrap.api.controller.dto.auth;
 
 import io.coffeedia.application.usecase.dto.UserResponse;
 import io.coffeedia.domain.vo.ActiveStatus;
-import lombok.Builder;
-import lombok.Getter;
-
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.Builder;
+import lombok.Getter;
 
 /**
  * 사용자 정보 응답 DTO
@@ -14,7 +13,7 @@ import java.util.List;
 @Getter
 @Builder
 public class UserInfoResponse {
-    
+
     private final String id;
     private final String username;
     private final String email;
@@ -31,16 +30,16 @@ public class UserInfoResponse {
      */
     public static UserInfoResponse from(UserResponse userResponse) {
         return UserInfoResponse.builder()
-                .id(userResponse.getId())
-                .username(userResponse.getUsername())
-                .email(userResponse.getEmail())
-                .firstName(userResponse.getFirstName())
-                .lastName(userResponse.getLastName())
-                .fullName(userResponse.getFullName())
-                .roles(userResponse.getRoles())
-                .status(userResponse.getStatus())
-                .createdAt(userResponse.getCreatedAt())
-                .updatedAt(userResponse.getUpdatedAt())
-                .build();
+            .id(userResponse.id())
+            .username(userResponse.username())
+            .email(userResponse.email())
+            .firstName(userResponse.firstName())
+            .lastName(userResponse.lastName())
+            .fullName(userResponse.fullName())
+            .roles(userResponse.roles())
+            .status(userResponse.status())
+            .createdAt(userResponse.createdAt())
+            .updatedAt(userResponse.updatedAt())
+            .build();
     }
 }

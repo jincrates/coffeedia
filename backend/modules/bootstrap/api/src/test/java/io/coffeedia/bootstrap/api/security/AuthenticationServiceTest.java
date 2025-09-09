@@ -82,12 +82,12 @@ class AuthenticationServiceTest {
 
             // then
             assertThat(response).isNotNull();
-            assertThat(response.getAccessToken()).isEqualTo(accessToken);
-            assertThat(response.getRefreshToken()).isEqualTo(refreshToken);
-            assertThat(response.getTokenType()).isEqualTo("Bearer");
-            assertThat(response.getExpiresIn()).isEqualTo(3600L);
-            assertThat(response.getUsername()).isEqualTo("testuser");
-            assertThat(response.getRoles()).containsExactly("customer");
+            assertThat(response.accessToken()).isEqualTo(accessToken);
+            assertThat(response.refreshToken()).isEqualTo(refreshToken);
+            assertThat(response.tokenType()).isEqualTo("Bearer");
+            assertThat(response.expiresIn()).isEqualTo(3600L);
+            assertThat(response.username()).isEqualTo("testuser");
+            assertThat(response.roles()).containsExactly("customer");
 
             verify(userRepositoryPort).findByUsername("testuser");
             verify(jwtTokenProvider).createAccessToken("testuser", List.of("customer"));
@@ -159,9 +159,9 @@ class AuthenticationServiceTest {
 
             // then
             assertThat(response).isNotNull();
-            assertThat(response.getAccessToken()).isEqualTo(newAccessToken);
-            assertThat(response.getRefreshToken()).isEqualTo(newRefreshToken);
-            assertThat(response.getUsername()).isEqualTo("testuser");
+            assertThat(response.accessToken()).isEqualTo(newAccessToken);
+            assertThat(response.refreshToken()).isEqualTo(newRefreshToken);
+            assertThat(response.username()).isEqualTo("testuser");
 
             verify(jwtTokenProvider).validateToken(refreshToken);
             verify(jwtTokenProvider).isRefreshToken(refreshToken);

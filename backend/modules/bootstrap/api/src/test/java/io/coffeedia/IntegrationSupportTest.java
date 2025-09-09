@@ -52,14 +52,16 @@ public abstract class IntegrationSupportTest {
     @Autowired
     protected RecipeRepositoryPort recipeRepository;
 
+    @Autowired
+    protected JwtTokenProvider jwtTokenProvider;
+
     // 테스트용 사용자 정보
     protected static final String TEST_USERNAME = "bjorn";
     protected static final List<String> TEST_ROLES = List.of("customer");
+
     // 관리자 테스트용
     protected static final String TEST_ADMIN_USERNAME = "isabelle";
     protected static final List<String> TEST_ADMIN_ROLES = List.of("customer", "employee");
-    @Autowired
-    protected JwtTokenProvider jwtTokenProvider;
 
     static {
         TestContainerManager.POSTGRES_CONTAINER.start();

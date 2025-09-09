@@ -89,11 +89,11 @@ class GetCurrentUserUseCaseTest {
 
             // then
             assertThat(result).isNotNull();
-            assertThat(result.getUsername()).isEqualTo(username);
-            assertThat(result.getEmail()).isEqualTo("test@example.com");
-            assertThat(result.getFullName()).isEqualTo("Test User");
-            assertThat(result.getRoles()).containsExactly("customer");
-            assertThat(result.getStatus()).isEqualTo(ActiveStatus.ACTIVE);
+            assertThat(result.username()).isEqualTo(username);
+            assertThat(result.email()).isEqualTo("test@example.com");
+            assertThat(result.fullName()).isEqualTo("Test User");
+            assertThat(result.roles()).containsExactly("customer");
+            assertThat(result.status()).isEqualTo(ActiveStatus.ACTIVE);
 
             verify(userRepositoryPort).findByUsername(username);
             verify(userMapper).toResponse(sampleUser);
@@ -132,9 +132,9 @@ class GetCurrentUserUseCaseTest {
 
             // then
             assertThat(result).isNotNull();
-            assertThat(result.getId()).isEqualTo(userId);
-            assertThat(result.getUsername()).isEqualTo("testuser");
-            assertThat(result.getEmail()).isEqualTo("test@example.com");
+            assertThat(result.id()).isEqualTo(userId);
+            assertThat(result.username()).isEqualTo("testuser");
+            assertThat(result.email()).isEqualTo("test@example.com");
 
             verify(userRepositoryPort).findById(userId);
             verify(userMapper).toResponse(sampleUser);
