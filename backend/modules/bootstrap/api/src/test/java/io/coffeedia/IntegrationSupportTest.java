@@ -6,6 +6,7 @@ import io.coffeedia.application.port.repository.BeanRepositoryPort;
 import io.coffeedia.application.port.repository.EquipmentRepositoryPort;
 import io.coffeedia.application.port.repository.RecipeRepositoryPort;
 import io.coffeedia.bootstrap.ApiApplication;
+import io.coffeedia.bootstrap.api.security.JwtTokenProvider;
 import io.coffeedia.domain.model.Bean;
 import io.coffeedia.domain.model.Equipment;
 import io.coffeedia.domain.model.Flavor;
@@ -51,6 +52,15 @@ public abstract class IntegrationSupportTest {
     @Autowired
     protected RecipeRepositoryPort recipeRepository;
 
+    // 테스트용 사용자 정보
+    protected static final String TEST_USERNAME = "bjorn";
+    protected static final List<String> TEST_ROLES = List.of("customer");
+    // 관리자 테스트용
+    protected static final String TEST_ADMIN_USERNAME = "isabelle";
+    protected static final List<String> TEST_ADMIN_ROLES = List.of("customer", "employee");
+    @Autowired
+    protected JwtTokenProvider jwtTokenProvider;
+
     static {
         TestContainerManager.POSTGRES_CONTAINER.start();
         TestContainerManager.REDIS_CONTAINER.start();
@@ -60,6 +70,94 @@ public abstract class IntegrationSupportTest {
     private static void registerProperties(DynamicPropertyRegistry registry) {
         TestContainerManager.registerPostgresProperties(registry);
         TestContainerManager.registerRedisProperties(registry);
+    }
+
+    /**
+     * 인증된 WebTestClient 요청을 위한 JWT 토큰 생성
+     */
+    protected String createAccessToken() {
+        return jwtTokenProvider.createAccessToken(TEST_USERNAME, TEST_ROLES);
+    }
+
+    /**
+     * 관리자 권한 JWT 토큰 생성
+     */
+    protected String createAdminAccessToken() {
+        return jwtTokenProvider.createAccessToken(TEST_ADMIN_USERNAME, TEST_ADMIN_ROLES);
+    }
+
+    /**
+     * 인증 헤더가 포함된 WebTestClient.RequestHeadersSpec 생성
+     */
+    protected WebTestClient.RequestHeadersSpec<?> authenticatedGet(String uri,
+        Object... uriVariables) {
+        return webTestClient.get()
+            .uri(uri, uriVariables)
+            .header("Authorization", "Bearer " + createAccessToken());
+    }
+
+    /**
+     * 인증 헤더가 포함된 POST 요청
+     */
+    protected WebTestClient.RequestBodySpec authenticatedPost(String uri, Object... uriVariables) {
+        return webTestClient.post()
+            .uri(uri, uriVariables)
+            .header("Authorization", "Bearer " + createAccessToken());
+    }
+
+    /**
+     * 인증 헤더가 포함된 PUT 요청
+     */
+    protected WebTestClient.RequestBodySpec authenticatedPut(String uri, Object... uriVariables) {
+        return webTestClient.put()
+            .uri(uri, uriVariables)
+            .header("Authorization", "Bearer " + createAccessToken());
+    }
+
+    /**
+     * 인증 헤더가 포함된 DELETE 요청
+     */
+    protected WebTestClient.RequestHeadersSpec<?> authenticatedDelete(String uri,
+        Object... uriVariables) {
+        return webTestClient.delete()
+            .uri(uri, uriVariables)
+            .header("Authorization", "Bearer " + createAccessToken());
+    }
+
+    /**
+     * 관리자 권한 GET 요청
+     */
+    protected WebTestClient.RequestHeadersSpec<?> adminGet(String uri, Object... uriVariables) {
+        return webTestClient.get()
+            .uri(uri, uriVariables)
+            .header("Authorization", "Bearer " + createAdminAccessToken());
+    }
+
+    /**
+     * 관리자 권한 POST 요청
+     */
+    protected WebTestClient.RequestBodySpec adminPost(String uri, Object... uriVariables) {
+        return webTestClient.post()
+            .uri(uri, uriVariables)
+            .header("Authorization", "Bearer " + createAdminAccessToken());
+    }
+
+    /**
+     * 관리자 권한 PUT 요청
+     */
+    protected WebTestClient.RequestBodySpec adminPut(String uri, Object... uriVariables) {
+        return webTestClient.put()
+            .uri(uri, uriVariables)
+            .header("Authorization", "Bearer " + createAdminAccessToken());
+    }
+
+    /**
+     * 관리자 권한 DELETE 요청
+     */
+    protected WebTestClient.RequestHeadersSpec<?> adminDelete(String uri, Object... uriVariables) {
+        return webTestClient.delete()
+            .uri(uri, uriVariables)
+            .header("Authorization", "Bearer " + createAdminAccessToken());
     }
 
     protected void cleanUpBeans() {

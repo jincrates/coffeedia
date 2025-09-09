@@ -1,17 +1,22 @@
 package io.coffeedia.bootstrap.api.security;
 
 import io.coffeedia.domain.exception.UnauthorizedException;
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtBuilder;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
-import javax.crypto.SecretKey;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
+import javax.crypto.SecretKey;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 /**
  * JWT 토큰 생성 및 검증을 담당하는 컴포넌트
@@ -25,9 +30,9 @@ public class JwtTokenProvider {
     private final long refreshTokenValidityInMilliseconds;
 
     public JwtTokenProvider(
-            @Value("${app.jwt.secret:coffeedia-jwt-secret-key-for-development-only-change-in-production}") String secret,
-            @Value("${app.jwt.access-token-validity:3600000}") long accessTokenValidity,  // 1시간
-            @Value("${app.jwt.refresh-token-validity:86400000}") long refreshTokenValidity // 24시간
+        @Value("${app.jwt.secret:coffeedia-jwt-secret-key-for-development-only-change-in-production}") String secret,
+        @Value("${app.jwt.access-token-validity:3600000}") long accessTokenValidity,  // 1시간
+        @Value("${app.jwt.refresh-token-validity:86400000}") long refreshTokenValidity // 24시간
     ) {
         this.secretKey = Keys.hmacShaKeyFor(secret.getBytes());
         this.accessTokenValidityInMilliseconds = accessTokenValidity;
@@ -51,16 +56,17 @@ public class JwtTokenProvider {
     /**
      * JWT 토큰 생성
      */
-    private String createToken(String username, List<String> roles, long validityInMilliseconds, String tokenType) {
+    private String createToken(String username, List<String> roles, long validityInMilliseconds,
+        String tokenType) {
         Date now = new Date();
         Date validity = new Date(now.getTime() + validityInMilliseconds);
 
         JwtBuilder builder = Jwts.builder()
-                .setSubject(username)
-                .setIssuedAt(now)
-                .setExpiration(validity)
-                .claim("tokenType", tokenType)
-                .signWith(secretKey);
+            .setSubject(username)
+            .setIssuedAt(now)
+            .setExpiration(validity)
+            .claim("tokenType", tokenType)
+            .signWith(secretKey);
 
         // Access Token인 경우에만 역할 정보 추가
         if ("access".equals(tokenType) && roles != null && !roles.isEmpty()) {
@@ -93,14 +99,14 @@ public class JwtTokenProvider {
         try {
             Claims claims = getClaimsFromToken(token);
             Date expiration = claims.getExpiration();
-            
+
             if (expiration.before(new Date())) {
                 log.debug("토큰이 만료되었습니다: {}", token);
                 return false;
             }
-            
+
             return true;
-            
+
         } catch (JwtException | IllegalArgumentException e) {
             log.debug("유효하지 않은 JWT 토큰: {}", e.getMessage());
             return false;
@@ -139,8 +145,8 @@ public class JwtTokenProvider {
     public LocalDateTime getExpirationFromToken(String token) {
         Claims claims = getClaimsFromToken(token);
         return claims.getExpiration().toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime();
+            .atZone(ZoneId.systemDefault())
+            .toLocalDateTime();
     }
 
     /**
@@ -149,10 +155,10 @@ public class JwtTokenProvider {
     private Claims getClaimsFromToken(String token) {
         try {
             return Jwts.parserBuilder()
-                    .setSigningKey(secretKey)
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody();
+                .setSigningKey(secretKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
         } catch (ExpiredJwtException e) {
             throw new UnauthorizedException("토큰이 만료되었습니다");
         } catch (UnsupportedJwtException e) {
