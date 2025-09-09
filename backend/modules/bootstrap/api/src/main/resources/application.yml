@@ -16,6 +16,13 @@ spring:
     import:
       - application-infrastructure.yml
 
+# JWT 설정
+app:
+  jwt:
+    secret: ${JWT_SECRET:coffeedia-jwt-secret-key-for-development-only-change-in-production-environment}
+    access-token-validity: 3600000  # 1시간 (밀리초)
+    refresh-token-validity: 86400000 # 24시간 (밀리초)
+
 management:
   endpoints:
     web:

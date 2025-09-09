@@ -1,25 +1,65 @@
 import React from 'react';
 import { RecipeSummaryResponse } from '@/types/api';
 import Card, { CardContent, CardFooter } from '@/components/common/Card';
-import Button from '@/components/common/Button';
-import { Eye, Users, Clock, Tag, Loader2 } from 'lucide-react';
+import CardActions from '@/components/common/CardActions';
+import { Users, Clock, Tag, ChefHat } from 'lucide-react';
 import { formatRelativeDate, getCategoryTypeKorean } from '@/utils/format';
 
 interface RecipeCardProps {
   recipe: RecipeSummaryResponse;
   loading?: boolean;
   onView?: (recipe: RecipeSummaryResponse) => void;
+  onEdit?: (recipe: RecipeSummaryResponse) => void;
+  onDelete?: (recipe: RecipeSummaryResponse) => void;
+  actionsPosition?: 'dropdown' | 'buttons';
 }
 
-const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, loading = false, onView }) => {
+const RecipeCard: React.FC<RecipeCardProps> = ({ 
+  recipe, 
+  loading = false, 
+  onView,
+  onEdit,
+  onDelete,
+  actionsPosition = 'dropdown'
+}) => {
   const handleView = () => {
-    if (!loading) {
-      onView?.(recipe);
+    if (!loading && onView) {
+      onView(recipe);
     }
   };
 
+  const actions = [];
+  
+  if (onView) {
+    actions.push({
+      type: 'view' as const,
+      label: '상세보기',
+      onClick: () => onView(recipe),
+      disabled: loading,
+    });
+  }
+  
+  if (onEdit) {
+    actions.push({
+      type: 'edit' as const,
+      label: '수정',
+      onClick: () => onEdit(recipe),
+      disabled: loading,
+    });
+  }
+  
+  if (onDelete) {
+    actions.push({
+      type: 'delete' as const,
+      label: '삭제',
+      onClick: () => onDelete(recipe),
+      variant: 'destructive' as const,
+      disabled: loading,
+    });
+  }
+
   return (
-    <Card hover={!!onView && !loading} onClick={handleView} className="h-full">
+    <Card hover={!!onView && !loading} onClick={onView ? handleView : undefined} className="h-full">
       <CardContent className="space-y-3">
         {/* 썸네일 이미지 */}
         {recipe.thumbnailUrl ? (
@@ -39,19 +79,25 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, loading = false, onView
           </div>
         ) : (
           <div className="aspect-video rounded-lg bg-gray-100 flex items-center justify-center">
-            <span className="text-gray-400 text-sm">이미지 없음</span>
+            <ChefHat className="h-16 w-16 text-gray-300" />
           </div>
         )}
 
         {/* 제목과 카테고리 */}
         <div>
           <div className="flex justify-between items-start mb-2">
-            <h3 className="font-semibold text-lg text-gray-900 line-clamp-2">
+            <h3 className="font-semibold text-lg text-gray-900 line-clamp-2 flex-1">
               {recipe.title}
             </h3>
-            <span className="inline-flex px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full ml-2 flex-shrink-0">
-              {getCategoryTypeKorean(recipe.category)}
-            </span>
+            <div className="flex items-center gap-2 ml-2">
+              <span className="inline-flex px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full flex-shrink-0">
+                {getCategoryTypeKorean(recipe.category)}
+              </span>
+              {/* 액션 메뉴 */}
+              {actions.length > 0 && actionsPosition === 'dropdown' && (
+                <CardActions actions={actions} position="dropdown" />
+              )}
+            </div>
           </div>
           
           {recipe.description && (
@@ -94,18 +140,9 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, loading = false, onView
         )}
       </CardContent>
 
-      {onView && (
+      {actions.length > 0 && actionsPosition === 'buttons' && (
         <CardFooter>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleView}
-            disabled={loading}
-            leftIcon={loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Eye className="h-4 w-4" />}
-            className="w-full"
-          >
-            {loading ? '로딩 중...' : '레시피 보기'}
-          </Button>
+          <CardActions actions={actions} position="buttons" />
         </CardFooter>
       )}
     </Card>

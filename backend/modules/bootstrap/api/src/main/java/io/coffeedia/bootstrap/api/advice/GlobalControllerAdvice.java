@@ -2,7 +2,12 @@ package io.coffeedia.bootstrap.api.advice;
 
 import io.coffeedia.bootstrap.api.controller.dto.BaseResponse;
 import io.coffeedia.domain.exception.AccessDeniedException;
+import io.coffeedia.domain.exception.BeanNotFoundException;
+import io.coffeedia.domain.exception.EquipmentNotFoundException;
 import io.coffeedia.domain.exception.RecipeNotFoundException;
+import io.coffeedia.domain.exception.UnauthorizedException;
+import io.coffeedia.domain.exception.UserNotFoundException;
+import io.coffeedia.domain.exception.ForbiddenException;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -100,7 +105,47 @@ class GlobalControllerAdvice extends ResponseEntityExceptionHandler {
         );
 
         return error(
-            HttpStatus.NOT_FOUND,
+            HttpStatus.BAD_REQUEST,
+            exception.getMessage()
+        );
+    }
+
+    /**
+     * BeanNotFoundException 에러 - 원두를 찾을 수 없는 경우
+     */
+    @ExceptionHandler(BeanNotFoundException.class)
+    protected ResponseEntity<?> handleBeanNotFoundException(
+        BeanNotFoundException exception,
+        WebRequest request
+    ) {
+        log.warn(
+            "Bean not found - path: {}, message: {}",
+            getRequestPath(request),
+            exception.getMessage()
+        );
+
+        return error(
+            HttpStatus.BAD_REQUEST,
+            exception.getMessage()
+        );
+    }
+
+    /**
+     * EquipmentNotFoundException 에러 - 장비를 찾을 수 없는 경우
+     */
+    @ExceptionHandler(EquipmentNotFoundException.class)
+    protected ResponseEntity<?> handleEquipmentNotFoundException(
+        EquipmentNotFoundException exception,
+        WebRequest request
+    ) {
+        log.warn(
+            "Equipment not found - path: {}, message: {}",
+            getRequestPath(request),
+            exception.getMessage()
+        );
+
+        return error(
+            HttpStatus.BAD_REQUEST,
             exception.getMessage()
         );
     }
@@ -122,13 +167,54 @@ class GlobalControllerAdvice extends ResponseEntityExceptionHandler {
         );
     }
 
-    @ExceptionHandler(AccessDeniedException.class)
-    protected ResponseEntity<?> handleAccessDeniedException(
-        AccessDeniedException exception,
+    /**
+     * UnauthorizedException 에러 - 인증되지 않은 사용자
+     */
+    @ExceptionHandler(UnauthorizedException.class)
+    protected ResponseEntity<?> handleUnauthorizedException(
+        UnauthorizedException exception,
         WebRequest request
     ) {
         log.warn(
-            "Access denied - path: {}, message: {}",
+            "Unauthorized access - path: {}, message: {}",
+            getRequestPath(request),
+            exception.getMessage()
+        );
+        return error(
+            HttpStatus.UNAUTHORIZED,  // 401 Unauthorized
+            exception.getMessage()
+        );
+    }
+
+    /**
+     * UserNotFoundException 에러 - 사용자를 찾을 수 없는 경우
+     */
+    @ExceptionHandler(UserNotFoundException.class)
+    protected ResponseEntity<?> handleUserNotFoundException(
+        UserNotFoundException exception,
+        WebRequest request
+    ) {
+        log.warn(
+            "User not found - path: {}, message: {}",
+            getRequestPath(request),
+            exception.getMessage()
+        );
+        return error(
+            HttpStatus.NOT_FOUND,  // 404 Not Found
+            exception.getMessage()
+        );
+    }
+
+    /**
+     * ForbiddenException 에러 - 접근 권한이 없는 경우
+     */
+    @ExceptionHandler(ForbiddenException.class)
+    protected ResponseEntity<?> handleForbiddenException(
+        ForbiddenException exception,
+        WebRequest request
+    ) {
+        log.warn(
+            "Forbidden access - path: {}, message: {}",
             getRequestPath(request),
             exception.getMessage()
         );

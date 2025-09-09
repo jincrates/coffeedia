@@ -1,19 +1,21 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Search, ArrowLeft } from 'lucide-react';
 import { beanService } from '@/services/beanService';
 import { BeanResponse, BeanSearchQuery, CreateBeanCommand, UpdateBeanCommand } from '@/types/api';
 import BeanList from '@/components/beans/BeanList';
 import BeanForm from '@/components/beans/BeanForm';
+import PageLayout from '@/components/common/PageLayout';
+import FormLayout from '@/components/common/FormLayout';
+import DeleteConfirmModal from '@/components/common/DeleteConfirmModal';
 import Button from '@/components/common/Button';
-import Input from '@/components/common/Input';
 import toast from 'react-hot-toast';
 
 const BeansPage: React.FC = () => {
   const navigate = useNavigate();
   const [showForm, setShowForm] = useState(false);
   const [editingBean, setEditingBean] = useState<BeanResponse | null>(null);
+  const [deleteBean, setDeleteBean] = useState<BeanResponse | null>(null);
   const [searchQuery, setSearchQuery] = useState<BeanSearchQuery>({
     page: 0,
     size: 12,
@@ -92,18 +94,25 @@ const BeansPage: React.FC = () => {
     setEditingBean(null);
   };
 
-  const handleDeleteBean = async (beanId: number) => {
-    if (!confirm('정말로 이 원두를 삭제하시겠습니까?')) {
-      return;
-    }
+  const handleDeleteBean = (bean: BeanResponse) => {
+    setDeleteBean(bean);
+  };
 
+  const confirmDelete = async () => {
+    if (!deleteBean) return;
+    
     try {
-      await beanService.deleteBean(beanId);
+      await beanService.deleteBean(deleteBean.beanId);
       toast.success('원두가 삭제되었습니다.');
       refetch();
+      setDeleteBean(null);
     } catch (error) {
       toast.error('원두 삭제에 실패했습니다.');
     }
+  };
+
+  const cancelDelete = () => {
+    setDeleteBean(null);
   };
 
   const handleViewBean = (bean: BeanResponse) => {
@@ -118,46 +127,31 @@ const BeansPage: React.FC = () => {
   // 폼 표시 중일 때
   if (showForm) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-8">
-          {/* 헤더 */}
-          <div className="mb-4 md:mb-8">
-            <Button
-              variant="ghost"
-              onClick={handleFormCancel}
-              leftIcon={<ArrowLeft className="h-4 w-4" />}
-              className="mb-4"
-            >
-              목록으로 돌아가기
-            </Button>
-            <h1 className="text-2xl font-bold text-gray-900">
-              {editingBean ? '원두 수정' : '새 원두 등록'}
-            </h1>
-            <p className="text-gray-600 mt-1">
-              {editingBean 
-                ? '원두 정보를 수정해보세요' 
-                : '나만의 특별한 원두를 등록해보세요'
-              }
-            </p>
-          </div>
-
-          {/* 원두 폼 */}
-          <BeanForm
-            initialData={editingBean || undefined}
-            onSubmit={handleFormSubmit}
-            onCancel={handleFormCancel}
-            loading={createBeanMutation.isLoading || updateBeanMutation.isLoading}
-            mode={editingBean ? 'edit' : 'create'}
-          />
-        </div>
-      </div>
+      <FormLayout
+        title={editingBean ? '원두 수정' : '새 원두 등록'}
+        subtitle={editingBean ? '원두 정보를 수정해보세요' : '나만의 특별한 원두를 등록해보세요'}
+        onBack={handleFormCancel}
+        onCancel={handleFormCancel}
+        onSubmit={() => {}} // 폼 내부에서 처리
+        submitLabel={editingBean ? '원두 수정' : '원두 등록'}
+        isLoading={createBeanMutation.isLoading || updateBeanMutation.isLoading}
+      >
+        <BeanForm
+          initialData={editingBean || undefined}
+          onSubmit={handleFormSubmit}
+          onCancel={handleFormCancel}
+          loading={createBeanMutation.isLoading || updateBeanMutation.isLoading}
+          mode={editingBean ? 'edit' : 'create'}
+          showButtons={false}
+        />
+      </FormLayout>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
+      <PageLayout title="오류 발생" showSearch={false}>
+        <div className="text-center py-12">
           <h2 className="text-xl font-semibold text-gray-900 mb-2">
             데이터를 불러오는 중 오류가 발생했습니다
           </h2>
@@ -168,45 +162,20 @@ const BeansPage: React.FC = () => {
             다시 시도
           </Button>
         </div>
-      </div>
+      </PageLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-8">
-        {/* Header */}
-        <div className="mb-4 md:mb-8">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">원두 관리</h1>
-              <p className="text-gray-600 mt-1">
-                나만의 원두 컬렉션을 관리해보세요
-              </p>
-            </div>
-            <Button
-              onClick={handleCreateBean}
-              leftIcon={<Plus className="h-4 w-4" />}
-              className="w-full sm:w-auto"
-            >
-              원두 추가
-            </Button>
-          </div>
-
-          {/* Search Bar */}
-          <div className="w-full sm:max-w-md">
-            <Input
-              placeholder="원두 이름이나 로스터를 검색하세요..."
-              leftIcon={<Search className="h-4 w-4" />}
-              onKeyPress={(e) => {
-                if (e.key === 'Enter') {
-                  handleSearch(e.currentTarget.value);
-                }
-              }}
-            />
-          </div>
-        </div>
-
+    <>
+      <PageLayout
+        title="원두 관리"
+        subtitle="나만의 원두 컬렉션을 관리해보세요"
+        searchPlaceholder="원두 이름이나 로스터를 검색하세요..."
+        onAddNew={handleCreateBean}
+        onSearch={handleSearch}
+        addButtonLabel="원두 추가"
+      >
         {/* Bean List */}
         <BeanList
           beans={beansData?.content || []}
@@ -216,7 +185,7 @@ const BeansPage: React.FC = () => {
           onView={handleViewBean}
         />
 
-        {/* Pagination - TODO: 구현 */}
+        {/* Pagination */}
         {beansData && beansData.content.length > 0 && (
           <div className="mt-8 flex justify-center">
             <div className="text-sm text-gray-500">
@@ -224,8 +193,18 @@ const BeansPage: React.FC = () => {
             </div>
           </div>
         )}
-      </div>
-    </div>
+      </PageLayout>
+
+      {/* 삭제 확인 모달 */}
+      <DeleteConfirmModal
+        isOpen={!!deleteBean}
+        title="원두 삭제 확인"
+        message={`정말로 "${deleteBean?.name}"을 삭제하시겠습니까? 삭제된 원두는 복구할 수 없습니다.`}
+        onConfirm={confirmDelete}
+        onCancel={cancelDelete}
+        loading={false}
+      />
+    </>
   );
 };
 

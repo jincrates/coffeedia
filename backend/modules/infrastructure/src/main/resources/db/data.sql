@@ -1,3 +1,18 @@
+-- 사용자 테이블 샘플 데이터 추가
+INSERT INTO users (user_id, username, email, first_name, last_name, status, created_at, updated_at)
+VALUES 
+  ('bjorn-user-id', 'bjorn', 'bjorn@coffeedia.com', 'Bjorn', 'Vinterberg', 'ACTIVE', NOW(), NOW()),
+  ('isabelle-user-id', 'isabelle', 'isabelle@coffeedia.com', 'Isabelle', 'Dahl', 'ACTIVE', NOW(), NOW()),
+  ('admin-user-id', 'admin', 'admin@coffeedia.com', 'Admin', 'User', 'ACTIVE', NOW(), NOW());
+
+-- 사용자 역할 데이터 추가
+INSERT INTO user_roles (user_id, role)
+VALUES 
+  ('bjorn-user-id', 'customer'),
+  ('isabelle-user-id', 'customer'),
+  ('isabelle-user-id', 'employee'),
+  ('admin-user-id', 'employee');
+
 -- flavors 테이블 샘플 데이터 삽입
 INSERT INTO flavors (id, name, created_at, updated_at)
 VALUES (1, '블루베리', NOW(), NOW()),
@@ -92,3 +107,110 @@ VALUES
 (27, 10, 3, NOW(), NOW()),
 (28, 10, 14, NOW(), NOW()),
 (29, 10, 2, NOW(), NOW());
+
+
+
+-- 레시피 관련 샘플 데이터 (3가지 레시피만)
+-- 실행 순서: 태그 → 레시피 → 재료 → 레시피 단계 → 레시피-태그 매핑
+
+-- =============================================================================
+-- 1. 태그 데이터 (tags 테이블)
+-- =============================================================================
+INSERT INTO tags (name)
+VALUES ('초보자'),
+       ('간단함'),
+       ('진한맛'),
+       ('부드러운맛'),
+       ('산미'),
+       ('에티오피아');
+
+-- =============================================================================
+-- 2. 레시피 메인 데이터 (recipes 테이블) - 3가지만
+-- =============================================================================
+INSERT INTO recipes (user_id, category, title, thumbnail_url, description, serving, tips, status,
+                     created_at, updated_at)
+VALUES (1, 'HAND_DRIP', 'V60으로 만드는 에티오피아 원두 핸드드립', 'https://example.com/v60-ethiopia.jpg',
+        '에티오피아 원두의 꽃향기와 산미를 살린 클래식한 V60 핸드드립 레시피입니다.', 1, '물 온도는 92-94도가 적당하며, 원두는 중간 굵기로 분쇄하세요.',
+        'ACTIVE', NOW(), NOW()),
+
+       (2, 'ESPRESSO', '클래식 에스프레소 추출법', 'https://example.com/classic-espresso.jpg',
+        '완벽한 에스프레소 추출을 위한 기본 레시피입니다. 크레마가 풍부하고 균형잡힌 맛을 만들어냅니다.', 1, '추출 시간 25-30초, 추출량 30ml 기준입니다.',
+        'ACTIVE', NOW(), NOW()),
+
+       (3, 'COLD_BREW', '12시간 콜드브루 농축액', 'https://example.com/12h-coldbrew.jpg',
+        '12시간 저온 추출로 만드는 진한 콜드브루 농축액입니다.', 4, '원두는 굵게 분쇄하고, 1:8 비율로 12시간 냉장고에서 추출하세요.', 'ACTIVE',
+        NOW(), NOW());
+
+-- =============================================================================
+-- 3. 재료 데이터 (ingredients 테이블)
+-- =============================================================================
+
+-- 레시피 1: V60 에티오피아 원두 핸드드립
+INSERT INTO ingredients (recipe_id, name, amount, unit, buy_url)
+VALUES (1, '에티오피아 원두 (예가체프)', 20.0, 'g', 'https://shop.example.com/ethiopia-yirgacheffe'),
+       (1, '필터된 물', 300.0, 'ml', NULL),
+       (1, 'V60 드리퍼', 1.0, '개', 'https://shop.example.com/v60-dripper'),
+       (1, 'V60 필터', 1.0, '장', 'https://shop.example.com/v60-filter');
+
+-- 레시피 2: 클래식 에스프레소
+INSERT INTO ingredients (recipe_id, name, amount, unit, buy_url)
+VALUES (2, '에스프레소 블렌드 원두', 18.0, 'g', 'https://shop.example.com/espresso-blend'),
+       (2, '필터된 물', 30.0, 'ml', NULL);
+
+-- 레시피 3: 12시간 콜드브루
+INSERT INTO ingredients (recipe_id, name, amount, unit, buy_url)
+VALUES (3, '콜드브루용 원두 (굵은 분쇄)', 100.0, 'g', 'https://shop.example.com/coldbrew-beans'),
+       (3, '차가운 물', 800.0, 'ml', NULL),
+       (3, '콜드브루 추출기', 1.0, '개', 'https://shop.example.com/coldbrew-maker');
+
+-- =============================================================================
+-- 4. 레시피 단계 데이터 (recipe_steps 테이블)
+-- =============================================================================
+
+-- 레시피 1: V60 에티오피아 원두 핸드드립 단계
+INSERT INTO recipe_steps (recipe_id, sort_order, image_url, description)
+VALUES (1, 1, 'https://example.com/steps/v60-step1.jpg', '에티오피아 원두 20g을 중간 굵기로 분쇄합니다.'),
+       (1, 2, 'https://example.com/steps/v60-step2.jpg',
+        'V60 드리퍼에 필터를 설치하고, 92-94도의 뜨거운 물로 필터를 린싱합니다.'),
+       (1, 3, 'https://example.com/steps/v60-step3.jpg', '분쇄된 원두를 필터에 넣고 가운데를 살짝 눌러 우물을 만듭니다.'),
+       (1, 4, 'https://example.com/steps/v60-step4.jpg',
+        '30초간 블루밍: 가운데부터 시작해서 40ml의 물을 부어 30초간 기다립니다.'),
+       (1, 5, 'https://example.com/steps/v60-step5.jpg', '2차 푸어링: 총 150ml가 되도록 천천히 물을 부어줍니다.'),
+       (1, 6, 'https://example.com/steps/v60-step6.jpg', '3차 푸어링: 나머지 110ml를 부어 총 300ml를 완성합니다.');
+
+-- 레시피 2: 클래식 에스프레소 단계
+INSERT INTO recipe_steps (recipe_id, sort_order, image_url, description)
+VALUES (2, 1, 'https://example.com/steps/espresso-step1.jpg', '에스프레소용 원두 18g을 곱게 분쇄합니다.'),
+       (2, 2, 'https://example.com/steps/espresso-step2.jpg', '포터필터에 원두를 넣고 평평하게 고르게 펴줍니다.'),
+       (2, 3, 'https://example.com/steps/espresso-step3.jpg', '탬퍼를 사용해 30파운드 압력으로 눌러 평평하게 탬핑합니다.'),
+       (2, 4, 'https://example.com/steps/espresso-step4.jpg', '에스프레소 머신에 포터필터를 장착하고 추출을 시작합니다.'),
+       (2, 5, 'https://example.com/steps/espresso-step5.jpg', '25-30초 동안 30ml의 에스프레소가 추출되도록 합니다.');
+
+-- 레시피 3: 12시간 콜드브루 단계
+INSERT INTO recipe_steps (recipe_id, sort_order, image_url, description)
+VALUES (3, 1, 'https://example.com/steps/coldbrew-step1.jpg', '콜드브루용 원두 100g을 굵게 분쇄합니다.'),
+       (3, 2, 'https://example.com/steps/coldbrew-step2.jpg', '콜드브루 메이커에 분쇄된 원두를 넣습니다.'),
+       (3, 3, 'https://example.com/steps/coldbrew-step3.jpg', '차가운 물 800ml를 천천히 부어 원두가 잠기도록 합니다.'),
+       (3, 4, 'https://example.com/steps/coldbrew-step4.jpg', '뚜껑을 덮고 냉장고에서 12시간 동안 추출합니다.'),
+       (3, 5, 'https://example.com/steps/coldbrew-step5.jpg', '필터나 체를 사용해 원두를 걸러낸 후 농축액을 완성합니다.');
+
+-- =============================================================================
+-- 5. 레시피-태그 매핑 데이터 (recipe_tags 테이블)
+-- =============================================================================
+
+-- V60 에티오피아 레시피 태그
+INSERT INTO recipe_tags (recipe_id, tag_id)
+VALUES (1, 1), -- 초보자
+       (1, 5), -- 산미
+       (1, 6);
+-- 에티오피아
+
+-- 클래식 에스프레소 태그
+INSERT INTO recipe_tags (recipe_id, tag_id)
+VALUES (2, 3);
+-- 진한맛
+
+-- 12시간 콜드브루 태그
+INSERT INTO recipe_tags (recipe_id, tag_id)
+VALUES (3, 1), -- 초보자
+       (3, 2); -- 간단함

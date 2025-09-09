@@ -3,9 +3,12 @@ package io.coffeedia;
 import static io.coffeedia.common.constant.CommonConstant.USER_ID;
 
 import io.coffeedia.application.port.repository.BeanRepositoryPort;
+import io.coffeedia.application.port.repository.EquipmentRepositoryPort;
 import io.coffeedia.application.port.repository.RecipeRepositoryPort;
 import io.coffeedia.bootstrap.ApiApplication;
+import io.coffeedia.bootstrap.api.security.JwtTokenProvider;
 import io.coffeedia.domain.model.Bean;
+import io.coffeedia.domain.model.Equipment;
 import io.coffeedia.domain.model.Flavor;
 import io.coffeedia.domain.model.Ingredient;
 import io.coffeedia.domain.model.Recipe;
@@ -13,6 +16,7 @@ import io.coffeedia.domain.model.RecipeStep;
 import io.coffeedia.domain.vo.ActiveStatus;
 import io.coffeedia.domain.vo.BlendType;
 import io.coffeedia.domain.vo.CategoryType;
+import io.coffeedia.domain.vo.EquipmentType;
 import io.coffeedia.domain.vo.Origin;
 import io.coffeedia.domain.vo.ProcessType;
 import io.coffeedia.domain.vo.RoastLevel;
@@ -43,7 +47,19 @@ public abstract class IntegrationSupportTest {
     protected BeanRepositoryPort beanRepository;
 
     @Autowired
+    protected EquipmentRepositoryPort equipmentRepository;
+
+    @Autowired
     protected RecipeRepositoryPort recipeRepository;
+
+    // 테스트용 사용자 정보
+    protected static final String TEST_USERNAME = "bjorn";
+    protected static final List<String> TEST_ROLES = List.of("customer");
+    // 관리자 테스트용
+    protected static final String TEST_ADMIN_USERNAME = "isabelle";
+    protected static final List<String> TEST_ADMIN_ROLES = List.of("customer", "employee");
+    @Autowired
+    protected JwtTokenProvider jwtTokenProvider;
 
     static {
         TestContainerManager.POSTGRES_CONTAINER.start();
@@ -56,8 +72,100 @@ public abstract class IntegrationSupportTest {
         TestContainerManager.registerRedisProperties(registry);
     }
 
+    /**
+     * 인증된 WebTestClient 요청을 위한 JWT 토큰 생성
+     */
+    protected String createAccessToken() {
+        return jwtTokenProvider.createAccessToken(TEST_USERNAME, TEST_ROLES);
+    }
+
+    /**
+     * 관리자 권한 JWT 토큰 생성
+     */
+    protected String createAdminAccessToken() {
+        return jwtTokenProvider.createAccessToken(TEST_ADMIN_USERNAME, TEST_ADMIN_ROLES);
+    }
+
+    /**
+     * 인증 헤더가 포함된 WebTestClient.RequestHeadersSpec 생성
+     */
+    protected WebTestClient.RequestHeadersSpec<?> authenticatedGet(String uri,
+        Object... uriVariables) {
+        return webTestClient.get()
+            .uri(uri, uriVariables)
+            .header("Authorization", "Bearer " + createAccessToken());
+    }
+
+    /**
+     * 인증 헤더가 포함된 POST 요청
+     */
+    protected WebTestClient.RequestBodySpec authenticatedPost(String uri, Object... uriVariables) {
+        return webTestClient.post()
+            .uri(uri, uriVariables)
+            .header("Authorization", "Bearer " + createAccessToken());
+    }
+
+    /**
+     * 인증 헤더가 포함된 PUT 요청
+     */
+    protected WebTestClient.RequestBodySpec authenticatedPut(String uri, Object... uriVariables) {
+        return webTestClient.put()
+            .uri(uri, uriVariables)
+            .header("Authorization", "Bearer " + createAccessToken());
+    }
+
+    /**
+     * 인증 헤더가 포함된 DELETE 요청
+     */
+    protected WebTestClient.RequestHeadersSpec<?> authenticatedDelete(String uri,
+        Object... uriVariables) {
+        return webTestClient.delete()
+            .uri(uri, uriVariables)
+            .header("Authorization", "Bearer " + createAccessToken());
+    }
+
+    /**
+     * 관리자 권한 GET 요청
+     */
+    protected WebTestClient.RequestHeadersSpec<?> adminGet(String uri, Object... uriVariables) {
+        return webTestClient.get()
+            .uri(uri, uriVariables)
+            .header("Authorization", "Bearer " + createAdminAccessToken());
+    }
+
+    /**
+     * 관리자 권한 POST 요청
+     */
+    protected WebTestClient.RequestBodySpec adminPost(String uri, Object... uriVariables) {
+        return webTestClient.post()
+            .uri(uri, uriVariables)
+            .header("Authorization", "Bearer " + createAdminAccessToken());
+    }
+
+    /**
+     * 관리자 권한 PUT 요청
+     */
+    protected WebTestClient.RequestBodySpec adminPut(String uri, Object... uriVariables) {
+        return webTestClient.put()
+            .uri(uri, uriVariables)
+            .header("Authorization", "Bearer " + createAdminAccessToken());
+    }
+
+    /**
+     * 관리자 권한 DELETE 요청
+     */
+    protected WebTestClient.RequestHeadersSpec<?> adminDelete(String uri, Object... uriVariables) {
+        return webTestClient.delete()
+            .uri(uri, uriVariables)
+            .header("Authorization", "Bearer " + createAdminAccessToken());
+    }
+
     protected void cleanUpBeans() {
         beanRepository.deleteAll();
+    }
+
+    protected void cleanUpEquipments() {
+        equipmentRepository.deleteAll();
     }
 
     protected void cleanUpRecipes() {
@@ -124,7 +232,40 @@ public abstract class IntegrationSupportTest {
         return beanRepository.createAll(beans);
     }
 
-    private Recipe createRecipe() {
+    protected Equipment createEquipment() {
+        return equipmentRepository.save(
+            Equipment.builder()
+                .userId(USER_ID)
+                .type(EquipmentType.GRINDER)
+                .name("조회용 바라짜 엔코어")
+                .brand("바라짜")
+                .status(ActiveStatus.ACTIVE)
+                .description("조회 테스트용 그라인더")
+                .buyDate(LocalDate.now().minusMonths(6))
+                .buyUrl("https://example.com/grinder")
+                .build()
+        );
+    }
+
+    protected List<Equipment> createEquipments(int count) {
+        List<Equipment> equipments = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            Equipment equipment = Equipment.builder()
+                .userId(USER_ID)
+                .type(i % 2 == 0 ? EquipmentType.GRINDER : EquipmentType.SCALE)
+                .name("조회용 장비" + i)
+                .brand("테스트 브랜드" + i)
+                .status(ActiveStatus.ACTIVE)
+                .description("조회 테스트용 장비 " + i)
+                .buyDate(LocalDate.now().minusMonths(i + 1))
+                .buyUrl("https://example.com/equipment" + i)
+                .build();
+            equipments.add(equipmentRepository.save(equipment));
+        }
+        return equipments;
+    }
+
+    protected Recipe createRecipe() {
         Recipe recipe = Recipe.builder()
             .userId(1L)
             .category(CategoryType.HAND_DRIP)

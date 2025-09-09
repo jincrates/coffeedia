@@ -19,6 +19,8 @@ public class EquipmentJpaMapper {
             .description(equipment.description())
             .buyDate(equipment.buyDate())
             .buyUrl(equipment.buyUrl())
+            .createdAt(equipment.createdAt())
+            .updatedAt(equipment.updatedAt())
             .build();
     }
 

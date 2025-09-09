@@ -7,8 +7,10 @@ import io.coffeedia.IntegrationSupportTest;
 import io.coffeedia.application.usecase.dto.CreateRecipeCommand;
 import io.coffeedia.application.usecase.dto.CreateRecipeCommand.CreateIngredientCommand;
 import io.coffeedia.application.usecase.dto.CreateRecipeCommand.CreateStepCommand;
+import io.coffeedia.application.usecase.dto.DeleteRecipeResponse;
 import io.coffeedia.application.usecase.dto.RecipeResponse;
 import io.coffeedia.application.usecase.dto.RecipeSummaryResponse;
+import io.coffeedia.application.usecase.dto.UpdateRecipeCommand;
 import io.coffeedia.bootstrap.api.controller.dto.BaseResponse;
 import io.coffeedia.bootstrap.api.controller.dto.PageResponse;
 import io.coffeedia.domain.vo.ActiveStatus;
@@ -63,13 +65,11 @@ class RecipeControllerTest extends IntegrationSupportTest {
                 ))
                 .build();
 
-            // when
-            webTestClient.post()
-                .uri("/api/recipes")
+            // when & then
+            authenticatedPost("/api/recipes")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(command)
                 .exchange()
-                // then
                 .expectStatus().isCreated()
                 .expectBody(new ParameterizedTypeReference<BaseResponse<RecipeResponse>>() {
                 })
@@ -91,6 +91,37 @@ class RecipeControllerTest extends IntegrationSupportTest {
                         () -> assertThat(data.updatedAt()).isNotNull()
                     );
                 });
+        }
+
+        @Test
+        @DisplayName("인증 없이 레시피 등록 시 401 Unauthorized를 반환한다")
+        void createRecipeWithoutAuthenticationReturns401() {
+            // given
+            CreateRecipeCommand command = CreateRecipeCommand.builder()
+                .category(CategoryType.HAND_DRIP)
+                .title("V60 핸드드립")
+                .serving(1)
+                .ingredients(List.of(
+                    CreateIngredientCommand.builder()
+                        .name("원두")
+                        .amount(BigDecimal.valueOf(20))
+                        .unit("g")
+                        .build()
+                ))
+                .steps(List.of(
+                    CreateStepCommand.builder()
+                        .description("원두를 분쇄합니다.")
+                        .build()
+                ))
+                .build();
+
+            // when & then
+            webTestClient.post()
+                .uri("/api/recipes")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(command)
+                .exchange()
+                .expectStatus().isUnauthorized();
         }
 
         @Test
@@ -125,13 +156,11 @@ class RecipeControllerTest extends IntegrationSupportTest {
                 .tips("추출 시간은 25-30초, 압력은 9바가 이상적입니다.")
                 .build();
 
-            // when
-            webTestClient.post()
-                .uri("/api/recipes")
+            // when & then
+            authenticatedPost("/api/recipes")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(command)
                 .exchange()
-                // then
                 .expectStatus().isCreated()
                 .expectBody(new ParameterizedTypeReference<BaseResponse<RecipeResponse>>() {
                 })
@@ -179,13 +208,11 @@ class RecipeControllerTest extends IntegrationSupportTest {
                 ))
                 .build();
 
-            // when
-            webTestClient.post()
-                .uri("/api/recipes")
+            // when & then
+            authenticatedPost("/api/recipes")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(command)
                 .exchange()
-                // then
                 .expectStatus().isBadRequest()
                 .expectBody(new ParameterizedTypeReference<BaseResponse<Void>>() {
                 })
@@ -219,13 +246,11 @@ class RecipeControllerTest extends IntegrationSupportTest {
                 ))
                 .build();
 
-            // when
-            webTestClient.post()
-                .uri("/api/recipes")
+            // when & then
+            authenticatedPost("/api/recipes")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(command)
                 .exchange()
-                // then
                 .expectStatus().isBadRequest()
                 .expectBody(new ParameterizedTypeReference<BaseResponse<Void>>() {
                 })
@@ -259,13 +284,11 @@ class RecipeControllerTest extends IntegrationSupportTest {
                 ))
                 .build();
 
-            // when
-            webTestClient.post()
-                .uri("/api/recipes")
+            // when & then
+            authenticatedPost("/api/recipes")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(command)
                 .exchange()
-                // then
                 .expectStatus().isBadRequest()
                 .expectBody(new ParameterizedTypeReference<BaseResponse<Void>>() {
                 })
@@ -293,13 +316,11 @@ class RecipeControllerTest extends IntegrationSupportTest {
                 ))
                 .build();
 
-            // when
-            webTestClient.post()
-                .uri("/api/recipes")
+            // when & then
+            authenticatedPost("/api/recipes")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(command)
                 .exchange()
-                // then
                 .expectStatus().isBadRequest()
                 .expectBody(new ParameterizedTypeReference<BaseResponse<Void>>() {
                 })
@@ -329,13 +350,11 @@ class RecipeControllerTest extends IntegrationSupportTest {
                 .steps(List.of())
                 .build();
 
-            // when
-            webTestClient.post()
-                .uri("/api/recipes")
+            // when & then
+            authenticatedPost("/api/recipes")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(command)
                 .exchange()
-                // then
                 .expectStatus().isBadRequest()
                 .expectBody(new ParameterizedTypeReference<BaseResponse<Void>>() {
                 })
@@ -370,13 +389,11 @@ class RecipeControllerTest extends IntegrationSupportTest {
                 ))
                 .build();
 
-            // when
-            webTestClient.post()
-                .uri("/api/recipes")
+            // when & then
+            authenticatedPost("/api/recipes")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(command)
                 .exchange()
-                // then
                 .expectStatus().isBadRequest()
                 .expectBody(new ParameterizedTypeReference<BaseResponse<Void>>() {
                 })
@@ -420,13 +437,11 @@ class RecipeControllerTest extends IntegrationSupportTest {
                 .tips("우리는 시간이 길수록 진한 맛이 납니다.")
                 .build();
 
-            // when
-            webTestClient.post()
-                .uri("/api/recipes")
+            // when & then
+            authenticatedPost("/api/recipes")
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(command)
                 .exchange()
-                // then
                 .expectStatus().isCreated()
                 .expectBody(new ParameterizedTypeReference<BaseResponse<RecipeResponse>>() {
                 })
@@ -461,11 +476,9 @@ class RecipeControllerTest extends IntegrationSupportTest {
         @Test
         @DisplayName("기본 페이징으로 레시피 목록을 조회한다")
         void getAllRecipesWithDefaultPaging() {
-            // when
-            webTestClient.get()
-                .uri("/api/recipes")
+            // when & then
+            authenticatedGet("/api/recipes")
                 .exchange()
-                // then
                 .expectStatus().isOk()
                 .expectBody(
                     new ParameterizedTypeReference<BaseResponse<PageResponse<RecipeSummaryResponse>>>() {
@@ -485,13 +498,21 @@ class RecipeControllerTest extends IntegrationSupportTest {
         }
 
         @Test
+        @DisplayName("인증 없이 레시피 목록 조회 시 401 Unauthorized를 반환한다")
+        void getAllRecipesWithoutAuthenticationReturns401() {
+            // when & then
+            webTestClient.get()
+                .uri("/api/recipes")
+                .exchange()
+                .expectStatus().isUnauthorized();
+        }
+
+        @Test
         @DisplayName("페이지 크기를 지정하여 레시피 목록을 조회한다")
         void getAllRecipesWithCustomPageSize() {
-            // when
-            webTestClient.get()
-                .uri("/api/recipes?page=0&size=2")
+            // when & then
+            authenticatedGet("/api/recipes?page=0&size=2")
                 .exchange()
-                // then
                 .expectStatus().isOk()
                 .expectBody(
                     new ParameterizedTypeReference<BaseResponse<PageResponse<RecipeSummaryResponse>>>() {
@@ -512,11 +533,9 @@ class RecipeControllerTest extends IntegrationSupportTest {
         @Test
         @DisplayName("정렬 조건을 지정하여 레시피 목록을 조회한다")
         void getAllRecipesWithSorting() {
-            // when
-            webTestClient.get()
-                .uri("/api/recipes?sort=createdAt:desc")
+            // when & then
+            authenticatedGet("/api/recipes?sort=createdAt:desc")
                 .exchange()
-                // then
                 .expectStatus().isOk()
                 .expectBody(
                     new ParameterizedTypeReference<BaseResponse<PageResponse<RecipeSummaryResponse>>>() {
@@ -534,11 +553,9 @@ class RecipeControllerTest extends IntegrationSupportTest {
         void returnEmptyListWhenNoRecipesExist() {
             cleanUpRecipes();
 
-            // when
-            webTestClient.get()
-                .uri("/api/recipes")
+            // when & then
+            authenticatedGet("/api/recipes")
                 .exchange()
-                // then
                 .expectStatus().isOk()
                 .expectBody(
                     new ParameterizedTypeReference<BaseResponse<PageResponse<RecipeSummaryResponse>>>() {
@@ -554,11 +571,9 @@ class RecipeControllerTest extends IntegrationSupportTest {
         @Test
         @DisplayName("페이지 번호가 범위를 벗어나도 빈 목록을 정상 반환한다")
         void returnEmptyListWhenPageOutOfRange() {
-            // when
-            webTestClient.get()
-                .uri("/api/recipes?page=10&size=10")
+            // when & then
+            authenticatedGet("/api/recipes?page=10&size=10")
                 .exchange()
-                // then
                 .expectStatus().isOk()
                 .expectBody(
                     new ParameterizedTypeReference<BaseResponse<PageResponse<RecipeSummaryResponse>>>() {
@@ -568,6 +583,142 @@ class RecipeControllerTest extends IntegrationSupportTest {
                     assertThat(response.success()).isTrue();
                     assertThat(response.data()).isNotNull();
                     assertThat(response.data().content()).isEmpty();
+                });
+        }
+    }
+
+    @Nested
+    @DisplayName("레시피 수정")
+    class UpdateRecipeTest {
+
+        private Long recipeId;
+
+        @BeforeEach
+        void setUp() {
+            recipeId = createRecipe().id();
+        }
+
+        @Test
+        @DisplayName("레시피를 정상적으로 수정할 수 있다")
+        void updateRecipeSuccessfully() {
+            // given
+            UpdateRecipeCommand command = UpdateRecipeCommand.builder()
+                .title("수정된 레시피 제목")
+                .description("수정된 설명")
+                .serving(2)
+                .build();
+
+            // when & then
+            authenticatedPut("/api/recipes/{recipeId}", recipeId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(command)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(new ParameterizedTypeReference<BaseResponse<RecipeResponse>>() {
+                })
+                .value(response -> {
+                    assertThat(response.success()).isTrue();
+                    assertThat(response.data()).isNotNull();
+                    RecipeResponse data = response.data();
+                    assertAll(
+                        () -> assertThat(data.title()).isEqualTo("수정된 레시피 제목"),
+                        () -> assertThat(data.description()).isEqualTo("수정된 설명"),
+                        () -> assertThat(data.serving()).isEqualTo(2),
+                        () -> assertThat(data.updatedAt()).isNotNull()
+                    );
+                });
+        }
+
+        @Test
+        @DisplayName("인증 없이 레시피 수정 시 401 Unauthorized를 반환한다")
+        void updateRecipeWithoutAuthenticationReturns401() {
+            // given
+            UpdateRecipeCommand command = UpdateRecipeCommand.builder()
+                .title("수정된 레시피 제목")
+                .build();
+
+            // when & then
+            webTestClient.put()
+                .uri("/api/recipes/{recipeId}", recipeId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(command)
+                .exchange()
+                .expectStatus().isUnauthorized();
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 레시피를 수정하면 실패한다")
+        void failToUpdateNonExistentRecipe() {
+            // given
+            UpdateRecipeCommand command = UpdateRecipeCommand.builder()
+                .title("없는 레시피")
+                .build();
+
+            // when & then
+            authenticatedPut("/api/recipes/{recipeId}", 99999L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(command)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(new ParameterizedTypeReference<BaseResponse<Void>>() {
+                })
+                .value(response -> {
+                    assertThat(response.success()).isFalse();
+                    assertThat(response.message()).contains("레시피를 찾을 수 없습니다. ID: 99999");
+                });
+        }
+    }
+
+    @Nested
+    @DisplayName("레시피 삭제")
+    class DeleteRecipeTest {
+
+        private Long recipeId;
+
+        @BeforeEach
+        void setUp() {
+            // 테스트용 레시피 하나 등록 후 ID 확보
+            recipeId = createRecipe().id();
+        }
+
+        @Test
+        @DisplayName("레시피를 정상적으로 삭제할 수 있다")
+        void deleteRecipeSuccessfully() {
+            // when & then
+            authenticatedDelete("/api/recipes/{recipeId}", recipeId)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(new ParameterizedTypeReference<BaseResponse<DeleteRecipeResponse>>() {
+                })
+                .value(response -> {
+                    assertThat(response.success()).isTrue();
+                    assertThat(response.data()).isNotNull();
+                    assertThat(response.data().recipeId()).isEqualTo(recipeId);
+                });
+        }
+
+        @Test
+        @DisplayName("인증 없이 레시피 삭제 시 401 Unauthorized를 반환한다")
+        void deleteRecipeWithoutAuthenticationReturns401() {
+            // when & then
+            webTestClient.delete()
+                .uri("/api/recipes/{recipeId}", recipeId)
+                .exchange()
+                .expectStatus().isUnauthorized();
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 레시피를 삭제하면 실패한다")
+        void failToDeleteNonExistentRecipe() {
+            // when & then
+            authenticatedDelete("/api/recipes/{recipeId}", 99999L)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(new ParameterizedTypeReference<BaseResponse<Void>>() {
+                })
+                .value(response -> {
+                    assertThat(response.success()).isFalse();
+                    assertThat(response.message()).contains("레시피를 찾을 수 없습니다. ID: 99999");
                 });
         }
     }

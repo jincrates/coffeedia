@@ -8,6 +8,7 @@ import io.coffeedia.application.usecase.mapper.RecipeMapper;
 import io.coffeedia.domain.exception.AccessDeniedException;
 import io.coffeedia.domain.exception.RecipeNotFoundException;
 import io.coffeedia.domain.model.Recipe;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -73,7 +74,7 @@ class UpdateRecipeService implements UpdateRecipeUseCase {
             .tips(command.tips() != null ? command.tips() : existingRecipe.tips())
             .status(command.status() != null ? command.status() : existingRecipe.status())
             .createdAt(existingRecipe.createdAt())
-            .updatedAt(java.time.LocalDateTime.now())
+            .updatedAt(LocalDateTime.now())
             .build();
     }
 }

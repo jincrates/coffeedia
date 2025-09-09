@@ -39,9 +39,10 @@ export enum BlendType {
 }
 
 export enum CategoryType {
-  BREW = 'BREW',
+  HAND_DRIP = 'HAND_DRIP',
   ESPRESSO = 'ESPRESSO',
-  DESSERT = 'DESSERT',
+  COLD_BREW = 'COLD_BREW',
+  MOCHA_POT = 'MOCHA_POT',
 }
 
 export enum EquipmentType {
@@ -174,6 +175,18 @@ export interface CreateStepCommand {
   description: string;
 }
 
+export interface UpdateRecipeCommand {
+  category: CategoryType;
+  title: string;
+  thumbnailUrl?: string;
+  description?: string;
+  serving: number;
+  tags: string[];
+  ingredients: CreateIngredientCommand[];
+  steps: CreateStepCommand[];
+  tips?: string;
+}
+
 // Equipment Types
 export interface EquipmentResponse {
   id: number;
@@ -195,6 +208,20 @@ export interface CreateEquipmentCommand {
   description?: string;
   buyDate?: string;
   buyUrl?: string;
+}
+
+export interface UpdateEquipmentCommand {
+  type: EquipmentType;
+  name: string;
+  brand: string;
+  description?: string;
+  buyDate?: string;
+  buyUrl?: string;
+}
+
+export interface DeleteEquipmentResponse {
+  id: number;
+  message: string;
 }
 
 // Search Query Types

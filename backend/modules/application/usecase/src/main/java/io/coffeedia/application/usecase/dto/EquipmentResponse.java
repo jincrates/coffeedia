@@ -9,7 +9,7 @@ import lombok.Builder;
 
 @Builder
 public record EquipmentResponse(
-    Long id,
+    Long equipmentId,
     EquipmentType type,
     String name,
     String brand,

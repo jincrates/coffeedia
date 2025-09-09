@@ -7,6 +7,7 @@ import io.coffeedia.infrastructure.persistence.jpa.entity.EquipmentJpaEntity;
 import io.coffeedia.infrastructure.persistence.jpa.mapper.EquipmentJpaMapper;
 import io.coffeedia.infrastructure.persistence.jpa.repository.EquipmentJpaRepository;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +27,12 @@ class EquipmentRepositoryAdapter implements EquipmentRepositoryPort {
     }
 
     @Override
+    public Optional<Equipment> findById(final Long equipmentId) {
+        return repository.findById(equipmentId)
+            .map(EquipmentJpaMapper::toDomain);
+    }
+
+    @Override
     public List<Equipment> findAll(final PageSize pageSize) {
         Pageable pageable = PageRequest.of(
             pageSize.page(),
@@ -34,5 +41,10 @@ class EquipmentRepositoryAdapter implements EquipmentRepositoryPort {
         return repository.findAllEquipments(pageable).stream()
             .map(EquipmentJpaMapper::toDomain)
             .toList();
+    }
+
+    @Override
+    public void deleteAll() {
+        repository.deleteAll();
     }
 }

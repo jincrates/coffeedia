@@ -9,9 +9,12 @@ import HomePage from '@/pages/HomePage';
 import BeansPage from '@/pages/BeansPage';
 import RecipesPage from '@/pages/RecipesPage';
 import RecipeDetailPage from '@/pages/RecipeDetailPage';
+import RecipeEditPage from '@/pages/RecipeEditPage';
 import BeanDetailPage from '@/pages/BeanDetailPage';
 import BeanEditPage from '@/pages/BeanEditPage';
 import EquipmentsPage from '@/pages/EquipmentsPage';
+import EquipmentDetailPage from '@/pages/EquipmentDetailPage';
+import EquipmentEditPage from '@/pages/EquipmentEditPage';
 
 // React Query 클라이언트 설정
 const queryClient = new QueryClient({
@@ -43,7 +46,10 @@ const App: React.FC = () => {
               <Route path="/beans/:id/edit" element={<BeanEditPage />} />
               <Route path="/recipes" element={<RecipesPage />} />
               <Route path="/recipes/:id" element={<RecipeDetailPage />} />
+              <Route path="/recipes/:id/edit" element={<RecipeEditPage />} />
               <Route path="/equipments" element={<EquipmentsPage />} />
+              <Route path="/equipments/:id" element={<EquipmentDetailPage />} />
+              <Route path="/equipments/:id/edit" element={<EquipmentEditPage />} />
               {/* 404 페이지 */}
               <Route path="*" element={
                 <div className="min-h-screen flex items-center justify-center">
