@@ -1,3 +1,18 @@
+-- 사용자 테이블 샘플 데이터 추가
+INSERT INTO users (user_id, username, email, first_name, last_name, status, created_at, updated_at)
+VALUES 
+  ('bjorn-user-id', 'bjorn', 'bjorn@coffeedia.com', 'Bjorn', 'Vinterberg', 'ACTIVE', NOW(), NOW()),
+  ('isabelle-user-id', 'isabelle', 'isabelle@coffeedia.com', 'Isabelle', 'Dahl', 'ACTIVE', NOW(), NOW()),
+  ('admin-user-id', 'admin', 'admin@coffeedia.com', 'Admin', 'User', 'ACTIVE', NOW(), NOW());
+
+-- 사용자 역할 데이터 추가
+INSERT INTO user_roles (user_id, role)
+VALUES 
+  ('bjorn-user-id', 'customer'),
+  ('isabelle-user-id', 'customer'),
+  ('isabelle-user-id', 'employee'),
+  ('admin-user-id', 'employee');
+
 -- flavors 테이블 샘플 데이터 삽입
 INSERT INTO flavors (id, name, created_at, updated_at)
 VALUES (1, '블루베리', NOW(), NOW()),
