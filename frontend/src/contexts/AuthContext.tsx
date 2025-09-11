@@ -36,31 +36,37 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        authService.initializeAuth();
+        // 저장된 토큰으로 인증 헤더 초기화
+        const hasValidToken = authService.initializeAuth();
 
-        if (authService.isAuthenticated()) {
-          // 토큰 검증
-          const isValid = await authService.validateToken();
-
-          if (isValid) {
-            // 사용자 정보 가져오기
-            const userData = await authService.getCurrentUser();
-            setUser(userData);
-            setIsAuthenticated(true);
-          } else {
-            // 토큰이 유효하지 않으면 리프레시 시도
+        if (hasValidToken) {
+          // 토큰이 만료되었는지 확인
+          if (authService.isAccessTokenExpired()) {
+            // 토큰이 만료되었으면 리프레시 시도
             const refreshToken = authService.getRefreshToken();
             if (refreshToken) {
               try {
                 await authService.refreshToken(refreshToken);
-                const userData = await authService.getCurrentUser();
-                setUser(userData);
-                setIsAuthenticated(true);
               } catch (error) {
                 // 리프레시도 실패하면 로그아웃
                 authService.clearAuth();
+                return;
               }
+            } else {
+              authService.clearAuth();
+              return;
             }
+          }
+
+          // 토큰이 유효하면 사용자 정보 가져오기
+          try {
+            const userData = await authService.getCurrentUser();
+            setUser(userData);
+            setIsAuthenticated(true);
+          } catch (error) {
+            // 사용자 정보를 가져올 수 없으면 토큰이 유효하지 않음
+            console.error('Failed to get user info:', error);
+            authService.clearAuth();
           }
         }
       } catch (error) {
@@ -74,11 +80,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
     initializeAuth();
   }, []);
 
-  // 로그인
+  // 로그인 - 올바르게 authService.login 호출
   const login = async (credentials: LoginRequest) => {
     try {
-      // 사용자 정보 가져오기
+      // 1. 로그인 API 호출 (토큰 받아오기)
+      const loginResponse = await authService.login(credentials);
+
+      // 2. 사용자 정보 가져오기
       const userData = await authService.getCurrentUser();
+
       setUser(userData);
       setIsAuthenticated(true);
 
@@ -127,22 +137,39 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
     }
   };
 
-  // 토큰 자동 갱신 설정 (선택적)
+  // 토큰 자동 갱신 설정
   useEffect(() => {
     if (!isAuthenticated) return;
 
-    // 50분마다 토큰 갱신 (토큰 만료 시간이 1시간이라고 가정)
-    const interval = setInterval(async () => {
-      const refreshToken = authService.getRefreshToken();
-      if (refreshToken) {
-        try {
-          await authService.refreshToken(refreshToken);
-        } catch (error) {
-          console.error('Token refresh failed:', error);
-          logout();
+    // 토큰 만료 5분 전에 자동 갱신
+    const checkAndRefreshToken = async () => {
+      if (authService.shouldRefreshToken()) {
+        const success = await authService.autoRefreshToken();
+        if (!success) {
+          // 토큰 갱신 실패 시 로그아웃
+          await logout();
         }
       }
-    }, 50 * 60 * 1000); // 50분
+    };
+
+    // 1분마다 토큰 만료 시간 체크
+    const interval = setInterval(checkAndRefreshToken, 60 * 1000);
+
+    return () => clearInterval(interval);
+  }, [isAuthenticated]);
+
+  // 토큰 만료 시 자동 로그아웃 감지
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    const checkTokenExpiry = () => {
+      if (authService.isAccessTokenExpired() && !authService.getRefreshToken()) {
+        logout();
+      }
+    };
+
+    // 30초마다 토큰 만료 체크
+    const interval = setInterval(checkTokenExpiry, 30 * 1000);
 
     return () => clearInterval(interval);
   }, [isAuthenticated]);

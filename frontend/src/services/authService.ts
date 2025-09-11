@@ -8,6 +8,12 @@ import {
   UserResponse
 } from '@/types/auth';
 
+// 토큰 저장 인터페이스
+interface TokenData {
+  token: string;
+  expiresAt: number; // timestamp
+}
+
 class AuthService {
   private readonly TOKEN_KEY = 'access_token';
   private readonly REFRESH_TOKEN_KEY = 'refresh_token';
@@ -18,10 +24,11 @@ class AuthService {
     const response = await api.post<BaseResponse<LoginResponse>>('/auth/login', credentials);
 
     if (response.data.success && response.data.data) {
-      const {accessToken, refreshToken, username, roles} = response.data.data;
+      const {accessToken, refreshToken, expiresIn, username, roles} = response.data.data;
 
-      // 토큰 저장
-      this.setTokens(accessToken, refreshToken);
+      // 토큰을 만료시간과 함께 저장
+      this.setTokenWithExpiry(this.TOKEN_KEY, accessToken, expiresIn);
+      this.setToken(this.REFRESH_TOKEN_KEY, refreshToken);
 
       // 사용자 정보 저장
       const user = {username, roles} as UserResponse;
@@ -54,10 +61,11 @@ class AuthService {
     } as RefreshTokenRequest);
 
     if (response.data.success && response.data.data) {
-      const {accessToken, refreshToken: newRefreshToken} = response.data.data;
+      const {accessToken, refreshToken: newRefreshToken, expiresIn} = response.data.data;
 
-      // 새 토큰 저장
-      this.setTokens(accessToken, newRefreshToken);
+      // 새 토큰을 만료시간과 함께 저장
+      this.setTokenWithExpiry(this.TOKEN_KEY, accessToken, expiresIn);
+      this.setToken(this.REFRESH_TOKEN_KEY, newRefreshToken);
 
       // Authorization 헤더 갱신
       this.setAuthHeader(accessToken);
@@ -103,20 +111,36 @@ class AuthService {
     }
   }
 
-  // 토큰 관리 메서드들
-  setTokens(accessToken: string, refreshToken: string): void {
-    localStorage.setItem(this.TOKEN_KEY, accessToken);
-    localStorage.setItem(this.REFRESH_TOKEN_KEY, refreshToken);
-  }
-
+  // Access Token 가져오기
   getAccessToken(): string | null {
-    return localStorage.getItem(this.TOKEN_KEY);
+    return this.getTokenWithExpiry(this.TOKEN_KEY);
   }
 
+  // Refresh Token 가져오기
   getRefreshToken(): string | null {
     return localStorage.getItem(this.REFRESH_TOKEN_KEY);
   }
 
+  // Access Token 만료 체크
+  isAccessTokenExpired(): boolean {
+    return this.getAccessToken() === null;
+  }
+
+  // Access Token 만료까지 남은 시간 (초)
+  getTokenTimeToExpiry(): number {
+    try {
+      const stored = localStorage.getItem(this.TOKEN_KEY);
+      if (!stored) return 0;
+
+      const tokenData: TokenData = JSON.parse(stored);
+      const timeToExpiry = Math.max(0, Math.floor((tokenData.expiresAt - Date.now()) / 1000));
+      return timeToExpiry;
+    } catch (error) {
+      return 0;
+    }
+  }
+
+  // 사용자 정보 관리
   setUser(user: UserResponse): void {
     localStorage.setItem(this.USER_KEY, JSON.stringify(user));
   }
@@ -126,6 +150,7 @@ class AuthService {
     return userStr ? JSON.parse(userStr) : null;
   }
 
+  // 인증 정보 클리어
   clearAuth(): void {
     localStorage.removeItem(this.TOKEN_KEY);
     localStorage.removeItem(this.REFRESH_TOKEN_KEY);
@@ -135,20 +160,85 @@ class AuthService {
     delete api.defaults.headers.common['Authorization'];
   }
 
+  // Bearer 토큰 헤더 설정
   setAuthHeader(token: string): void {
     api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
   }
 
-  // 초기화 - 앱 시작 시 토큰이 있으면 헤더에 설정
-  initializeAuth(): void {
+  // 초기화 - 앱 시작 시 유효한 토큰이 있으면 헤더에 설정
+  initializeAuth(): boolean {
     const token = this.getAccessToken();
     if (token) {
       this.setAuthHeader(token);
+      return true;
+    }
+    return false;
+  }
+
+  // 인증 상태 확인
+  isAuthenticated(): boolean {
+    const token = this.getAccessToken();
+    return !!token;
+  }
+
+  // 토큰 자동 갱신이 필요한지 확인 (만료 5분 전)
+  shouldRefreshToken(): boolean {
+    const timeToExpiry = this.getTokenTimeToExpiry();
+    return timeToExpiry > 0 && timeToExpiry <= 300; // 5분 = 300초
+  }
+
+  // 자동 토큰 갱신
+  async autoRefreshToken(): Promise<boolean> {
+    const refreshToken = this.getRefreshToken();
+    if (!refreshToken) {
+      return false;
+    }
+
+    try {
+      await this.refreshToken(refreshToken);
+      return true;
+    } catch (error) {
+      console.error('Auto refresh failed:', error);
+      this.clearAuth();
+      return false;
     }
   }
 
-  isAuthenticated(): boolean {
-    return !!this.getAccessToken();
+  // 토큰을 만료시간과 함께 저장
+  private setTokenWithExpiry(key: string, token: string, expiresInSeconds: number): void {
+    const expiresAt = Date.now() + (expiresInSeconds * 1000);
+    const tokenData: TokenData = {
+      token,
+      expiresAt
+    };
+    localStorage.setItem(key, JSON.stringify(tokenData));
+  }
+
+  // 일반 토큰 저장 (리프레시 토큰용)
+  private setToken(key: string, token: string): void {
+    localStorage.setItem(key, token);
+  }
+
+  // 토큰 가져오기 (만료 체크 포함)
+  private getTokenWithExpiry(key: string): string | null {
+    try {
+      const stored = localStorage.getItem(key);
+      if (!stored) return null;
+
+      const tokenData: TokenData = JSON.parse(stored);
+
+      // 토큰이 만료되었는지 확인
+      if (Date.now() >= tokenData.expiresAt) {
+        localStorage.removeItem(key);
+        return null;
+      }
+
+      return tokenData.token;
+    } catch (error) {
+      console.error('Token parsing error:', error);
+      localStorage.removeItem(key);
+      return null;
+    }
   }
 }
 
