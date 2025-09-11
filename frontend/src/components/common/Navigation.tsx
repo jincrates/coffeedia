@@ -41,31 +41,29 @@ const Navigation: React.FC = () => {
                 Coffeedia
               </Link>
 
-              {/* Navigation Links - 인증된 사용자만 표시 */}
-              {isAuthenticated && (
-                  <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-                    {navItems.map((item) => {
-                      const Icon = item.icon;
-                      const isActive = location.pathname.startsWith(item.path);
+              {/* Navigation Links - 모든 사용자에게 표시 */}
+              <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
+                {navItems.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = location.pathname.startsWith(item.path);
 
-                      return (
-                          <Link
-                              key={item.path}
-                              to={item.path}
-                              className={cn(
-                                  'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors',
-                                  isActive
-                                      ? 'border-coffee-500 text-coffee-600'
-                                      : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                              )}
-                          >
-                            <Icon className="h-4 w-4 mr-2"/>
-                            {item.name}
-                          </Link>
-                      );
-                    })}
-                  </div>
-              )}
+                  return (
+                      <Link
+                          key={item.path}
+                          to={item.path}
+                          className={cn(
+                              'inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors',
+                              isActive
+                                  ? 'border-coffee-500 text-coffee-600'
+                                  : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                          )}
+                      >
+                        <Icon className="h-4 w-4 mr-2"/>
+                        {item.name}
+                      </Link>
+                  );
+                })}
+              </div>
             </div>
 
             {/* 우측 메뉴 */}

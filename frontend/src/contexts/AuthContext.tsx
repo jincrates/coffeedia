@@ -8,7 +8,7 @@ interface AuthContextType {
   user: UserResponse | null;
   isLoading: boolean;
   login: (credentials: LoginRequest) => Promise<void>;
-  signup: (data: SignupRequest) => Promise<void>;
+  signup: (data: SignupRequest & { confirmPassword?: string }) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
 }
@@ -77,8 +77,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
   // 로그인
   const login = async (credentials: LoginRequest) => {
     try {
-      const response = await authService.login(credentials);
-
       // 사용자 정보 가져오기
       const userData = await authService.getCurrentUser();
       setUser(userData);
@@ -93,7 +91,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({children}) => {
   };
 
   // 회원가입
-  const signup = async (data: SignupRequest) => {
+  const signup = async (data: SignupRequest & { confirmPassword?: string }) => {
     try {
       await authService.signup(data);
       toast.success('회원가입이 완료되었습니다. 로그인해주세요.');

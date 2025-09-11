@@ -4,7 +4,6 @@ import {useForm} from 'react-hook-form';
 import {yupResolver} from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import {useAuth} from '@/contexts/AuthContext';
-import {SignupRequest} from '@/types/auth';
 import {Check, Coffee, Eye, EyeOff, Loader2, X} from 'lucide-react';
 import {clsx} from 'clsx';
 
@@ -38,8 +37,13 @@ const signupSchema = yup.object({
   .oneOf([yup.ref('password')], '비밀번호가 일치하지 않습니다'),
 });
 
-interface SignupFormData extends SignupRequest {
+interface SignupFormData {
+  username: string;
+  email: string;
+  password: string;
   confirmPassword: string;
+  firstName: string;
+  lastName: string;
 }
 
 const SignupPage: React.FC = () => {
@@ -81,8 +85,8 @@ const SignupPage: React.FC = () => {
   const onSubmit = async (data: SignupFormData) => {
     setIsSubmitting(true);
     try {
-      const {confirmPassword, ...signupData} = data;
-      await signup(signupData);
+      // confirmPassword도 함께 전달 (백엔드에서 비밀번호 일치 검증)
+      await signup(data);
       navigate('/login', {
         state: {message: '회원가입이 완료되었습니다. 로그인해주세요.'}
       });
@@ -96,6 +100,11 @@ const SignupPage: React.FC = () => {
         setError('email', {
           type: 'manual',
           message: '이미 사용 중인 이메일입니다'
+        });
+      } else if (error.response?.data?.field === 'confirmPassword') {
+        setError('confirmPassword', {
+          type: 'manual',
+          message: '비밀번호가 일치하지 않습니다'
         });
       } else {
         setError('root', {

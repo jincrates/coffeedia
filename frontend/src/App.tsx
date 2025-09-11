@@ -71,16 +71,18 @@ const App: React.FC = () => {
                   {/* 홈페이지는 인증 불필요 */}
                   <Route path="/" element={<HomePage/>}/>
 
-                  {/* 보호된 라우트들 - 인증 필요 */}
+                  {/* 비회원도 접근 가능한 조회 페이지들 */}
+                  <Route path="/beans" element={<BeansPage/>}/>
+                  <Route path="/beans/:id" element={<BeanDetailPage/>}/>
+                  <Route path="/recipes" element={<RecipesPage/>}/>
+                  <Route path="/recipes/:id" element={<RecipeDetailPage/>}/>
+                  <Route path="/equipments" element={<EquipmentsPage/>}/>
+                  <Route path="/equipments/:id" element={<EquipmentDetailPage/>}/>
+
+                  {/* 인증이 필요한 등록/수정 페이지들 */}
                   <Route element={<ProtectedRoute><Outlet/></ProtectedRoute>}>
-                    <Route path="/beans" element={<BeansPage/>}/>
-                    <Route path="/beans/:id" element={<BeanDetailPage/>}/>
                     <Route path="/beans/:id/edit" element={<BeanEditPage/>}/>
-                    <Route path="/recipes" element={<RecipesPage/>}/>
-                    <Route path="/recipes/:id" element={<RecipeDetailPage/>}/>
                     <Route path="/recipes/:id/edit" element={<RecipeEditPage/>}/>
-                    <Route path="/equipments" element={<EquipmentsPage/>}/>
-                    <Route path="/equipments/:id" element={<EquipmentDetailPage/>}/>
                     <Route path="/equipments/:id/edit" element={<EquipmentEditPage/>}/>
                   </Route>
 

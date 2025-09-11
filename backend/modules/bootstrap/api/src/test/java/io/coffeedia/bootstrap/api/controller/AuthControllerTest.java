@@ -8,6 +8,8 @@ import io.coffeedia.bootstrap.api.controller.dto.BaseResponse;
 import io.coffeedia.bootstrap.api.controller.dto.auth.LoginRequest;
 import io.coffeedia.bootstrap.api.controller.dto.auth.LoginResponse;
 import io.coffeedia.bootstrap.api.controller.dto.auth.RefreshTokenRequest;
+import io.coffeedia.bootstrap.api.controller.dto.auth.SignUpRequest;
+import io.coffeedia.bootstrap.api.controller.dto.auth.SignUpResponse;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -28,6 +30,134 @@ class AuthControllerTest extends IntegrationSupportTest {
     @Sql(scripts = "/test-data.sql", executionPhase = ExecutionPhase.BEFORE_TEST_METHOD)
     void setUp() {
         // 테스트 데이터가 각 테스트 메서드 실행 전에 로드됩니다
+    }
+
+    @Nested
+    @DisplayName("회원가입 API")
+    class SignUpApiTest {
+
+        @Test
+        @DisplayName("유효한 정보로 회원가입할 수 있다")
+        void signUpWithValidData() {
+            // given
+            SignUpRequest request = new SignUpRequest(
+                "newuser",
+                "newuser@example.com",
+                "Password123!",
+                "Password123!",
+                "New",
+                "User"
+            );
+
+            // when & then
+            webTestClient.post()
+                .uri("/api/auth/signup")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(request)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectBody(new ParameterizedTypeReference<BaseResponse<SignUpResponse>>() {
+                })
+                .value(response -> {
+                    assertThat(response).isNotNull();
+                    assertThat(response.success()).isTrue();
+                    assertThat(response.data()).isNotNull();
+
+                    SignUpResponse data = response.data();
+                    assertThat(data.getUsername()).isEqualTo("newuser");
+                    assertThat(data.getEmail()).isEqualTo("newuser@example.com");
+                    assertThat(data.getFirstName()).isEqualTo("New");
+                    assertThat(data.getLastName()).isEqualTo("User");
+                    assertThat(data.getFullName()).isEqualTo("New User");
+                    assertThat(data.getId()).isNotNull();
+                });
+        }
+
+        @Test
+        @DisplayName("이미 존재하는 사용자명으로 회원가입하면 409를 반환한다")
+        void signUpWithExistingUsername() {
+            // given
+            SignUpRequest request = new SignUpRequest(
+                "bjorn", // 이미 존재하는 사용자명
+                "different@example.com",
+                "Password123!",
+                "Password123!",
+                "Different",
+                "User"
+            );
+
+            // when & then
+            webTestClient.post()
+                .uri("/api/auth/signup")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(request)
+                .exchange()
+                .expectStatus().isEqualTo(409)
+                .expectBody(new ParameterizedTypeReference<BaseResponse<Void>>() {
+                })
+                .value(response -> {
+                    assertThat(response).isNotNull();
+                    assertThat(response.success()).isFalse();
+                    assertThat(response.message()).contains("이미 존재하는 사용자명");
+                });
+        }
+
+        @Test
+        @DisplayName("비밀번호와 비밀번호 확인이 일치하지 않으면 400을 반환한다")
+        void signUpWithMismatchedPasswords() {
+            // given
+            SignUpRequest request = new SignUpRequest(
+                "testuser",
+                "testuser@example.com",
+                "Password123!",
+                "DifferentPassword123!", // 다른 비밀번호
+                "Test",
+                "User"
+            );
+
+            // when & then
+            webTestClient.post()
+                .uri("/api/auth/signup")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(request)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(new ParameterizedTypeReference<BaseResponse<Void>>() {
+                })
+                .value(response -> {
+                    assertThat(response).isNotNull();
+                    assertThat(response.success()).isFalse();
+                    assertThat(response.message()).contains("비밀번호와 비밀번호 확인이 일치하지 않습니다");
+                });
+        }
+
+        @Test
+        @DisplayName("잘못된 요청 형식으로 회원가입하면 400을 반환한다")
+        void signUpWithInvalidRequest() {
+            // given
+            SignUpRequest request = new SignUpRequest(
+                "", // 빈 사용자명
+                "invalid-email", // 잘못된 이메일 형식
+                "weak", // 약한 비밀번호
+                "weak",
+                "",
+                ""
+            );
+
+            // when & then
+            webTestClient.post()
+                .uri("/api/auth/signup")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(request)
+                .exchange()
+                .expectStatus().isBadRequest()
+                .expectBody(new ParameterizedTypeReference<BaseResponse<Void>>() {
+                })
+                .value(response -> {
+                    assertThat(response).isNotNull();
+                    assertThat(response.success()).isFalse();
+                });
+        }
     }
 
     @Nested

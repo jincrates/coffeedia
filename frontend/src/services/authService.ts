@@ -37,7 +37,7 @@ class AuthService {
   }
 
   // 회원가입
-  async signup(data: SignupRequest): Promise<UserResponse> {
+  async signup(data: SignupRequest & { confirmPassword?: string }): Promise<UserResponse> {
     const response = await api.post<BaseResponse<UserResponse>>('/auth/signup', data);
 
     if (response.data.success && response.data.data) {

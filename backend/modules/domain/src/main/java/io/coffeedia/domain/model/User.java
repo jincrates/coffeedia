@@ -1,11 +1,10 @@
 package io.coffeedia.domain.model;
 
 import io.coffeedia.domain.vo.ActiveStatus;
-import lombok.Builder;
-import lombok.Getter;
-
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.Builder;
+import lombok.Getter;
 
 /**
  * 사용자 도메인 모델
@@ -13,10 +12,11 @@ import java.util.List;
 @Getter
 @Builder
 public class User {
-    
+
     private final String id;
     private final String username;
     private final String email;
+    private final String password; // 암호화된 비밀번호
     private final String firstName;
     private final String lastName;
     private final List<String> roles;
@@ -31,7 +31,7 @@ public class User {
         if (firstName == null && lastName == null) {
             return username;
         }
-        
+
         StringBuilder fullName = new StringBuilder();
         if (firstName != null) {
             fullName.append(firstName);
@@ -42,7 +42,7 @@ public class User {
             }
             fullName.append(lastName);
         }
-        
+
         return fullName.toString();
     }
 
@@ -72,5 +72,13 @@ public class User {
      */
     public boolean isCustomer() {
         return hasRole("customer");
+    }
+
+    /**
+     * 비밀번호 검증 (암호화된 비밀번호와 비교) 주의: 이 메서드는 도메인 레이어에서 사용하지 말고, 인프라 레이어에서 PasswordEncoder를 사용하여 검증할 것
+     */
+    public boolean matchesPassword(String rawPassword,
+        java.util.function.Function<String, Boolean> passwordMatcher) {
+        return passwordMatcher.apply(rawPassword);
     }
 }

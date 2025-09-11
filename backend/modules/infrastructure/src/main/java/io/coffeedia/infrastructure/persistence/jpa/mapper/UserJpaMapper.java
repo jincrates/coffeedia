@@ -19,16 +19,17 @@ public class UserJpaMapper {
         }
 
         return User.builder()
-                .id(entity.getId())
-                .username(entity.getUsername())
-                .email(entity.getEmail())
-                .firstName(entity.getFirstName())
-                .lastName(entity.getLastName())
-                .roles(entity.getRoles())
-                .status(entity.getStatus())
-                .createdAt(entity.getCreatedAt())
-                .updatedAt(entity.getUpdatedAt())
-                .build();
+            .id(entity.getId())
+            .username(entity.getUsername())
+            .email(entity.getEmail())
+            .password(entity.getPassword())
+            .firstName(entity.getFirstName())
+            .lastName(entity.getLastName())
+            .roles(entity.getRoles())
+            .status(entity.getStatus())
+            .createdAt(entity.getCreatedAt())
+            .updatedAt(entity.getUpdatedAt())
+            .build();
     }
 
     /**
@@ -40,14 +41,15 @@ public class UserJpaMapper {
         }
 
         return UserJpaEntity.builder()
-                .id(user.getId())
-                .username(user.getUsername())
-                .email(user.getEmail())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .roles(user.getRoles())
-                .status(user.getStatus())
-                .build();
+            .id(user.getId())
+            .username(user.getUsername())
+            .email(user.getEmail())
+            .password(user.getPassword())
+            .firstName(user.getFirstName())
+            .lastName(user.getLastName())
+            .roles(user.getRoles())
+            .status(user.getStatus())
+            .build();
     }
 
     /**
@@ -59,10 +61,12 @@ public class UserJpaMapper {
         }
 
         entity.updateInfo(user.getFirstName(), user.getLastName(), user.getEmail());
+        if (user.getPassword() != null) {
+            entity.updatePassword(user.getPassword());
+        }
         entity.changeStatus(user.getStatus());
-        
+
         // 역할 업데이트
-        entity.getRoles().clear();
         if (user.getRoles() != null) {
             user.getRoles().forEach(entity::addRole);
         }

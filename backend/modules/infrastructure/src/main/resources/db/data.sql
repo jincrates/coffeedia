@@ -1,17 +1,23 @@
 -- 사용자 테이블 샘플 데이터 추가
-INSERT INTO users (user_id, username, email, first_name, last_name, status, created_at, updated_at)
-VALUES 
-  ('bjorn-user-id', 'bjorn', 'bjorn@coffeedia.com', 'Bjorn', 'Vinterberg', 'ACTIVE', NOW(), NOW()),
-  ('isabelle-user-id', 'isabelle', 'isabelle@coffeedia.com', 'Isabelle', 'Dahl', 'ACTIVE', NOW(), NOW()),
-  ('admin-user-id', 'admin', 'admin@coffeedia.com', 'Admin', 'User', 'ACTIVE', NOW(), NOW());
+-- 비밀번호는 BCrypt로 암호화되어 있음 ("password" 원문)
+INSERT INTO users (id, username, email, password, first_name, last_name, status, created_at,
+                   updated_at)
+VALUES ('bjorn-user-id', 'bjorn', 'bjorn@coffeedia.com',
+        '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi.', 'Bjorn', 'Vinterberg',
+        'ACTIVE', NOW(), NOW()),
+       ('isabelle-user-id', 'isabelle', 'isabelle@coffeedia.com',
+        '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi.', 'Isabelle', 'Dahl',
+        'ACTIVE', NOW(), NOW()),
+       ('admin-user-id', 'admin', 'admin@coffeedia.com',
+        '$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi.', 'Admin', 'User', 'ACTIVE',
+        NOW(), NOW());
 
 -- 사용자 역할 데이터 추가
-INSERT INTO user_roles (user_id, role)
-VALUES 
-  ('bjorn-user-id', 'customer'),
-  ('isabelle-user-id', 'customer'),
-  ('isabelle-user-id', 'employee'),
-  ('admin-user-id', 'employee');
+INSERT INTO user_roles (id, role)
+VALUES ('bjorn-user-id', 'customer'),
+       ('isabelle-user-id', 'customer'),
+       ('isabelle-user-id', 'employee'),
+       ('admin-user-id', 'employee');
 
 -- flavors 테이블 샘플 데이터 삽입
 INSERT INTO flavors (id, name, created_at, updated_at)
